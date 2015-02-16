@@ -6,9 +6,13 @@ class User(models.Model):
     password = models.CharField(max_length=20)
     github_id = models.CharField(max_length=30, null=True)
     join_date = models.DateField('date joined', auto_now_add=True)
-    following = models.ManyToManyField('self', blank=True)
-    followers = models.ManyToManyField('self', blank=True)
-    friends = models.ManyToManyField('self', blank=True)
+    follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False)
+
+    def __str__(self):
+        return self.email
+
+    def getFriends(self):
+        return self.follows.all() & self.followed_by.all()
 
 
 class Profile(models.Model):
@@ -17,6 +21,9 @@ class Profile(models.Model):
     profile_image = models.ImageField(blank=True, null=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.first_name + " " + self.last_name
 
 
 class Post(models.Model):
