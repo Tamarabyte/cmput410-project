@@ -37,4 +37,11 @@ class UserTestCases(TestCase):
         self.assertQuerysetEqual(a.getFriends(), ["<User: %s>" % b.email])
         self.assertQuerysetEqual(b.getFriends(), ["<User: %s>" % a.email])
 
+    def test_friend_requests(self):
+        a = mommy.make('Hindlebook.User')
+        b = mommy.make('Hindlebook.User')
+
+        self.assertQuerysetEqual(a.getFriendRequests(), [])
+        b.follows.add(a)
+        self.assertQuerysetEqual(a.getFriendRequests(), ["<User: %s>" % b.email])
 

@@ -11,8 +11,15 @@ class User(models.Model):
     def __str__(self):
         return self.email
 
+    # Two way following implies "real" friendship
     def getFriends(self):
         return self.follows.all() & self.followed_by.all()
+
+    # Those which are following me but I am not following back
+    def getFriendRequests(self):
+        A = self.followed_by.all()
+        B = self.follows.all()
+        return A.exclude(pk__in=B)
 
 
 class Profile(models.Model):
