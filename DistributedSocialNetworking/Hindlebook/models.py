@@ -1,15 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
-class User(models.Model):
-    email = models.EmailField(primary_key=True)
-    password = models.CharField(max_length=20)
+class Author(models.Model):
+    user = models.OneToOneField(User)
     github_id = models.CharField(max_length=30, null=True)
     join_date = models.DateField('date joined', auto_now_add=True)
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False)
+    profile_image = models.ImageField(blank=True, null=True)
 
     def __str__(self):
-        return self.email
+        return self.user.username
 
     # Two way following implies "real" friendship
     def getFriends(self):
@@ -21,21 +22,14 @@ class User(models.Model):
         B = self.follows.all()
         return A.exclude(pk__in=B)
 
-
-class Profile(models.Model):
-    id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User)
-    profile_image = models.ImageField(blank=True, null=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.first_name + " " + self.last_name
+    # Get my own posts
+    def getAuthoredPosts():
+        pass
 
 
 class Post(models.Model):
     id = models.AutoField(primary_key=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(Author)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
     privacy_level = models.IntegerField()
     text = models.TextField()
