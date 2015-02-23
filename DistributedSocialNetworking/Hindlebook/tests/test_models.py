@@ -1,5 +1,5 @@
 from django.test import TestCase
-from Hindlebook.models import Author, Post
+from Hindlebook.models import Author, Post, Comment
 from model_mommy import mommy
 
 
@@ -69,12 +69,12 @@ class PostTestCases(TestCase):
         pass
 
     # Test fetching own Posts
-    def test_get_own_posts(self):
-        pass
-
-    # Test fetching others Posts
-    def test_get_other_posts(self):
-        pass
+    def test_getAuthoredPosts(self):
+        self.assertQuerysetEqual(self.author2.getAuthoredPosts(),
+                                 ["<Post: %s>" % self.post1_by_a2.id])
+        self.assertQuerysetEqual(self.author1.getAuthoredPosts().order_by('id'),
+                                 ["<Post: %s>" % self.post1_by_a1.id,
+                                  "<Post: %s>" % self.post2_by_a1.id])
 
 
 class CommentTestCases(TestCase):
@@ -82,13 +82,27 @@ class CommentTestCases(TestCase):
     def setUp(self):
         self.author1 = mommy.make(Author)
         self.author2 = mommy.make(Author)
-        self.post_by_a1 = mommy.make(Post, author=self.author1)
-        self.otherpost_by_a1 = mommy.make(Post, author=self.author1)
+        self.post1_by_a1 = mommy.make(Post, author=self.author1)
+        self.post2_by_a1 = mommy.make(Post, author=self.author1)
         self.post_by_a2 = mommy.make(Post, author=self.author2)
+        self.comment_by_a2_on_post1_by_a1 = mommy.make(Comment,
+                                                       author=self.author2,
+                                                       post=self.post1_by_a1)
 
     # Test Comment creation
     def test_comment_creation(self):
-        pass
+        self.assertEquals(self.comment_by_a2_on_post1_by_a1.author.user.username,
+                          self.author2.user.username)
+
+    # Test fetching Authors Comments
+    def test_getAuthoredComments(self):
+        self.assertQuerysetEqual(self.author2.getAuthoredComments(),
+                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.id])
+
+    # Test fetching Posts Comments
+    def test_getPostsComments(self):
+        self.assertQuerysetEqual(self.post1_by_a1.getComments(),
+                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.id])
 
 
 class ImageTestCases(TestCase):

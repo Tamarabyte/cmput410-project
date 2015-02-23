@@ -23,9 +23,13 @@ class Author(models.Model):
         B = self.follows.all()
         return A.exclude(pk__in=B)
 
-    # Get my own posts
-    def getAuthoredPosts():
-        pass
+    # Get Authors own posts
+    def getAuthoredPosts(self):
+        return self.post_set.all()
+
+    # Get Authors own Comments
+    def getAuthoredComments(self):
+        return self.comment_set.all()
 
 
 class Post(models.Model):
@@ -37,19 +41,23 @@ class Post(models.Model):
     text = models.TextField()
 
     def __str__(self):
-        return str(self.text)
+        return str(self.id)
+
+    # Get the comments for this Post
+    def getComments(self):
+        return self.comment_set.all()
 
 
 class Comment(models.Model):
     """Model for representing a Comment on a Post made by an Author"""
     id = models.AutoField(primary_key=True)
     post = models.ForeignKey(Post)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(Author)
     text = models.CharField(max_length=2048)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     def __str__(self):
-        return str(self.text)
+        return str(self.id)
 
 
 class Image(models.Model):
