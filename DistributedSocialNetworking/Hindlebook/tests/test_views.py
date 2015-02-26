@@ -28,7 +28,7 @@ class APITests(TestCase):
         self.assertNotEquals(response.status_code, 404, "Received a 404 response")
         self.assertEquals(response.status_code, 200, "Friendship not retrieved Ok")
 
-        decoded = json.loads(response.content)
+        decoded = json.loads(response.content.decode('utf-8'))
 
         # Expects a JSON response similar to:
         # https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/example-article.json
@@ -55,7 +55,7 @@ class APITests(TestCase):
         self.assertNotEquals(response.status_code, 404, "Received a 404 response")
         self.assertEquals(response.status_code, 200, "Friendship not retrieved Ok")
 
-        decoded = json.loads(response.content)
+        decoded = json.loads(response.content.decode('utf-8'))
 
         # Expects a JSON response with the below values
         self.assertEquals(decoded['query'], "friends", "JSON response needs \"query\":\"friends\"")

@@ -40,7 +40,7 @@ def friendQuery(request, authorID1):
         raise Http404("Should be a POST request")
 
     # Load the POSTed data as JSON
-    JSONrequest = json.loads(request.body)
+    JSONrequest = json.loads(request.body.decode('utf-8'))
 
     # Check if valid POST data
     if (not 'author' in JSONrequest):
