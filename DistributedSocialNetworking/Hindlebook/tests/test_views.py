@@ -5,7 +5,9 @@ import json
 
 c = Client()
 
+
 class APITests(TestCase):
+    """ Test some of the GET/POST API """
 
     def setUp(self):
         self.author1 = mommy.make(Author)
@@ -22,11 +24,11 @@ class APITests(TestCase):
         self.author2.follows.add(self.author1)
 
         # Send a GET request to check if they are friends
-        response = c.get('/friends/%s/%s' %(self.author1.id, self.author2.id))
+        response = c.get('/friends/%s/%s' % (self.author1.id, self.author2.id))
 
         # Should receive a 200 Ok with a JSON response
-        self.assertNotEquals(response.status_code, 404, "Received a 404 response")
-        self.assertEquals(response.status_code, 200, "Friendship not retrieved Ok")
+        self.assertNotEquals(response.status_code, 404, "Received a 404")
+        self.assertEquals(response.status_code, 200, "Response not 200")
 
         decoded = json.loads(response.content.decode('utf-8'))
 
@@ -46,14 +48,14 @@ class APITests(TestCase):
         self.author2.follows.add(self.author1)
 
         # JSON specifying a list of authors to check friendship with author1
-        JSONdata = json.dumps({"query":"friends", "author":self.author1.id, "authors":[5, 6, 7, 2, 3]})
+        JSONdata = json.dumps({"query": "friends", "author": self.author1.id, "authors": [5, 6, 7, 2, 3]})
 
         # Send a POST request to check if author1 is friends with anyone in the authors list
-        response = c.post('/friends/%s' %self.author1.id, data=JSONdata, content_type='application/json; charset=utf')
+        response = c.post('/friends/%s' % self.author1.id, data=JSONdata, content_type='application/json; charset=utf')
 
         # Should receive a 200 Ok with a JSON response
-        self.assertNotEquals(response.status_code, 404, "Received a 404 response")
-        self.assertEquals(response.status_code, 200, "Friendship not retrieved Ok")
+        self.assertNotEquals(response.status_code, 404, "Received a 404")
+        self.assertEquals(response.status_code, 200, "Response not 200")
 
         decoded = json.loads(response.content.decode('utf-8'))
 
