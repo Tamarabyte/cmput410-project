@@ -63,6 +63,8 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'Hindlebook.User'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

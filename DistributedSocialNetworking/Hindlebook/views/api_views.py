@@ -1,15 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import Author
+from Hindlebook.models import User
 import json
-
-
-def home(request):
-    """ Handles the home URL """
-    html = "<html><body>Server is Working! - Hindlebook!</body></html>"
-
-    # Should use render() with a template in the future
-    return HttpResponse(html)
 
 
 def friend2friendQuery(request, authorID1, authorID2):
@@ -20,9 +12,9 @@ def friend2friendQuery(request, authorID1, authorID2):
 
     # Get the author objects from their given IDs, 404 if they don't exist
     try:
-        author1 = Author.objects.get(id=authorID1)
-        author2 = Author.objects.get(id=authorID2)
-    except Author.DoesNotExist:
+        author1 = User.objects.get(id=authorID1)
+        author2 = User.objects.get(id=authorID2)
+    except User.DoesNotExist:
         raise Http404("An author doesn't exist")
 
     # Check if the authors are 'real' friends
@@ -56,7 +48,7 @@ def friendQuery(request, authorID1):
 
     # Get the author object from the given ID, return 404 if it doesn't exist
     try:
-        author1 = Author.objects.get(id=authorID1)
+        author1 = User.objects.get(id=authorID1)
     except Author.DoesNotExist:
         raise Http404("Author doesn't exist")
 
@@ -65,7 +57,7 @@ def friendQuery(request, authorID1):
     # Loop through all POSTed authors, check if friends with author1
     for authorID2 in JSONrequest['authors']:
         try:
-            author2 = Author.objects.get(id=authorID2)
+            author2 = User.objects.get(id=authorID2)
             if (author2 in author1.getFriends() and
                author1 in author2.getFriends()):
                 friends.append(authorID2)
