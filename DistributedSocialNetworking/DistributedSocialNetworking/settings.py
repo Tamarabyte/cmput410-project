@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 STATIC_URL = '/static/'
 STATIC_ROOT = '/home/www/hindlebook/static/'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'starfall/static'),
+    os.path.join(BASE_DIR, 'Hindlebook/static'),
 )
 
 LOGIN_URL = 'login'
