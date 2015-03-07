@@ -3,7 +3,7 @@
 
 {% block content %}
 <h1>{{fname}} {{lname}}'s Profile </h1>
-	<form method="POST" action="./{{author}}">
+	<form method="POST" action="./{{author}}/sendPost">
 					 {% csrf_token %}
 		      {{form}}
 		      <!-- Submit Button -->
