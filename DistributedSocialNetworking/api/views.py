@@ -1,7 +1,6 @@
 from django.shortcuts import render, render_to_response
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from main.modles import Link
 from Hindlebook.models import User
 import json
 
