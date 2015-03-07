@@ -9,8 +9,8 @@ import json
 
 def profileQuery(request, authorID1):
 	""" Handles requesting a user profile """
-	if (request.method == "PUT"):
-		raise Http404("Should be a GET or POST request")
+	if (request.method != "GET"):
+		raise Http404("Should be a GET request")
 	
 
 	try:
@@ -30,15 +30,15 @@ def profileQuery(request, authorID1):
 
 	return render_to_response("profile.html",{'posts':posts,'form':form,'author':authorID1,'fname':user.first_name,'lname':user.last_name},context)
 	
-def sendPost(request, authorID1):
+def statusUpdate(request, authorID1):
 	""" Handles status update posts"""
 	if (request.method != "POST"):
 		raise Http404("Should be a POST")
 	
-	print(request.body)
-
+	posttext = request.POST.get("post_text","")
+	newpost = Post(author_id = authorID1, text=posttext)
+	newpost.save()
 	context = RequestContext(request)
 
-	
-	
+	return redirect("/profile/"+authorID1)
 	
