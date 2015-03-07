@@ -7,15 +7,15 @@ import json
 def friend2friendQuery(request, authorID1, authorID2):
     """ Handles friend2friend querying via GET """
     if (request.method != "GET"):
-        # Should raise a better error
-        raise Http404("Should be a GET request")
+        # Raises a 405, Method not allowed
+        return HttpResponse(status=405)
 
     # Get the author objects from their given IDs, 404 if they don't exist
     try:
         author1 = User.objects.get(id=authorID1)
         author2 = User.objects.get(id=authorID2)
     except User.DoesNotExist:
-        raise Http404("An author doesn't exist")
+        return HttpResponse(status=404)
 
     # Check if the authors are 'real' friends
     if (author2 in author1.getFriends() and author1 in author2.getFriends()):
@@ -32,25 +32,25 @@ def friend2friendQuery(request, authorID1, authorID2):
 def friendQuery(request, authorID1):
     """ Handles friend querying via POST with JSON """
     if (request.method != "POST"):
-        # Should raise a better error
-        raise Http404("Should be a POST request")
+        # Raises a 405, Method Not Allowed
+        return HttpResponse(status=405)
 
     # Load the POSTed data as JSON
     JSONrequest = json.loads(request.body.decode('utf-8'))
 
-    # Check if valid POST data
+    # Check if valid POST data, return Bad Request
     if ('author' not in JSONrequest):
-        raise Http404("Missing author ID")
+        return HttpResponse(status=400)
     elif ('authors' not in JSONrequest):
-        raise Http404("Missing author list")
+        return HttpResponse(status=400)
     elif (str(authorID1) != str(JSONrequest['author'])):
-        raise Http404("Inconsistent author ID")
+        return HttpResponse(status=400)
 
     # Get the author object from the given ID, return 404 if it doesn't exist
     try:
         author1 = User.objects.get(id=authorID1)
     except Author.DoesNotExist:
-        raise Http404("Author doesn't exist")
+        return HttpResponse(status=404)
 
     friends = []
 
@@ -62,8 +62,39 @@ def friendQuery(request, authorID1):
                author1 in author2.getFriends()):
                 friends.append(authorID2)
         except:
-            # Maybe throw 404 if the POST author list contains an invalid ID??
+            # Silently ignore author IDs which don't exist
             pass
 
     # Return a JSON object based from https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/example-article.json
     return JsonResponse({"query": "friends", "author": authorID1, "friends": friends})
+
+
+def friendRequest(request):
+    """ Handles friend request via POST with JSON """
+    if (request.method != "POST"):
+        # Raises a 405, Method not allowed
+        return HttpResponse(status=405)
+
+    # Load the POSTed data as JSON
+    JSONrequest = json.loads(request.body.decode('utf-8'))
+
+    # If
+    if ('author' not in JSONrequest or 'id' not in JSONrequest['author']):
+        return HttpResponse(status=400)
+    elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+        return HttpResponse(status=400)
+
+    authorID = JSONrequest['author']['id']
+    friendID = JSONrequest['friend']['id']
+
+    try:
+        author = User.objects.get(id=authorID)
+        friend = User.objects.get(id=friendID)
+
+        # Don't send repeated friend requests
+        if (friend not in author.getFriendRequests()):
+            author.follows.add(friend)
+    except:
+        return HttpResponse(status=404)
+
+    return HttpResponse(status=200)

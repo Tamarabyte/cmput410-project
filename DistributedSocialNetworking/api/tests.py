@@ -27,7 +27,6 @@ class APITests(TestCase):
         response = c.get('/api/friends/%s/%s' % (self.author1.id, self.author2.id))
 
         # Should receive a 200 Ok with a JSON response
-        self.assertNotEquals(response.status_code, 404, "Received a 404")
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         decoded = json.loads(response.content.decode('utf-8'))
@@ -53,14 +52,33 @@ class APITests(TestCase):
         # Send a POST request to check if author1 is friends with anyone in the authors list
         response = c.post('/api/friends/%s' % self.author1.id, data=JSONdata, content_type='application/json; charset=utf')
 
-        # Should receive a 200 Ok with a JSON response
+        # Expects a 200 Ok with a JSON response
         self.assertNotEquals(response.status_code, 404, "Received a 404")
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         decoded = json.loads(response.content.decode('utf-8'))
 
-        # Expects a JSON response with the below values
+        # Expects a JSON response with these values
         self.assertEquals(decoded['query'], "friends", "JSON response needs \"query\":\"friends\"")
         self.assertEquals(decoded['author'], str(self.author1.id), "Author has incorrect ID")
         self.assertEquals(len(decoded['friends']), 1, "Author should have exactly one friend")
         self.assertEquals(decoded['friends'][0], self.author2.id, "Authors are not friends but they should be")
+
+    def testFriendRequest(self):
+        """ Send a friend request """
+        authorID1 = str(self.author1.id)
+        authorID2 = str(self.author2.id)
+
+        # The JSON data to be POSTed
+        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1"},
+                               "friend": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2",
+                                          "url": "http://127.0.0.1:8000/author/"+authorID2}})
+
+        # POST the friend request
+        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+
+        # Expect a 200 Ok
+        self.assertEquals(response.status_code, 200, "Response not 200")
+
+        # Author1 should now be following Author2
+        self.assertTrue(self.author2 in self.author1.follows.all())
