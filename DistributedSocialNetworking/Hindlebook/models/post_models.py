@@ -6,11 +6,28 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
     text = models.TextField()
     pub_date = models.DateTimeField('date published', auto_now_add=True)
+		
+	# Edited by Rob Hackman March 7th
+	# Added field for privacy on posts, privacy settings are as follows
+	# 0 - Private to me
+	# 1 - Private to one other author
+	# 2 - Private to my friends
+	# 3 - Private to friends of friends
+	# 4 - private to friends on my host
+	# 5 - Public
+    privacy_choices = ((0,"Self Only"),
+					    (1,"Selected author"),
+					    (2,"Friends"),
+					    (3,"Friends of Friends"),
+					    (4,"Friends on host"),
+					    (5,"Public"))
+    privacy = models.IntegerField(default=5,max_length=1,choices=privacy_choices)
+	# Need to add some way to specify for privacy setting 1 who the other author is
 
     def __str__(self):
-				# Edited by Rob Hackman March 7th 
-				# Ultimately this should probably return some sort of HTML
-				# for displaying the post in case it's  got a picture etc.
+		# Edited by Rob Hackman March 7th 
+		# Ultimately this should probably return some sort of HTML
+		# for displaying the post in case it's  got a picture etc.
         return str(self.text)
 
     # Get the comments for this Post

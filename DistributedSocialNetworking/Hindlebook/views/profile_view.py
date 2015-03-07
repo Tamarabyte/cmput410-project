@@ -36,7 +36,7 @@ def statusUpdate(request, authorID1):
 		raise Http404("Should be a POST")
 	
 	posttext = request.POST.get("post_text","")
-	newpost = Post(author_id = authorID1, text=posttext)
+	newpost = Post(author_id = authorID1, text=posttext,privacy=request.POST.get("post_privacy"))
 	newpost.save()
 	context = RequestContext(request)
 
