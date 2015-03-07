@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from Hindlebook.models import Author
+from Hindlebook.models import User
 from model_mommy import mommy
 import json
 
@@ -10,11 +10,11 @@ class APITests(TestCase):
     """ Test some of the GET/POST API """
 
     def setUp(self):
-        self.author1 = mommy.make(Author)
-        self.author2 = mommy.make(Author)
+        self.author1 = mommy.make(User)
+        self.author2 = mommy.make(User)
 
     def tearDown(self):
-        Author.objects.all().delete()
+        User.objects.all().delete()
 
     def testFriend2FriendGetQuery(self):
         """Check if 2 authors are friends via GET"""
