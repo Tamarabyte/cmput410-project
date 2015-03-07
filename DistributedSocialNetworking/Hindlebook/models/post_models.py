@@ -15,7 +15,13 @@ class Post(models.Model):
 	# 3 - Private to friends of friends
 	# 4 - private to friends on my host
 	# 5 - Public
-    privacy = models.IntegerField(default=5)
+    privacy_choices = ((0,"Self Only"),
+					    (1,"Selected author"),
+					    (2,"Friends"),
+					    (3,"Friends of Friends"),
+					    (4,"Friends on host"),
+					    (5,"Public"))
+    privacy = models.IntegerField(default=5,max_length=1,choices=privacy_choices)
 	# Need to add some way to specify for privacy setting 1 who the other author is
 
     def __str__(self):
