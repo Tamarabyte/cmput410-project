@@ -1,0 +1,88 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.navbar-default {
+    border-color: #dd4814;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  background-color: #dd4814;
+}
+
+body {
+    margin-top: 70px;
+    margin-bottom: 60px;
+}
+
+.form-buttons {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.trailing {
+    text-align: right;
+}
+
+.navbar-brand {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.well {
+    background-color: #fefefe;
+    margin-bottom: 8px;
+    padding-top: 40px;
+    padding-bottom: 30px;
+    border: 1px solid #F2CEC2;
+}
+
+.form-control {
+    border: 1px solid #F2CEC2;
+}
+
+.form-control:focus {
+    border: 1px solid #F7AB92;
+    box-shadow: inset 0 1px 1px rgba(236,150,124,.075), 0 0 8px rgba(236, 150, 124, 0.45);
+      
+}
+
+.vertical-center {
+  min-height: 70%;  /* Fallback for browsers do NOT support vh unit */
+  min-height: 70vh;
+
+  display: flex;
+  align-items: center;
+}
+
+header {
+    font-size: 40px;
+    color: #dd4814;
+}
+
+.btn-ex-lg {
+    padding: 8px 20px;
+    font-size: 24px;
+    line-height: 1.333;
+    border-radius: 6px;
+}
+
+.control-label {
+    font-size: larger;
+    font-weight: normal;
+}
+
+.error-container {
+    padding-right: 15px;
+    text-align: right;
+}
+
+.error {
+    color: #b94a48;
+}
+

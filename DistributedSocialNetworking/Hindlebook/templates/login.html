@@ -1,0 +1,35 @@
+{% extends "base_login.html" %}
+{% load staticfiles %}
+
+{% block header %}Hindleb <i class="title-img icon-glasses"></i> k{% endblock %}
+
+{% block form %}
+
+    <form method="post" action=".">
+        
+        {% csrf_token %}
+        <fieldset>
+            {{ form.as_bootstrap_form }}
+        </fieldset>
+        
+        <!-- Submit Button -->
+        <div class="form-buttons col-lg-12">
+          <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
+            <i class="icon-rocket2"></i> login
+          </button>
+       </div>
+        
+        <div class="clearfix"></div>
+        <!-- /Submit Button -->
+        
+        <input type="hidden" name="next" value="{{ next }}" />
+    
+    </form>
+    
+{% endblock %}
+        
+{% block trailing %}
+    <div class="trailing">
+        <a href="/forgot/password">forgot password?</a> / <a href="/register" class="help-link">register</a>
+    </div>
+{% endblock %}

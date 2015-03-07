@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# Komodo project file
+*.komodoproject
+
 # C extensions
 *.so
 

@@ -1,0 +1,1 @@
+from Hindlebook.forms.auth_forms import LoginForm

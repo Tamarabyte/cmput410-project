@@ -26,6 +26,15 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+STATIC_URL = '/static/'
+STATIC_ROOT = '/home/www/hindlebook/static/'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'starfall/static'),
+)
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'stream'
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -36,7 +45,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Hindlebook',
-    'rest_framework',
     'api'
 )
 
