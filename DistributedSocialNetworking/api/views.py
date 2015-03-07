@@ -72,8 +72,6 @@ def friendQuery(request, authorID1):
 
     # Return a JSON object based from https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/example-article.json
     return JsonResponse({"query": "friends", "author": authorID1, "friends": friends})
-<<<<<<< HEAD
-=======
 
 
 def friendRequest(request):
@@ -113,4 +111,4 @@ def friendRequest(request):
         return HttpResponse(status=404)
 
     return HttpResponse(status=200)
->>>>>>> 7702525c639ec8deaa6778df1251e8aab3abfd8d
+
