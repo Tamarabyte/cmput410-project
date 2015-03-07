@@ -1,0 +1,12 @@
+.well {
+    background-color: #fefefe;
+    margin-bottom: 8px;
+    padding-top: 40px;
+    padding-bottom: 30px;
+    border: 1px solid #F2CEC2;
+}
+
+body {
+    margin-top: 70px;
+    margin-bottom: 60px;
+}

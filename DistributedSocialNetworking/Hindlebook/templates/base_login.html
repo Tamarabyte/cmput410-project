@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{% static "css/base_login.css" %}">
+{% endblock %}
+
 {% block content %}
-    
+
     <div class="container vertical-center">
         <div class="row col-lg-6 col-md-8 col-sm-12 col-xs-12">
-    
+
             <!-- Django Messages -->
            {% if messages %}
                {% for message in messages %}
@@ -16,16 +20,16 @@
                {% endfor %}
            {% endif %}
            <!-- /Django Messages -->
-           
+
            <header class="section-header">{% block header %}{% endblock header %}</header>
-  
+
            <div class="well well-lg">
                {% block form %}{% endblock form %}
            </div> <!-- /panel -->
-           
+
            {% block trailing %}{% endblock trailing %}
-           
+
         </div> <!-- row -->
     </div> <!-- container -->
-    
+
 {% endblock content %}

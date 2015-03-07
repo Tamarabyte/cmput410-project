@@ -52,13 +52,21 @@
 			<div class="row">
 				<div class="col-md-2 col-sm-2"><img src="{% static "{{ post.author.avatar" %}"  height="100"></img></div>
 				<div class="col-md-10 col-sm-10">
-					<div class="row">{{ post.author.username }}</div>
+					<div class="row"><h4>{{ post.author.first_name }} {{ post.author.last_name }}</h4></div>
 					<div class="row">{{post.pub_date }}</div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12 col-sm-12">{{ post.text }}</div>
 			</div>
+			{% for comment in post.getComments %}
+			<div class="row">
+				<div class="well">
+					<div class="row"><h4>{{ comment.author.first_name }} {{ comment.author.last_name }}</h4></div>
+					<div class="row">{{ comment.text}}</div>
+				</div>
+			</div>
+			{% endfor %}
 		</div>
 	</div>
 	{% endfor %}
