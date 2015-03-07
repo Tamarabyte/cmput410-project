@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
+from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
+from main.modles import Link
 from Hindlebook.models import User
 import json
 
@@ -27,6 +29,7 @@ def friend2friendQuery(request, authorID1, authorID2):
     # Hindle's format specifies "friends":[id1, id2], and also "friends":"YES"
     # Does this make more sense: "authors":[id1, id2], and "friends":"YES"??
     return JsonResponse({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
+
 
 
 def friendQuery(request, authorID1):

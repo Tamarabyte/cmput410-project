@@ -1,0 +1,30 @@
+{% extends "base_login.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<h1>{{fname}} {{lname}}'s Profile </h1>
+	<form method="POST" action="./{{author}}">
+					 {% csrf_token %}
+		      {{form}}
+		      <!-- Submit Button -->
+		      <div class="form-buttons col-lg-12">
+		        <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
+		          <i class="icon-rocket2"></i> Post
+		        </button>
+		     </div>
+		      
+		      <div class="clearfix"></div>
+		      <!-- /Submit Button -->
+		      
+		      <input type="hidden" name="next" value="{{ next }}" />
+		  
+	  </form>
+
+<div class="Test" style="text-align: center">HERE ARE SOME POSTS</div>
+<ul>
+{%for p in posts %}
+	<li>{{ p }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

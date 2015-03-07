@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # Pre-login URLS
     url(r'^$', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
     url(r'^stream$', login_required(TemplateView.as_view(template_name='placeholder.html')), name="stream"),
+		url(r'^profile/(?P<authorID1>[0-9]+)/sendpost', 'Hindlebook.views.sendPost', name='sendPost'),
+		url(r'^profile/(?P<authorID1>[0-9]+)', 'Hindlebook.views.profileQuery', name='profileQuery'),
     
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
@@ -15,4 +17,5 @@ urlpatterns = patterns('',
 
     # Admin Site
     url(r'^admin/', include(admin.site.urls)),
+
 )

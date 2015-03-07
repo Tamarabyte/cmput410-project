@@ -8,7 +8,10 @@ class Post(models.Model):
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     def __str__(self):
-        return str(self.id)
+				# Edited by Rob Hackman March 7th 
+				# Ultimately this should probably return some sort of HTML
+				# for displaying the post in case it's  got a picture etc.
+        return str(self.text)
 
     # Get the comments for this Post
     def getComments(self):
