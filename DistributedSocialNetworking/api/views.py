@@ -43,6 +43,8 @@ def friendQuery(request, authorID1):
         return HttpResponse(status=400)
     elif ('authors' not in JSONrequest):
         return HttpResponse(status=400)
+    elif (type(JSONrequest['authors']) is not list):
+        return HttpResponse(status=400)
     elif (str(authorID1) != str(JSONrequest['author'])):
         return HttpResponse(status=400)
 
@@ -78,10 +80,18 @@ def friendRequest(request):
     # Load the POSTed data as JSON
     JSONrequest = json.loads(request.body.decode('utf-8'))
 
-    # If
-    if ('author' not in JSONrequest or 'id' not in JSONrequest['author']):
+    # Check for valid JSON syntax
+    if ('author' not in JSONrequest):
+        return HttpResponse(status=400)
+    elif (type(JSONrequest['author']) is not dict):
+        return HttpResponse(status=400)
+    elif ('id' not in JSONrequest['author']):
         return HttpResponse(status=400)
     elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+        return HttpResponse(status=400)
+    elif (type(JSONrequest['friend']) is not dict):
+        return HttpResponse(status=400)
+    elif ('id' not in JSONrequest['friend']):
         return HttpResponse(status=400)
 
     authorID = JSONrequest['author']['id']
