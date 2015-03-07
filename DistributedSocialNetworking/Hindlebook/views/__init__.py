@@ -1,1 +1,1 @@
-from Hindlebook.views.login_views import login
+from Hindlebook.views.stream_view import stream
