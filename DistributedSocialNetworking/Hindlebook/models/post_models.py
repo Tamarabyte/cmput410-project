@@ -17,7 +17,7 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """Model for representing a Comment on a Post made by an Author"""
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, related_name="comments")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="comments")
     text = models.CharField(max_length=2048)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
@@ -32,4 +32,3 @@ class Image(models.Model):
     image = models.ImageField(null=False)
     date_added = models.DateTimeField(auto_now_add=True)
 
-    
