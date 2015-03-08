@@ -1,4 +1,4 @@
-from django.shortcuts import render, render_to_response,redirect
+from django.shortcuts import render, render_to_response, redirect
 from django.template import Template, RequestContext
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
 from Hindlebook.models import Post, User
@@ -15,6 +15,7 @@ class ProfileView(TemplateView):
     fname = ""
     lname = ""
     author = None
+
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -55,46 +56,5 @@ class ProfileView(TemplateView):
         if (username == user.username):
             self.template_name = "selfProfile.html"
         return [self.template_name]
-
-"""
-    @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
-"""
-"""
-def profileQuery(request, authorID1):
-
-	if (request.method != "GET"):
-		raise Http404("Should be a GET request")
-	
-
-	try:
-		profile = User.objects.get(id=authorID1)
-	except User.DoesNotExist:
-		raise Http404("User does not exist")
-
-	context = RequestContext(request)
-	form = PostForm()
-	posts = Post.objects.filter(author_id=authorID1)
-	user = User.objects.filter(id=authorID1).first()
-	
-	if (request.method == 'POST'):
-		posttext = request.POST.get("post_text","")
-		newpost = Post(author_id = authorID1, text=posttext)
-		newpost.save()
-
-	return render_to_response("profile.html",{'posts':posts,'form':form,'author':authorID1,'fname':user.first_name,'lname':user.last_name},context)
-	
-def statusUpdate(request, authorID1):
-
-	if (request.method != "POST"):
-		raise Http404("Should be a POST")
-	
-	posttext = request.POST.get("post_text","")
-	newpost = Post(author_id = authorID1, text=posttext,privacy=request.POST.get("post_privacy"))
-	newpost.save()
-	context = RequestContext(request)
-
-	return redirect("/profile/"+authorID1)
-"""
 
 
