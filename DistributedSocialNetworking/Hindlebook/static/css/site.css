@@ -73,3 +73,9 @@ header {
     color: #b94a48;
 }
 
+.badge {
+    background-color: #444;
+    padding: 3px 4px;
+    
+}
+

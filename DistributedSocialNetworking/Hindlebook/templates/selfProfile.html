@@ -1,10 +1,13 @@
-{% extends "base_login.html" %}
+{% extends "profile_header.html" %}
 {% load staticfiles %}
 
-{% block content %}
-<h1>{{fname}} {{lname}}'s Profile </h1>
+{% block buttons %} 
+<div class="row-1"><span class="icon-kub-cog"></span></div>
+<div class="row-2"><span class="icon-kub-avatar-02"></span></div> 
+<div class="row-3"><a href="#"><span class="badge">{{notification_count}}</span></a></div>
+{% endblock %}
 
-
+{% block profile %}
 
 <div class="Test" style="text-align: center">HERE ARE SOME POSTS</div>
 	{% for post in posts %}
