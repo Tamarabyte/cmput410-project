@@ -12,3 +12,5 @@
 [ ] friend requests can be made by POSTing a friend request to service/friendrequest  
 [ ] service/author/posts (posts that are visible to the currently authenticated user)   
 [ ] service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)  
+
+[ ] [Login Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#login)  
