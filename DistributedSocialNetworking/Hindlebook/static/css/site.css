@@ -89,13 +89,6 @@ a .btn {
     color: #b94a48;
 }
 
-
-
-.badge {
-    background-color: #444;
-    padding: 3px 4px;
-}
-
 .help-text {
     font-size: smaller;
     color: #aea79f;
@@ -106,5 +99,13 @@ a .btn {
 .alert-success {
   color: #38b44a;
   border-color: #38b44a;
+}
+
+.profile-icon {
+    font-size: 20pt;
+}
+
+.profile-badge {
+    font-size: 20pt;
 }
 
