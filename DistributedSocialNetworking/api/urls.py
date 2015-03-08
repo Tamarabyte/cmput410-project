@@ -1,16 +1,12 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from rest_framework.urlpatterns import format_suffix_patterns
+from api import views
 
-urlpatterns = patterns('',
+urlpatterns = [
+    url(r'^post/(?P<postID>[-\w]+)$', views.PostDetail.as_view(), name='postByID'),
+    url(r'^friends/(?P<authorID1>[-\w]+)/(?P<authorID2>[-\w]+)$', views.Friend2Friend.as_view(), name='friend2friend'),
+    url(r'^friends/(?P<authorID1>[-\w]+)$', views.FriendQuery.as_view(), name='friendQuery'),
+    url(r'^friendrequest$', views.FriendRequest.as_view(), name='friendRequest'),
+]
 
-    # URL for GET requests to check if two authors are friends
-    url(r'^friends/(?P<authorID1>[0-9]+)/(?P<authorID2>[0-9]+)$', 'api.views.friend2friendQuery', name='friend2friendQuery'),
-
-    # URL for POST requests to check if the author ID in URL is friends with any in the given JSON list
-
-    url(r'^friends/(?P<authorID1>[0-9]+)', 'api.views.friendQuery', name='friendQuery'),
-
-    url(r'^friends/(?P<authorID1>[0-9]+)$', 'api.views.friendQuery', name='friendQuery'),
-
-    # URL for POST friend requests
-    url(r'^friendrequest$', 'api.views.friendRequest', name='friendRequest'),
-)
+urlpatterns = format_suffix_patterns(urlpatterns)

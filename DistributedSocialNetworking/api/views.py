@@ -1,113 +1,135 @@
 from django.shortcuts import render, render_to_response
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import User
+from Hindlebook.models import User, Post
+from Hindlebook.serializers import PostSerializer
 import json
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions, status
 
-def friend2friendQuery(request, authorID1, authorID2):
-    """ Handles friend2friend querying via GET """
-    if (request.method != "GET"):
-        # Raises a 405, Method not allowed
-        return HttpResponse(status=405)
+class PostDetail(APIView):
+    """ GET, POST, or PUT an author post """
 
-    # Get the author objects from their given IDs, 404 if they don't exist
-    try:
-        author1 = User.objects.get(id=authorID1)
-        author2 = User.objects.get(id=authorID2)
-    except User.DoesNotExist:
-        return HttpResponse(status=404)
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
 
-    # Check if the authors are 'real' friends
-    if (author2 in author1.getFriends() and author1 in author2.getFriends()):
-        friends = "YES"
-    else:
-        friends = "NO"
-
-    # Return a JSON object based from https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/example-article.json
-    # Hindle's format specifies "friends":[id1, id2], and also "friends":"YES"
-    # Does this make more sense: "authors":[id1, id2], and "friends":"YES"??
-    return JsonResponse({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
-
-
-
-def friendQuery(request, authorID1):
-    """ Handles friend querying via POST with JSON """
-    if (request.method != "POST"):
-        # Raises a 405, Method Not Allowed
-        return HttpResponse(status=405)
-
-    # Load the POSTed data as JSON
-    JSONrequest = json.loads(request.body.decode('utf-8'))
-
-    # Check if valid POST data, return Bad Request
-    if ('author' not in JSONrequest):
-        return HttpResponse(status=400)
-    elif ('authors' not in JSONrequest):
-        return HttpResponse(status=400)
-    elif (type(JSONrequest['authors']) is not list):
-        return HttpResponse(status=400)
-    elif (str(authorID1) != str(JSONrequest['author'])):
-        return HttpResponse(status=400)
-
-    # Get the author object from the given ID, return 404 if it doesn't exist
-    try:
-        author1 = User.objects.get(id=authorID1)
-    except Author.DoesNotExist:
-        return HttpResponse(status=404)
-
-    friends = []
-
-    # Loop through all POSTed authors, check if friends with author1
-    for authorID2 in JSONrequest['authors']:
+    def get_object(self, uuid):
         try:
-            author2 = User.objects.get(id=authorID2)
-            if (author2 in author1.getFriends() and
-               author1 in author2.getFriends()):
-                friends.append(authorID2)
+            return Post.objects.get(uuid=uuid)
+        except Post.DoesNotExist:
+            raise Http404
+
+    def get(self, request, postID, format=None):
+        post = self.get_object(postID)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+    def post(self, request, postID, format=None):
+        post = self.get_object(postID)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+    def put(self, request, postID, format=None):
+        post = self.get_object(postID)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Friend2Friend(APIView):
+    """ GET a friend2friend query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get(self, request, authorID1, authorID2, format=None):      
+        try:
+            author1 = User.objects.get(uuid=authorID1)
+            author2 = User.objects.get(uuid=authorID2)
+        except User.DoesNotExist:
+            return HttpResponse(status=404)    
+        
+        if (author2 in author1.getFriends() and author1 in author2.getFriends()):
+            friends = "YES"
+        else:
+            friends = "NO"
+
+        return JsonResponse({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
+
+class FriendQuery(APIView):
+    """ POST a friend query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, authorID1, format=None):
+        JSONrequest = json.loads(request.body.decode('utf-8'))
+
+        if ('author' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif ('authors' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['authors']) is not list):
+            return HttpResponse(status=400)
+        elif (str(authorID1) != str(JSONrequest['author'])):
+            return HttpResponse(status=400)
+
+        try:
+            author1 = User.objects.get(uuid=authorID1)
+        except User.DoesNotExist:
+            return HttpResponse(status=404)
+        
+        friends = []
+        
+        for authorID2 in JSONrequest['authors']:
+            try:
+                author2 = User.objects.get(uuid=authorID2)
+                if (author2 in author1.getFriends() and
+                    author1 in author2.getFriends()):
+                    friends.append(authorID2)
+            except:
+                pass
+
+        return JsonResponse({"query": "friends", "author": authorID1, "friends": friends})
+
+class FriendRequest(APIView):
+    """ POST a friend query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        JSONrequest = json.loads(request.body.decode('utf-8'))
+
+        if ('author' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['author']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['author']):
+            return HttpResponse(status=400)
+        elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['friend']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+        
+        authorID = JSONrequest['author']['id']
+        friendID = JSONrequest['friend']['id']
+        
+        try:
+            author = User.objects.get(id=authorID)
+            friend = User.objects.get(id=friendID)
+
+            if (friend not in author.getFriendRequests()):
+                author.follows.add(friend)
         except:
-            # Silently ignore author IDs which don't exist
-            pass
+            return HttpResponse(status=404)
+        
+        return HttpResponse(status=200)
 
-    # Return a JSON object based from https://github.com/abramhindle/CMPUT404-project-socialdistribution/blob/master/example-article.json
-    return JsonResponse({"query": "friends", "author": authorID1, "friends": friends})
-
-
-def friendRequest(request):
-    """ Handles friend request via POST with JSON """
-    if (request.method != "POST"):
-        # Raises a 405, Method not allowed
-        return HttpResponse(status=405)
-
-    # Load the POSTed data as JSON
-    JSONrequest = json.loads(request.body.decode('utf-8'))
-
-    # Check for valid JSON syntax
-    if ('author' not in JSONrequest):
-        return HttpResponse(status=400)
-    elif (type(JSONrequest['author']) is not dict):
-        return HttpResponse(status=400)
-    elif ('id' not in JSONrequest['author']):
-        return HttpResponse(status=400)
-    elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
-        return HttpResponse(status=400)
-    elif (type(JSONrequest['friend']) is not dict):
-        return HttpResponse(status=400)
-    elif ('id' not in JSONrequest['friend']):
-        return HttpResponse(status=400)
-
-    authorID = JSONrequest['author']['id']
-    friendID = JSONrequest['friend']['id']
-
-    try:
-        author = User.objects.get(id=authorID)
-        friend = User.objects.get(id=friendID)
-
-        # Don't send repeated friend requests
-        if (friend not in author.getFriendRequests()):
-            author.follows.add(friend)
-    except:
-        return HttpResponse(status=404)
-
-    return HttpResponse(status=200)
 
