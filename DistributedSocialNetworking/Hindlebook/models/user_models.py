@@ -23,6 +23,10 @@ class User(AbstractUser):
         A = self.followed_by.all()
         B = self.follows.all()
         return A.exclude(pk__in=B)
+    
+    # Get the count of friend requests
+    def getFriendRequestCount(self):
+        return len(self.getFriendRequests())
 
     # Get Authors own posts
     def getAuthoredPosts(self):

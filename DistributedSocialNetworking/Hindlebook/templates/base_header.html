@@ -9,28 +9,34 @@
     
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
+
         
         <div class="navbar-header">
           <a class="navbar-brand" href="{% url "stream" %}">Hindleb <i class="title-img icon-glasses"></i> k</a>
         </div> <!-- /navbar-header -->
   
-        <div class="collapse navbar-collapse" id="navbar-collapsed">
-        <ul class="nav navbar-nav">
-          <li><a href="#"><i class="icon-kub-avatar-02"></i></a></li>
-          <li><a><span class="badge">1</span></a></li>
-        </ul>
 
-          <!-- search -->
-          <form class="navbar-form navbar-right" role="search" method="post" action="{% url "search" %}">
-            <div id="jquery-live-search">
-              <div class="form-group">
-                <input type="text" name="q" class="form-control" placeholder="Search">
-              </div> <!-- /form-group -->
-              <button type="submit" class="btn btn-default"><span class="icon-search"></span></button>
-            </div> <!-- jquery-live-search -->
-          </form> <!-- search form -->
+        <ul class="nav navbar-nav">
+          <li><a href="{% url "personal_profile" %}"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
+          <li><a><span class="badge">{{ user.getFriendRequestCount }}</span></a></li>
+          <li><a><i class="icon-search navbar-img bold"></i></a></li>
+          <li><input id = "test" type="text" class="form-control input-sm hidden" placeholder="Search"></input></li>
+        </ul>
+ 
+        
+        <div class="navbar-right">
+          <ul class="nav navbar-nav">
+            <li><a href="#">logout&nbsp;&nbsp;<i class="icon-sign-out navbar-img"></i></a></li>
+          </ul>
+        </div>
+        
+        </div> <!-- /collapse-->
       </div> <!-- /container-fluid -->
     </nav>
+
+    
+    
+
 
 
     {% block page %}

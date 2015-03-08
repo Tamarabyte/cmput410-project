@@ -16,9 +16,6 @@ class RegistrationView(FormView):
     form_class = RegistrationForm
     success_url = reverse_lazy('register')
 
-    # @method_decorator(never_cache)
-    # @method_decorator(csrf_protect)
-    # @method_decorator(sensitive_post_parameters)
     def dispatch(self, *args, **kwargs):
         return super(RegistrationView, self).dispatch(*args, **kwargs)
     
