@@ -3,13 +3,12 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import stream
-from django.contrib.auth.decorators import login_required
+from Hindlebook.views import StreamView
 urlpatterns = patterns('',
     # Pre-login URLS
     url(r'^$', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
 		url(r'^profile/(?P<authorID1>[0-9]+)/sendPost$', 'Hindlebook.views.statusUpdate', name='statusUpdate'),
-    url(r'^stream$', login_required(stream), name="stream"),
+    url(r'^stream$', StreamView.as_view(), name="stream"),
 		url(r'^profile/(?P<authorID1>[0-9]+)$', 'Hindlebook.views.profileQuery', name='profileQuery'),
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
