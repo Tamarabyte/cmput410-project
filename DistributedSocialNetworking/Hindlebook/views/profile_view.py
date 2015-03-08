@@ -4,9 +4,9 @@ from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
+
 class ProfileView(TemplateView):
     template_name = 'profile.html'
-    model = User
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -19,10 +19,9 @@ class ProfileView(TemplateView):
             profile = User.objects.get(id=profileID)
         except User.DoesNotExist:
             raise Http404("User does not exist")
-        posts = Post.objects.filter(author_id=profileID)
-        context['author'] = User.objects.filter(id=profileID).first()
-        context['posts'] = posts
 
-        # Set this to the number of pending friend reuqests ltaer
-        context['notification_count'] = 0
+        context['author'] = User.objects.filter(id=profileID).first()
+        context['posts'] = Post.objects.filter(author_id=profileID)
+
+        context['notification_count'] = getFriendRequestCount()
         return context
