@@ -1,11 +1,18 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
     text = models.TextField()
     pub_date = models.DateTimeField('date published', auto_now_add=True)
+    uuid = models.CharField(max_length=40, blank=False, unique=True, default=uuid.uuid4)
+    title = models.CharField(max_length=40, blank=True, default='No title')
+    description = models.CharField(max_length=40, blank=True, default='No description')
+    content_type = models.CharField(max_length=40, blank=True, default='text/plain')
+    source = models.CharField(max_length=100, blank=True, default='Unknown source')
+    origin = models.CharField(max_length=100, blank=True, default='Unknown origin')
 		
 	# Edited by Rob Hackman March 7th
 	# Added field for privacy on posts, privacy settings are as follows

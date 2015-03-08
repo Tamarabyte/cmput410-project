@@ -101,11 +101,22 @@ a .btn {
   border-color: #38b44a;
 }
 
+
 .profile-icon {
     font-size: 20pt;
 }
 
 .profile-badge {
     font-size: 20pt;
+}
+
+/* Navbar */
+.navbar-header .title-img {
+  font-weight: bold;
+}
+
+.navbar .badge {
+  left: -15px;
+
 }
 

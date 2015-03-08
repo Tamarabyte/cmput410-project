@@ -1,0 +1,2 @@
+from Hindlebook.serializers.user_serializer import UserSerializer
+from Hindlebook.serializers.post_serializer import PostSerializer
