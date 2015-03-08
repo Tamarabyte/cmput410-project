@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+    
     <nav class="navbar navbar-default">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapsed">
@@ -20,7 +21,7 @@
       <div class="collapse navbar-collapse" id="navbar-collapsed">
       <ul class="nav navbar-nav">
         <li class="active"><a href="/stream">Home<span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Profile</a></li>
+        <li><a href="/profile/{{user.id}}">Profile</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">Logout</a></li>
@@ -42,8 +43,10 @@
 
 {% endblock %}
 
+
 {% block scripts%}
     <script type="text/javascript">
         jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
     </script>
 {% endblock %}
+
