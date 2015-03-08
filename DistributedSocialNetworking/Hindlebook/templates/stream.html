@@ -2,12 +2,13 @@
 {% load staticfiles %}
 
 {% block page %}
+
 <div class="container">
 	<div class="row">
 		<div class="well">
-			<form action="" method="post"> {% csrf_token %}
-				{{ form.as_p }}
-				<input type="submit" value="Send message" />
+			<form action="post" method="post"> {% csrf_token %}
+				{{ post_form.as_bootstrap_form }}
+				<input type="submit" name="new_post" value="Create Post" />
 			</form>
 		</div>
 	</div>
@@ -32,6 +33,11 @@
 					</div>
 				</div>
 				{% endfor %}
+				<form action="{{post.id}}/comment" method="post">
+				 {% csrf_token %}
+					{{ comment_form.as_bootstrap_form }}
+					<input type="submit" name="new_comment" value="Add comment" />
+				</form>
 			</div>
 		</div>
 	{% endfor %}

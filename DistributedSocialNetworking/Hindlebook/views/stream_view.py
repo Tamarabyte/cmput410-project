@@ -1,26 +1,19 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView
+from django.views.generic.base import TemplateView
 from django.template import RequestContext
 from django import forms
 
-from datetime import datetime
-
-from Hindlebook.models.post_models import Post
+from Hindlebook.models.post_models import Post, Comment
 from Hindlebook.models import user_models
+from Hindlebook.forms import PostForm, CommentForm
 
 
-class PostForm(forms.Form):
-	text = forms.CharField()
-
-	def make_post(self, user):
-		new_p = Post(author=user, text=self.cleaned_data['text'] , pub_date=datetime.now())
-		new_p.save()
-
-class StreamView(FormView):
+class StreamView(TemplateView):
 	template_name = "stream.html"
-	form_class = PostForm
-	success_url = "/stream"
+	post_form = PostForm(prefix="pos")
+	comment_form = CommentForm(prefix="com")
+	success_url = "stream"
 
 	@method_decorator(login_required)
 	def dispatch(self, *args, **kwargs):
@@ -29,10 +22,11 @@ class StreamView(FormView):
 	def get_context_data(self, **kwargs):
 		context = super(StreamView, self).get_context_data(**kwargs)
 		context['posts'] = Post.objects.all().order_by('-pub_date')
+		context['user'] = self.request.user
+		context['post_form'] = self.post_form
+		context['comment_form'] = self.comment_form
 		return context
 
-	def form_valid(self, form):
-		form.make_post(self.request.user)
-		return super(StreamView, self).form_valid(self)
+
 
 

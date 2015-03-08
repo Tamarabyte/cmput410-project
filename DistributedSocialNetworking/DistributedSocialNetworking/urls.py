@@ -7,9 +7,12 @@ from Hindlebook.views import StreamView
 urlpatterns = patterns('',
     # Pre-login URLs
     url(r'^$', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
+    
     # Stream URLs
     url(r'^stream$', StreamView.as_view(), name="stream"),
-		url(r'^profile/(?P<authorID1>[0-9]+)$', 'Hindlebook.views.profileQuery', name='profileQuery'),
+    # url(r'^stream/(?P<postID>[0-9]+)/comment$', )
+
+    url(r'^profile/(?P<authorID1>[0-9]+)$', 'Hindlebook.views.profileQuery', name='profileQuery'),
 
     # Profile URLs
     url(r'^profile/(?P<authorID1>[0-9]+)/sendPost', 'Hindlebook.views.statusUpdate', name='statusUpdate'),
