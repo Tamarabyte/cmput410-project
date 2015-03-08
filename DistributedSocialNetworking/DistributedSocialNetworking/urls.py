@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     url(r'^profile/(?P<authorID1>[0-9]+)', ProfileView.as_view()),
 
     # Search URLs
-    url(r'^search/(?P<query>\w{0,50})/$', 'Hindlebook.views.search', name="search"),
+    url(r'^search$', 'Hindlebook.views.search', name="search"),
 
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
