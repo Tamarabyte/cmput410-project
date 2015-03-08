@@ -19,10 +19,11 @@ class APITests(TestCase):
         self.post2 = mommy.make(Post)
 
     def tearDown(self):
+        Post.objects.all().delete()
         User.objects.all().delete()
 
     def testGETPost(self):
-        """ Test GET an au post by given post ID """
+        """ Test GET an author post by given post ID """
 
         serializer = PostSerializer(self.post1)
         originalPost = serializer.data
@@ -37,8 +38,8 @@ class APITests(TestCase):
         decoded = json.loads(response.content.decode('utf-8'))
 
         # Serialize the response
-        serializer = PostSerializer(data=decoded) 
-       
+        serializer = PostSerializer(data=decoded)
+
         self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
         responsePost = serializer.data
 
@@ -60,8 +61,8 @@ class APITests(TestCase):
         decoded = json.loads(response.content.decode('utf-8'))
 
         # Serialize the response
-        serializer = PostSerializer(data=decoded) 
-       
+        serializer = PostSerializer(data=decoded)
+
         self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
         responsePost = serializer.data
 
@@ -70,18 +71,20 @@ class APITests(TestCase):
     def testPUTPost(self):
         """ Test PUT an author post by given post ID """
 
-        # Send a GET request to check if they are friends
+        # Send a GET request with post id
         response = c.get('/api/post/%s' % self.post1.uuid)
 
         # Decode the JSON response
         decoded = json.loads(response.content.decode('utf-8'))
-        serializer = PostSerializer(data=decoded) 
-       
+        serializer = PostSerializer(data=decoded)
+
         self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
         originalPost = serializer.data
 
         serializer = PostSerializer(self.post2)
         newPost = serializer.data
+
+        JSONdata = json.dumps(newPost)
 
         # Send a PUT request to check if they are friends
         response = c.put('/api/post/%s' % self.post1.uuid, newPost, content_type='application/json; charset=utf')
@@ -90,14 +93,9 @@ class APITests(TestCase):
         decoded = json.loads(response.content.decode('utf-8'))
         serializer = PostSerializer(data=decoded)
 
-        if (serializer.is_valid()):
-            pass
-            #self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        else:
-            print("Response: " + str(serializer.data))            
-        
+        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
 
-        self.assertEquals(response.status_code, 200, "Response not 200")        
+        self.assertEquals(response.status_code, 200, "Response not 200")
 
         responsePost = serializer.data
 
@@ -106,7 +104,7 @@ class APITests(TestCase):
 
     def testFriend2FriendGetQuerySuccess(self):
         """ Test a successful friend2friend query """
-        
+
         self.author1.follows.add(self.author2)
         self.author2.follows.add(self.author1)
 
@@ -145,13 +143,13 @@ class APITests(TestCase):
 
     def testFriendRequestSuccess(self):
         """ Test sending a successful friend request """
-        
+
         authorID1 = str(self.author1.id)
         authorID2 = str(self.author2.id)
 
         JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1"},
-        "friend": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2",
-        "url": "http://127.0.0.1:8000/author/"+authorID2}})
+                               "friend": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2",
+                                          "url": "http://127.0.0.1:8000/author/"+authorID2}})
 
         response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
