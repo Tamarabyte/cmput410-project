@@ -86,7 +86,7 @@ class APITests(TestCase):
 
         JSONdata = json.dumps(newPost)
 
-        # Send a PUT request to check if they are friends
+        # Send a PUT request to update the existing post
         response = c.put('/api/post/%s' % self.post1.uuid, data=JSONdata, content_type='application/json; charset=utf')
 
         # Decode the JSON response
@@ -160,13 +160,13 @@ class APITests(TestCase):
 
     def testGETAuthorPosts(self):
         """ Test GET posts from given author """
-   
+
         post1 = mommy.make(Post, author=self.author1)
         post2 = mommy.make(Post, author=self.author1)
         different_post = mommy.make(Post, author=self.author2)
 
         response = c.get('/api/author/%s/posts' % self.author1.uuid)
-        
+
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         jsonString = json.loads(response.content.decode('utf-8'))
@@ -180,13 +180,13 @@ class APITests(TestCase):
             postData = serializer.data
 
     def testGETAuthorPostText(self):
-        """ Test GET posts from given author """
-   
+        """ Test GET post text from given author """
+
         post1 = mommy.make(Post, author=self.author1)
         different_post = mommy.make(Post, author=self.author2)
 
         response = c.get('/api/author/%s/posts' % self.author1.uuid)
-        
+
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         jsonString = json.loads(response.content.decode('utf-8'))
@@ -199,4 +199,26 @@ class APITests(TestCase):
             self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
             postData = serializer.data
             self.assertEquals(postData['text'], post1.text, "Post has wrong text")
-        
+
+    def testGETPublicPosts(self):
+        """ Test GET all public posts """
+
+        # Posts are public by default
+        publicPost = mommy.make(Post)
+
+        # Make a private post
+        privatePost = mommy.make(Post, privacy=0)
+
+        response = c.get('/api/posts')
+
+        self.assertEquals(response.status_code, 200, "Response not 200")
+
+        jsonString = json.loads(response.content.decode('utf-8'))
+        jsonObject = json.loads(jsonString)
+
+        self.assertEquals(len(jsonObject), 3, "Should be 2 public post")
+
+        for post in jsonObject:
+            serializer = PostSerializer(data=post)
+            self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
+            postData = serializer.data
