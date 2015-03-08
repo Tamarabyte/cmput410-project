@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     url(r'^stream$', StreamView.as_view(), name="stream"),
 
     # Profile URLs
-    url(r'^profile/(?P<authorID1>[0-9]+)', ProfileView.as_view()),
+    url(r'^profile/(?P<profileID>[0-9]+)', ProfileView.as_view()),
 
     # Search URLs
     url(r'^search$', 'Hindlebook.views.search', name="search"),

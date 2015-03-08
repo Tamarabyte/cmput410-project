@@ -89,13 +89,6 @@ a .btn {
     color: #b94a48;
 }
 
-.col-lg-4 .col-sm-1
-
-.badge {
-    background-color: #444;
-    padding: 3px 4px;
-}
-
 .help-text {
     font-size: smaller;
     color: #aea79f;
@@ -108,6 +101,15 @@ a .btn {
   border-color: #38b44a;
 }
 
+
+.profile-icon {
+    font-size: 20pt;
+}
+
+.profile-badge {
+    font-size: 20pt;
+}
+
 /* Navbar */
 .navbar-header .title-img {
   font-weight: bold;
@@ -115,5 +117,6 @@ a .btn {
 
 .navbar .badge {
   left: -15px;
+
 }
 

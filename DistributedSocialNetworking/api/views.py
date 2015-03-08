@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
 
+
 class PostDetail(APIView):
     """ GET, POST, or PUT an author post """
 
@@ -46,19 +47,20 @@ class Friend2Friend(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def get(self, request, authorID1, authorID2, format=None):      
+    def get(self, request, authorID1, authorID2, format=None):
         try:
             author1 = User.objects.get(uuid=authorID1)
             author2 = User.objects.get(uuid=authorID2)
         except User.DoesNotExist:
-            return HttpResponse(status=404)    
-        
+            return HttpResponse(status=404)
+
         if (author2 in author1.getFriends() and author1 in author2.getFriends()):
             friends = "YES"
         else:
             friends = "NO"
 
         return JsonResponse({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
+
 
 class FriendQuery(APIView):
     """ POST a friend query """
@@ -82,19 +84,19 @@ class FriendQuery(APIView):
             author1 = User.objects.get(uuid=authorID1)
         except User.DoesNotExist:
             return HttpResponse(status=404)
-        
+
         friends = []
-        
+
         for authorID2 in JSONrequest['authors']:
             try:
                 author2 = User.objects.get(uuid=authorID2)
-                if (author2 in author1.getFriends() and
-                    author1 in author2.getFriends()):
+                if (author2 in author1.getFriends() and author1 in author2.getFriends()):
                     friends.append(authorID2)
             except:
                 pass
 
         return JsonResponse({"query": "friends", "author": authorID1, "friends": friends})
+
 
 class FriendRequest(APIView):
     """ POST a friend query """
@@ -117,10 +119,10 @@ class FriendRequest(APIView):
             return HttpResponse(status=400)
         elif ('id' not in JSONrequest['friend']):
             return HttpResponse(status=400)
-        
+
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
-        
+
         try:
             author = User.objects.get(id=authorID)
             friend = User.objects.get(id=friendID)
@@ -129,7 +131,5 @@ class FriendRequest(APIView):
                 author.follows.add(friend)
         except:
             return HttpResponse(status=404)
-        
+
         return HttpResponse(status=200)
-
-

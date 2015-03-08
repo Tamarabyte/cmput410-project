@@ -1,34 +1,59 @@
-{% extends "base_login.html" %}
+{% extends "base_header.html" %}
 {% load staticfiles %}
 
-{% block content %}
-<h1>{{fname}} {{lname}}'s Profile </h1>
+{% block page %}
 
+<div class="container">
+    <div class="profile row">
+        <div class="col-md-2 col-sm-2"></div>
+        <div class="col-md-1 col-sm-1 text-right">
+        {% if user.id == author.id %}
+            <div class="profile-icon"><a href="#"><span class="icon-kub-cog"></span></a></div>
+            <div class="profile-icon"><a href="#"><span class="icon-kub-avatar-02"></span></a></div>
+            <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{notification_count}}</span></a></div>
+        {% else %}
+            <div class="profile-icon"><a href="#"><span class="icon-favourite-3"></span></a></div>
+        {% endif %}
 
+        </div>
+        <div class="col-md-1 text-right">
+            <img class="img-responsive" src="{% static "imgs/placeholder.jpg" %}"></img>
+        </div>
+        <div class="col-md-8">
+            <div class="row text-left"><h4><b>{{ author.username }}</b></h4></div>
+            <div class="row text-left"><h4><b>About Me:</b></h4></div>
+            <div class="row text-left">{{ author.about }}</div>
+        </div>
+    </div>
+</div>
 
-<div class="Test" style="text-align: center">HERE ARE SOME POSTS</div>
-	{% for post in posts %}
-		<div class="row">
-			<div class="well">
-				<div class="row">
-					<div class="col-md-2 col-sm-2"><img src="{% static "{{ post.author.avatar" %}"  height="75"></img></div>
-					<div class="col-md-10 col-sm-10">
-						<div class="row"><h4><b>{{ post.author.first_name }} {{ post.author.last_name }}</b></h4></div>
-						<div class="row">{{post.pub_date }}</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12 col-sm-12">{{ post.text }}</div>
-				</div>
-				{% for comment in post.getComments %}
-				<div class="row">
-					<div class="well">
-						<div class="row"><h5><b>{{ comment.author.first_name }} {{ comment.author.last_name }} - {{ comment.pub_date }}</b></h5></div>
-						<div class="row">{{ comment.text}}</div>
-					</div>
-				</div>
-				{% endfor %}
-			</div>
-		</div>
-	{% endfor %}
+<div class="container">
+    <div class="Test" style="text-align: center"><h2>{{author.username}}'s Posts<h2></div>
+    {% for post in posts %}
+        <div class="row">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-2 col-sm-2"><img src="{% static "{{ post.author.avatar" %}"  height="75"></img></div>
+                    <div class="col-md-10 col-sm-10">
+                        <div class="row"><h4><b>{{ post.author.first_name }} {{ post.author.last_name }}</b></h4></div>
+                        <div class="row">{{post.pub_date }}</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">{{ post.text }}</div>
+                </div>
+                {% for comment in post.getComments %}
+                <div class="row">
+                    <div class="well">
+                        <div class="row"><h5><b>{{ comment.author.first_name }} {{ comment.author.last_name }} - {{ comment.pub_date }}</b></h5></div>
+                        <div class="row">{{ comment.text}}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
 {% endblock %}
