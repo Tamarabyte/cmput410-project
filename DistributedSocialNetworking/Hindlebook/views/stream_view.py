@@ -2,11 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.template import RequestContext
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 from django import forms
 
 from Hindlebook.models.post_models import Post, Comment
 from Hindlebook.models import user_models
 from Hindlebook.forms import PostForm, CommentForm
+import Hindlebook
 
 
 class StreamView(TemplateView):
@@ -27,6 +30,19 @@ class StreamView(TemplateView):
 		context['comment_form'] = self.comment_form
 		return context
 
+	def post(self, request):
+		form = None
+		if 'new_post' in request.POST:
+			form = PostForm(request.POST, prefix="pos", request=request)
+		else:
+			form = CommentForm(request.POST, prefix="com",request=request)
 
 
-
+		if (form.is_valid()):
+			print('valid')
+			print(request.POST)
+			form.on_valid(self.request.user)
+		else:
+			print('not valid')
+			print(request.POST)
+		return redirect(reverse("stream"))

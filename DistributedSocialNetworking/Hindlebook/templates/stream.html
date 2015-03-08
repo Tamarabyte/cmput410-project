@@ -6,7 +6,7 @@
 <div class="container">
 	<div class="row">
 		<div class="well">
-			<form action="post" method="post"> {% csrf_token %}
+			<form action="" method="post"> {% csrf_token %}
 				{{ post_form.as_bootstrap_form }}
 				<input type="submit" name="new_post" value="Create Post" />
 			</form>
@@ -33,9 +33,10 @@
 					</div>
 				</div>
 				{% endfor %}
-				<form action="{{post.id}}/comment" method="post">
+				<form action="" method="post">
 				 {% csrf_token %}
 					{{ comment_form.as_bootstrap_form }}
+					<input type="hidden" name="post_id" value="{{post.id}}" />
 					<input type="submit" name="new_comment" value="Add comment" />
 				</form>
 			</div>
