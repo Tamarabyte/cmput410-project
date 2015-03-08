@@ -16,14 +16,15 @@ class TemplateMixin(object):
                     %(label)s
                     <div class="col-lg-12">
                         %(field)s
-                    </div>
-                    %(help_text)s
-                </div>
-                <div class="error-container error">
-                    %(errors)s
-                    %(top_errors)s
-                </div>
-            </div>''',
+                        %(help_text)s
+
+                        <div class="error-container error">
+                            %(errors)s
+                            %(top_errors)s
+                        </div> <!-- /error-container -->
+                    </div> <!-- /col -->
+                </div> <!-- /input-container -->
+            </div> <!-- /form-group -->''',
             error_row='%s',
             row_ender='</div>',
             help_text_html='%s',
