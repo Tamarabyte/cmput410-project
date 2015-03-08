@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^friends/(?P<authorID1>[-\w]+)/(?P<authorID2>[-\w]+)$', views.Friend2Friend.as_view(), name='friend2friend'),
     url(r'^friends/(?P<authorID1>[-\w]+)$', views.FriendQuery.as_view(), name='friendQuery'),
     url(r'^friendrequest$', views.FriendRequest.as_view(), name='friendRequest'),
+    url(r'^author/(?P<authorID>[-\w]+)/posts$', views.AuthorPosts.as_view(), name='authorPosts'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
