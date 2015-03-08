@@ -89,7 +89,7 @@ a .btn {
     color: #b94a48;
 }
 
-
+.col-lg-4 .col-sm-1
 
 .badge {
     background-color: #444;
@@ -106,5 +106,14 @@ a .btn {
 .alert-success {
   color: #38b44a;
   border-color: #38b44a;
+}
+
+/* Navbar */
+.navbar-header .title-img {
+  font-weight: bold;
+}
+
+.navbar .badge {
+  left: -15px;
 }
 
