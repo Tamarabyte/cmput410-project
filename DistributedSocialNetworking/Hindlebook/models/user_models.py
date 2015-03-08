@@ -4,7 +4,7 @@ import uuid
 
 class User(AbstractUser):
     """Model for represting a User"""
-    avatar = models.ImageField(null=True, blank=True, width_field=100, height_field=100)
+    avatar = models.ImageField(null=True, blank=True)
     github_id = models.CharField(max_length=30, null=False, blank=True, default='')
     about = models.CharField(max_length=250, null=False, blank=True, default="This user hasn't filled out their profile yet!")
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False)

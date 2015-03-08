@@ -22,4 +22,4 @@ urlpatterns = [
     url(r'^posts$', views.PublicPosts.as_view(), name='publicPosts'),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns) 
