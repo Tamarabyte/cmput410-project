@@ -8,7 +8,7 @@ class User(AbstractUser):
     github_id = models.CharField(max_length=30, null=False, blank=True, default='')
     about = models.CharField(max_length=250, null=False, blank=True, default="This user hasn't filled out their profile yet!")
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False)
-    uuid = models.CharField(max_length=40, blank=True, unique=True, default=uuid.uuid4)
+    uuid = models.CharField(max_length=40, blank=True, default=uuid.uuid4)
     host = models.CharField(max_length=100, blank=True, default='')
     
     def __str__(self):
@@ -23,6 +23,10 @@ class User(AbstractUser):
         A = self.followed_by.all()
         B = self.follows.all()
         return A.exclude(pk__in=B)
+    
+    # Get the count of friend requests
+    def getFriendRequestCount(self):
+        return len(self.getFriendRequests())
 
     # Get Authors own posts
     def getAuthoredPosts(self):

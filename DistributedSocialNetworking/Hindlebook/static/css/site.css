@@ -120,3 +120,37 @@ a .btn {
 
 }
 
+.navbar .btn {
+  height: 32px;
+  margin-top: 5px;
+}
+
+.navbar .navbar-img {
+  font-size: 20px;;
+}
+
+.navbar .input-sm {
+  margin-top: 12px;
+}
+
+.navbar-header {
+  float: left !important;
+  margin-right: 15px !important;
+}
+
+.navbar-nav>li, .navbar-nav {
+float: left !important;
+}
+
+.navbar-nav.navbar-right:last-child {
+margin-right: -15px !important;
+}
+
+.navbar-right {
+float: right!important;
+}
+
+.bold {
+  font-weight: bold;
+}
+

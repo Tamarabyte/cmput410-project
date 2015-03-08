@@ -124,8 +124,8 @@ class FriendRequest(APIView):
         friendID = JSONrequest['friend']['id']
 
         try:
-            author = User.objects.get(id=authorID)
-            friend = User.objects.get(id=friendID)
+            author = User.objects.get(uuid=authorID)
+            friend = User.objects.get(uuid=friendID)
 
             if (friend not in author.getFriendRequests()):
                 author.follows.add(friend)
@@ -133,3 +133,43 @@ class FriendRequest(APIView):
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
+
+
+class AuthorPosts(APIView):
+    """ GET posts from given author """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, authorID, format=None):
+        try:
+            postAuthor = User.objects.get(uuid=authorID)
+        except User.DoesNotExist:
+            return HttpResponse(status=404)
+
+        posts = postAuthor.getAuthoredPosts()
+
+        returnPosts = []
+        for post in posts:
+            serializer = PostSerializer(post)
+            returnPosts.append(serializer.data)
+
+        return Response(json.dumps(returnPosts))
+
+
+class PublicPosts(APIView):
+    """ GET all public posts """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, requst, format=None):
+        # Filter to get public posts, 5 is public
+        posts = Post.objects.filter(privacy=5)
+
+        returnPosts = []
+        for post in posts:
+            serializer = PostSerializer(post)
+            returnPosts.append(serializer.data)
+
+        return Response(json.dumps(returnPosts))

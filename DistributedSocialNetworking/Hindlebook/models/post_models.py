@@ -7,7 +7,7 @@ class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
     text = models.TextField()
     pub_date = models.DateTimeField('date published', auto_now_add=True)
-    uuid = models.CharField(max_length=40, blank=False, unique=True, default=uuid.uuid4)
+    uuid = models.CharField(max_length=40, blank=False, default=uuid.uuid4)
     title = models.CharField(max_length=40, blank=True, default='No title')
     description = models.CharField(max_length=40, blank=True, default='No description')
     content_type = models.CharField(max_length=40, blank=True, default='text/plain')
