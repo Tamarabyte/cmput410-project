@@ -39,10 +39,6 @@ class StreamView(TemplateView):
 
 
 		if (form.is_valid()):
-			print('valid')
-			print(request.POST)
 			form.on_valid(self.request.user)
-		else:
-			print('not valid')
-			print(request.POST)
+			
 		return redirect(reverse("stream"))

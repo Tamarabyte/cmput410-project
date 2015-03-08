@@ -16,10 +16,11 @@ class CommentForm(forms.Form, TemplateMixin):
 		super(CommentForm, self).__init__(*args, **kwargs)
 
 	def on_valid(self, user):
-		post = uuid.UUID(self.data['post_id'])
-		print(post)
-		if (post != None):
-			p = Post.objects.get(id=post)
-			if p != None:
-				new_f = Comment(author=user, text=self.cleaned_data['text'], pub_date=datetime.now(), post=p)
-				new_f.save()
+		p = Post.objects.get(uuid=self.cleaned_data['post_id'])
+		if p != None:
+			new_f = Comment(author=user, text=self.cleaned_data['text'], pub_date=datetime.now(), post=p)
+			new_f.save()
+			
+	def clean(self):
+		post = str(uuid.UUID(self.data['post_id']))
+		self.cleaned_data['post_id'] = post
