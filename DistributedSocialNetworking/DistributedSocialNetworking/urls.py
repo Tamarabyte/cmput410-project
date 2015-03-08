@@ -17,7 +17,7 @@ urlpatterns = patterns('',
     url(r'^profile', 'Hindlebook.views.myProfile', name='myProfile'),
 
     # Search URLs
-    url(r'^search$', 'Hindlebook.views.search', name="search"),
+    url(r'^search/(?P<query>\w{0,50})/$', 'Hindlebook.views.search', name="search"),
 
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),

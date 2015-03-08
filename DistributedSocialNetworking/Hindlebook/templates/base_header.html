@@ -26,7 +26,7 @@
         <li><a href="/logout">Logout</a></li>
       </ul>
       <div id="jquery-live-search">
-        <form class="navbar-form navbar-right" role="search" method="post" action="/search">
+        <form class="navbar-form navbar-right" role="search" method="post" action="">{% csrf_token %}
           <div class="form-group">
             <input type="text" name="q" class="form-control" placeholder="Search">
           </div>
@@ -44,6 +44,6 @@
 
 {% block scripts%}
     <script type="text/javascript">
-        jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search' + '&q='});
+        jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
     </script>
 {% endblock %}

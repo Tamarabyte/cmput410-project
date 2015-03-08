@@ -1,3 +1,0 @@
-
-def search(request):
-    pass
