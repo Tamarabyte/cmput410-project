@@ -17,7 +17,6 @@ urlpatterns = patterns('',
     url(r'^profile/(?P<authorID1>[0-9]+)', 'Hindlebook.views.profileQuery', name='profileQuery'),
     url(r'^profile', 'Hindlebook.views.myProfile', name='myProfile'),
 
-
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
