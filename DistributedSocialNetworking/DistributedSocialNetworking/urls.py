@@ -6,11 +6,18 @@ from Hindlebook.forms import LoginForm
 from Hindlebook.views import stream
 from django.contrib.auth.decorators import login_required
 urlpatterns = patterns('',
-    # Pre-login URLS
+    # Pre-login URLs
     url(r'^$', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
-		url(r'^profile/(?P<authorID1>[0-9]+)/sendPost', 'Hindlebook.views.statusUpdate', name='statusUpdate'),
+
+    # Stream URLs
     url(r'^stream$', login_required(stream), name="stream"),
-		url(r'^profile/(?P<authorID1>[0-9]+)', 'Hindlebook.views.profileQuery', name='profileQuery'),
+
+    # Profile URLs
+    url(r'^profile/(?P<authorID1>[0-9]+)/sendPost', 'Hindlebook.views.statusUpdate', name='statusUpdate'),
+    url(r'^profile/(?P<authorID1>[0-9]+)', 'Hindlebook.views.profileQuery', name='profileQuery'),
+    url(r'^profile', 'Hindlebook.views.myProfile', name='myProfile'),
+
+
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
