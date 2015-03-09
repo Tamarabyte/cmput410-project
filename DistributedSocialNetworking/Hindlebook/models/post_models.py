@@ -22,7 +22,7 @@ class Post(models.Model):
     title = models.CharField(max_length=40, blank=True, default='No title')
     description = models.CharField(max_length=40, blank=True, default='No description')
     categories = models.ManyToManyField(Category, blank=True, related_name='tagged_posts')
-    text = models.TextField()
+    text = models.TextField(blank=False)
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
     pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
