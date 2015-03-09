@@ -17,7 +17,7 @@
         <div class="col-md-1 col-sm-1 text-right">
         {% if user.uuid == author.uuid %}
             <div class="profile-icon">
-                <a data-toggle="modal" href="{% url 'edit_profile' pk=user.id %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
+                <a data-toggle="modal" href="{% url 'edit_profile' user.id %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
             </div>
             <div class="profile-icon"><a href="#"><span class="icon-kub-avatar-02"></span></a></div>
             <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{user.getFriendRequestCount}}</span></a></div>

@@ -41,7 +41,7 @@ class ProfileUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.save()
-        return HttpResponse(render_to_string('edit_profile_success.html'))
+        return HttpResponse(render_to_string('profile.html'))
         # return HttpResponse(render_to_string('profile.html', {'loan': loan}))
 
     def get_context_data(self, **kwargs):
