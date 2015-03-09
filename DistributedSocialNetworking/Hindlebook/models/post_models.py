@@ -1,40 +1,33 @@
 from django.db import models
 from django.conf import settings
-import uuid
+import uuid as uuid_import
+from Hindlebook.models import ForeignUser
+
+class Category(models.Model):
+    tag = models.CharField(max_length=25, null=False, blank=False)
 
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
-    text = models.TextField()
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
-    uuid = models.CharField(max_length=40, blank=False, default=uuid.uuid4)
-    title = models.CharField(max_length=40, blank=True, default='No title')
-    description = models.CharField(max_length=40, blank=True, default='No description')
-    content_type = models.CharField(max_length=40, blank=True, default='text/plain')
+
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True)
     source = models.CharField(max_length=100, blank=True, default='Unknown source')
     origin = models.CharField(max_length=100, blank=True, default='Unknown origin')
-		
-	# Edited by Rob Hackman March 7th
-	# Added field for privacy on posts, privacy settings are as follows
-	# 0 - Private to me
-	# 1 - Private to one other author
-	# 2 - Private to my friends
-	# 3 - Private to friends of friends
-	# 4 - private to friends on my host
-	# 5 - Public
-    privacy_choices = ((0,"Self Only"),
-					    (1,"Selected author"),
-					    (2,"Friends"),
-					    (3,"Friends of Friends"),
-					    (4,"Friends on host"),
-					    (5,"Public"))
-    privacy = models.IntegerField(default=5,max_length=1,choices=privacy_choices)
-	# Need to add some way to specify for privacy setting 1 who the other author is
+
+    title = models.CharField(max_length=40, blank=True, default='No title')
+    description = models.CharField(max_length=40, blank=True, default='No description')
+    categories = models.ManyToManyField(Category, blank=True, related_name='tagged_posts')
+    text = models.TextField()
+
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
+    pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
+
+    content_type_choices = ((0,"text/plain"), (1,"text/x-markdown"), (2,"text/html"))
+    content_type = models.IntegerField(max_length=1, blank=True, choices=content_type_choices, default=0)
+
+    privacy_choices = ((0, "PUBLIC"), (1, "FOAF"), (2, "FRIENDS"), (3, "PRIVATE"), (4, "SERVERONLY"))
+    privacy = models.IntegerField(default=0, max_length=1, choices=privacy_choices, db_index=True)
 
     def __str__(self):
-		# Edited by Rob Hackman March 7th 
-		# Ultimately this should probably return some sort of HTML
-		# for displaying the post in case it's  got a picture etc.
         return str(self.text)
 
     # Get the comments for this Post
@@ -44,18 +37,28 @@ class Post(models.Model):
 
 class Comment(models.Model):
     """Model for representing a Comment on a Post made by an Author"""
+
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True)
     post = models.ForeignKey(Post, related_name="comments")
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="comments")
+
+    # only author or foreign author should be set
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="comments")
+    foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
+
     text = models.CharField(max_length=2048)
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
+    pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.uuid)
 
+    def getAuthor(self):
+        if self.author:
+            return self.author
+        return self.foreign_author
 
 class Image(models.Model):
     """Model for representing an Image attached to Posts"""
-    attached_to = models.ManyToManyField(Post, null=True)
+    attached_to = models.ForeignKey(Post, null=False)
     image = models.ImageField(null=False)
     date_added = models.DateTimeField(auto_now_add=True)
 
