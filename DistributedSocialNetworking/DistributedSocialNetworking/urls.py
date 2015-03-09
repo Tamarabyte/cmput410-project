@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView, RedirectView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import ProfileView, StreamView, CreatePost, RegistrationView, LogoutRedirect, PostView, CommentView, ProfileUpdateView
+from Hindlebook.views import ProfileView, StreamView, CreatePost, RegistrationView, LogoutRedirect, PostView, CommentView, ProfileUpdateView, FriendsListView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.static import static
 from django.conf import settings
