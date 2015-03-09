@@ -5,5 +5,3 @@ from django.views.generic.edit import UpdateView
 from Hindlebook.models import Post, User
 from Hindlebook.forms import PostForm
 import json
-
-

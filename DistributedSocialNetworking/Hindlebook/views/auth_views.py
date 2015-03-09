@@ -12,26 +12,28 @@ from django.contrib import messages
 
 from Hindlebook.forms.auth_forms import RegistrationForm
 
+
 class RegistrationView(FormView):
-    
+
     template_name = "registration.html"
     form_class = RegistrationForm
     success_url = reverse_lazy('register')
 
     def dispatch(self, *args, **kwargs):
         return super(RegistrationView, self).dispatch(*args, **kwargs)
-    
+
     def form_valid(self, form):
-        form.save();
+        form.save()
         messages.add_message(self.request, messages.SUCCESS,
             'You have successfully registered. An admin should confirm your account shortly.')
         return super(RegistrationView, self).form_valid(form)
-    
+
     def get_success_url(self):
         return reverse('login')
 
+
 class LogoutRedirect(RedirectView):
-    
+
     pattern_name = 'login'
 
     def dispatch(self, *args, **kwargs):

@@ -9,12 +9,13 @@ from Hindlebook.models import User
 
 def get_query(query_string, search_fields):
     ''' Returns a query, that is a combination of Q objects. That combination
-        aims to search keywords within a model by testing the given search fields.
+        aims to search keywords within a model by testing the given search
+        fields.
 
     '''
-    query = None # Query to search for every search term
+    query = None  # Query to search for every search term
     for term in query_string:
-        or_query = None # Query to search for a given term in each field
+        or_query = None  # Query to search for a given term in each field
         for field_name in search_fields:
             q = Q(**{"%s__icontains" % field_name: term})
             if or_query is None:

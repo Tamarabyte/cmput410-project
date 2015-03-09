@@ -1,4 +1,4 @@
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from Hindlebook.models import User
