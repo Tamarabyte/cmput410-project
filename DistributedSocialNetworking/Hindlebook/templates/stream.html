@@ -28,12 +28,7 @@
 			{% for comment in post.getComments %}
                 {% include "comment.html" %}
 			{% endfor %}
-        <div id="{{ post.uuid }}"></div>
-        <div>
-            <button data-postUUID="{{ post.uuid }}" class="add_comment_button btn btn-xs btn-success" value="submit">
-                <i class="icon-rocket2"></i> Add Comment
-            </button>
-        </div>
+            {% include "post_footer.html" %}
 	{% endfor %}
     </div> <!-- /stream -->
 </div> <!-- /container --->
@@ -41,7 +36,6 @@
 
 {% block scripts %}
 <script>
-
     /* Post Ajax */
     var base_url = "/post/create/";
     
@@ -67,6 +61,7 @@
         $('#post-form').html(response["form"]);
         $('#post-form').clearForm();
         $('#stream').prepend(response["post"]);
+        $('.add_comment_button[data-postUUID="' + response["created_uuid"] +'"]').click(showCommentForm);
     }
 
     function ajaxError(xhr, errmsg, err) {
@@ -79,6 +74,10 @@
     /* End Post Ajax */
 
     /* Comment Ajax*/
+    $(document).ready(function (){
+        $(".add_comment_button").click(showCommentForm);
+    });
+
     var base_comment_url = "/post/";
     var commentPostUUID;
 
@@ -117,18 +116,7 @@
         $('#comment-form').html(response["form"]);
     }
 
-
-    $(".add_comment_button").click(function(event) {
-        var data = $(this).attr("data-postUUID");
-        console.log(data);
-        $(".add_comment_button").show();
-        $(this).hide();
-        $("#comment_form_html").hide();
-        $("#"+ data ).after($("#comment_form_html"))
-        $("#comment_form_html").show();
-    });
-
-        $(".add_comment_button").click(function(event) {
+    function showCommentForm(event) {
         var data = $(this).attr("data-postUUID");
         console.log(data);
 
@@ -139,7 +127,7 @@
         $("#comment_form_html").show();
         $("#comment-form").data("postUUID", data);
         console.log($("#comment-form").data("postUUID"));
-    });
+    };
 
     /* End Comment Ajax */
 </script>

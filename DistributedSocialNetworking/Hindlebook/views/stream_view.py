@@ -1,21 +1,15 @@
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic import View
-from django.http import JsonResponse, QueryDict, HttpResponse
+from django.http import JsonResponse, QueryDict
 from django.core.exceptions import ValidationError
-
 from django.template.loader import render_to_string
-from django.template import RequestContext
-from django.shortcuts import redirect, get_object_or_404
-from django.core.urlresolvers import reverse
-from django import forms
+from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 
 from Hindlebook.models.post_models import Post, Comment
-from Hindlebook.models import user_models
 from Hindlebook.forms import PostForm, CommentForm
 
 
@@ -59,7 +53,10 @@ class CreatePost(View):
 
         post.save()
         response_data = { 'form' : render_to_string("post_form.html", {"post_form" : PostForm()}) }
+
         response_data["post"] = render_to_string("post.html", {"post" : post, "MEDIA_URL" : settings.MEDIA_URL })
+        response_data["post"] += render_to_string("post_footer.html", {"post" : post})
+        response_data["created_uuid"] = post.uuid;
         return JsonResponse(response_data, status=201)
 
 

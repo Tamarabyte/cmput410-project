@@ -1,14 +1,9 @@
 import uuid
-from datetime import datetime
-
 from django import forms
-from django.core.exceptions import ValidationError
-
-
 from Hindlebook.models.post_models import Post, Comment
-from Hindlebook.forms.template_mixin import TemplateMixin
 
-class PostForm(forms.ModelForm, TemplateMixin):
+
+class PostForm(forms.ModelForm):
     
     def __init__(self,  *args, **kwargs):
         self.uuid = uuid.uuid4
@@ -47,6 +42,7 @@ class CommentForm(forms.ModelForm):
         """
         # Save the provided password in hashed format
         comment = super(CommentForm, self).save(commit=False)
+        comment.uuid = commentUUID
         comment.post = post
         comment.author = user
 
@@ -59,4 +55,3 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
-        exclude = ["author"]
