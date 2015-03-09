@@ -1,6 +1,7 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.http import Http404
 from django.views.generic import TemplateView, UpdateView
+from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
@@ -41,8 +42,9 @@ class ProfileUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.save()
-        return HttpResponse(render_to_string('profile.html'))
+        # return HttpResponse(render_to_string('profile.html'))
         # return HttpResponse(render_to_string('profile.html', {'loan': loan}))
+        return HttpResponseRedirect(reverse('personal_profile'))
 
     def get_context_data(self, **kwargs):
         # raise Http404("wtf3")
