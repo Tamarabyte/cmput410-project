@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView, RedirectView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import ProfileView, StreamView, CreatePost, CreateComment, RegistrationView, LogoutRedirect, ProfileUpdateView
+from Hindlebook.views import ProfileView, StreamView, CreatePost, CreateComment, RegistrationView, LogoutRedirect, ProfileUpdateView, FriendsListView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.static import static
 from django.conf import settings
@@ -27,6 +27,9 @@ urlpatterns = patterns('',
     url(r'^author/(?P<pk>[\d]+)/edit', ProfileUpdateView.as_view(), name='edit_profile'),
     # url(r'^author/edit$', ProfileUpdateView.as_view(), name='edit_profile'),
     url(r'^profile/(?P<authorUUID>[\w-]+)', ProfileView.as_view(), name="profile"),
+
+    # Friends URLs
+    url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsListView.as_view(), name='friends_view'),
 
     # Search URLs
     url(r'^search$', 'Hindlebook.views.search', name="search"),

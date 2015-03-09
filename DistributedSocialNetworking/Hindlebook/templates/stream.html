@@ -13,7 +13,7 @@
 		</form>
 	</div> <!-- /row -->
     <!-- /EndNewPostForm -->
-    
+
     <!-- New Comment Form -->
     <div id="comment_form_html" class="row" hidden>
         <form id="comment-form" action=".">
@@ -22,7 +22,7 @@
     </div> <!-- /row -->
 
     <div id="stream">
-    
+
 	{% for post in posts %}
 		{% include "post.html" %}
 			{% for comment in post.getComments %}
@@ -31,14 +31,14 @@
             {% include "post_footer.html" %}
 	{% endfor %}
     </div> <!-- /stream -->
-</div> <!-- /container --->
+</div> <!-- /container -->
 {% endblock %}
 
 {% block scripts %}
 <script>
     /* Post Ajax */
     var base_url = "/post/create/";
-    
+
     var form_options = {
         success: postSuccess,
         dataType: "json",
