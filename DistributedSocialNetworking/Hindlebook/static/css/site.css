@@ -48,11 +48,16 @@ a .btn {
 }
 
 .btn-ex-lg {
-    padding: 8px 20px;
+    padding: 10px 20px;
     font-size: 24px;
     line-height: 1.333;
     border-radius: 6px;
 }
+
+.btn-xs {
+    margin-top: 5px;
+}
+
 
 
 /* Forms ------------------------------------------ */
@@ -60,6 +65,15 @@ a .btn {
 .form-buttons {
     text-align: right;
     margin-top: 15px;
+}
+
+.form-buttons {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.form-buttons-inline {
+    margin-right: 10px;
 }
 
 .control-label {
@@ -88,6 +102,10 @@ a .btn {
 .help-text {
     font-size: smaller;
     color: #aea79f;
+}
+
+.fill-remaining-right {
+    overflow: hidden;
 }
 
 
@@ -219,6 +237,10 @@ float: right!important;
 /* Posts  ------------------------------------------ */
 
 
+#post-form {
+    margin-bottom: 80px;
+}
+
 @media (min-width: 500px) {
 
 .post-row  {
@@ -233,3 +255,16 @@ float: right!important;
         text-align: right;
      }
  }
+
+ /* Comments  ------------------------------------------ */
+
+ .add_comment_button {
+    position: relative;
+    top: -10px;
+    left: -10px;
+    margin-bottom: 50px;
+}
+
+#comment_form_html {
+    margin-bottom: 50px;
+}

@@ -62,12 +62,14 @@ class Comment(models.Model):
             return self.author
         return self.foreign_author
 
-    def clean(self):
+    def save(self, *args, **kwargs):
         if not self.author and not self.foreign_author:
             raise ValidationError("Requires an author.")
 
         if self.author and self.foreign_author:
             raise ValidationError("Can't have both an author and a foreign author.")
+        
+        return super(Comment, self).save(*args, **kwargs)
 
 
 class Image(models.Model):

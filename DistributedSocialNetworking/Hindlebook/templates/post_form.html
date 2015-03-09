@@ -5,7 +5,7 @@
         {% csrf_token %}
         <fieldset>
             <div class="col-lg-12">
-                    {% render_field post_form.text rows="3" cols="10" placeholder="Enter a new post..." class+="form-control" %}
+                    {% render_field post_form.text rows="3" placeholder="Enter a new post..." class+="form-control input-lg" %}
                     {% if post_form.text.errors %}
                         <div class="error-container error">{{ post_form.text.errors.0|escape }}</div>
                     {% endif %}
@@ -19,7 +19,7 @@
         <!-- Submit Button -->
         <div class="form-buttons col-lg-12">
           <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
-            <i class="icon-rocket2"></i> Create Post
+            <i class="icon-rocket2"></i> Post
           </button>
        </div> <!-- buttons -->
     <div class="clearfix"></div>

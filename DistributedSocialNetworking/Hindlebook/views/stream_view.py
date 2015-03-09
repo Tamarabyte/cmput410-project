@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from django.template.loader import render_to_string
 from django.template import RequestContext
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django import forms
 from django.conf import settings
@@ -30,6 +30,7 @@ class StreamView(TemplateView):
         context = super(StreamView, self).get_context_data(**kwargs)
         context['posts'] = Post.objects.all().order_by('-pub_date')
         context['post_form'] = PostForm()
+        context['comment_form'] = CommentForm()
         return context
 
 class CreatePost(View):
@@ -61,9 +62,36 @@ class CreatePost(View):
         response_data["post"] = render_to_string("post.html", {"post" : post, "MEDIA_URL" : settings.MEDIA_URL })
         return JsonResponse(response_data, status=201)
 
-    def get_context_data(self, **kwargs):
-        context = super(ProfileUpdateView, self).get_context_data(**kwargs)
-        return context
+
+class CreateComment(View):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(CreateComment, self).dispatch(*args, **kwargs)
+
+    def put(self, request, postUUID, commentUUID, *args, **kwargs):
+        put = QueryDict(request.body);
+        form = CommentForm(data=put)
+
+        if not form.is_valid():
+            response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : form}), 'errors': form.errors }
+            return JsonResponse(response_data, status=400)
+
+        post = get_object_or_404(Post, uuid=postUUID)
+        comment = form.save(request.user, post, commentUUID, commit=False);
+
+        try:
+            comment.full_clean()
+        except ValidationError as e:
+            errors = ""
+            for value in e.message_dict.values():
+                errors += ' '.join(value);
+            response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : form, "alert" : errors }) }
+            return JsonResponse(response_data, status=400)
+
+        comment.save()
+        response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : PostForm()}) }
+        response_data["comment"] = render_to_string("comment.html", {"comment" : comment })
+        return JsonResponse(response_data, status=201)
 
 
 
