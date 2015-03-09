@@ -1,17 +1,24 @@
 {% extends "base_header.html" %}
 {% load staticfiles %}
-{% block stylesheets %}
-    <script src="http://malsup.github.com/jquery.form.js"></script>
-{% endblock %}
 
 {% block page %}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div> <!-- /.modal-content -->
+    </div> <!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <div class="container">
     <div class="profile row">
         <div class="col-md-2 col-sm-2"></div>
         <div class="col-md-1 col-sm-1 text-right">
-        {% if user.id == author.id %}
-            <div class="profile-icon"><a href="#"><span class="icon-kub-edit"></span></a></div>
+        {% if user.uuid == author.uuid %}
+            <div class="profile-icon">
+                <a data-toggle="modal" href="{% url 'edit_profile' pk=user.id %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
+            </div>
             <div class="profile-icon"><a href="#"><span class="icon-kub-avatar-02"></span></a></div>
             <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{user.getFriendRequestCount}}</span></a></div>
         {% else %}
@@ -30,4 +37,9 @@
     </div>
 </div>
 
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="http://malsup.github.com/jquery.form.js"></script>
 {% endblock %}

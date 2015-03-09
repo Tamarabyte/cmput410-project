@@ -1,6 +1,8 @@
+from django.http import HttpResponse
 from django.http import Http404
 from django.views.generic import TemplateView, UpdateView
 from django.utils.decorators import method_decorator
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from Hindlebook.models import Post, User
 from Hindlebook.forms import ProfileEditForm
@@ -27,10 +29,22 @@ class ProfileView(TemplateView):
 
 
 class ProfileUpdateView(UpdateView):
+    template_name = 'edit_profile.html'
     model = User
     form_class = ProfileEditForm
-    template_name = 'profile_form.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        # uuid = kwargs.get('uuid', self.request.user.uuid)
+        # self.user = get_object_or_404(User, uuid=self.uuid)
+        return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         form.save()
-        return HttpResponse(render_to_string('profile_edit_form_success.html'))
+        return HttpResponse(render_to_string('edit_profile_success.html'))
+        # return HttpResponse(render_to_string('profile.html', {'loan': loan}))
+
+    def get_context_data(self, **kwargs):
+        # raise Http404("wtf3")
+        context = super(ProfileUpdateView, self).get_context_data(**kwargs)
+        return context
