@@ -16,9 +16,9 @@ class PostDetail(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
-    def get_object(self, uuid):
+    def get_object(self, guid):
         try:
-            return Post.objects.get(uuid=uuid)
+            return Post.objects.get(guid=guid)
         except Post.DoesNotExist:
             raise Http404
 
@@ -154,7 +154,7 @@ class AuthorPosts(APIView):
             serializer = PostSerializer(post)
             returnPosts.append(serializer.data)
 
-        return Response(json.dumps({"posts":returnPosts}))
+        return Response(json.dumps({"posts": returnPosts}))
 
 
 class PublicPosts(APIView):
@@ -163,7 +163,7 @@ class PublicPosts(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, requst, format=None):
+    def get(self, request, format=None):
         # Filter to get public posts, 0 is currently public (Should make it a text field)
         posts = Post.objects.filter(privacy=0)
 
@@ -172,4 +172,4 @@ class PublicPosts(APIView):
             serializer = PostSerializer(post)
             returnPosts.append(serializer.data)
 
-        return Response(json.dumps({"posts":returnPosts}))
+        return Response(json.dumps({"posts": returnPosts}))

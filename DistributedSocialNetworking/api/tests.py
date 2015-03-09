@@ -29,7 +29,7 @@ class APITests(TestCase):
         originalPost = serializer.data
 
         # Send a GET request with the post id
-        response = c.get('/api/post/%s' % self.post1.uuid)
+        response = c.get('/api/post/%s' % self.post1.guid)
 
         # Expects a 200 Ok with a JSON response
         self.assertEquals(response.status_code, 200, "Response not 200")
@@ -52,7 +52,7 @@ class APITests(TestCase):
         originalPost = serializer.data
 
         # Send a POST request with the post id
-        response = c.post('/api/post/%s' % self.post1.uuid)
+        response = c.post('/api/post/%s' % self.post1.guid)
 
         # Expects a 200 Ok with a JSON response
         self.assertEquals(response.status_code, 200, "Response not 200")
@@ -72,7 +72,7 @@ class APITests(TestCase):
         """ Test PUT an author post by given post ID """
 
         # Send a GET request with post id
-        response = c.get('/api/post/%s' % self.post1.uuid)
+        response = c.get('/api/post/%s' % self.post1.guid)
 
         # Decode the JSON response
         decoded = json.loads(response.content.decode('utf-8'))
@@ -87,7 +87,7 @@ class APITests(TestCase):
         JSONdata = json.dumps(newPost)
 
         # Send a PUT request to update the existing post
-        response = c.put('/api/post/%s' % self.post1.uuid, data=JSONdata, content_type='application/json; charset=utf')
+        response = c.put('/api/post/%s' % self.post1.guid, data=JSONdata, content_type='application/json; charset=utf')
 
         # Decode the JSON response
         decoded = json.loads(response.content.decode('utf-8'))

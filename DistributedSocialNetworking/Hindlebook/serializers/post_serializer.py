@@ -6,7 +6,7 @@ from Hindlebook.models import Post
 class PostSerializer(serializers.Serializer):
     text = serializers.CharField()
     pub_date = serializers.DateTimeField()
-    uuid = serializers.CharField(max_length=40)
+    guid = serializers.CharField(max_length=40)
     title = serializers.CharField(max_length=40)
     description = serializers.CharField(max_length=40)
     content_type = serializers.CharField(max_length=40)
@@ -28,7 +28,7 @@ class PostSerializer(serializers.Serializer):
         with transaction.atomic():
             instance.text = validated_data.get('text', instance.text)
             instance.pub_date = validated_data.get('pub_date', instance.pub_date)
-            instance.uuid = validated_data.get('uuid', instance.uuid)
+            instance.guid = validated_data.get('guid', instance.guid)
             instance.title = validated_data.get('title', instance.title)
             instance.description = validated_data.get('description', instance.description)
             instance.content_type = validated_data.get('content_type', instance.content_type)
