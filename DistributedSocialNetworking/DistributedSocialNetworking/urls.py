@@ -27,6 +27,9 @@ urlpatterns = patterns('',
     # url(r'^author/edit$', ProfileUpdateView.as_view(), name='edit_profile'),
     url(r'^profile/(?P<authorUUID>[\w-]+)', ProfileView.as_view(), name="profile"),
 
+    # Friends URLs
+    url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsListView.as_view(), name='friends_view'),
+
     # Search URLs
     url(r'^search$', 'Hindlebook.views.search', name="search"),
 

@@ -19,7 +19,9 @@
             <div class="profile-icon">
                 <a data-toggle="modal" href="{% url 'edit_profile' user.id %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
             </div>
-            <div class="profile-icon"><a href="#"><span class="icon-kub-avatar-02"></span></a></div>
+            <div class="profile-icon">
+                <a data-toggle="modal" href="{% url 'friends_view' user.uuid %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-avatar-02"></span></a>
+            </div>
             <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{user.getFriendRequestCount}}</span></a></div>
         {% else %}
             <div class="profile-icon"><a href="#"><span class="icon-favourite-3"></span></a></div>

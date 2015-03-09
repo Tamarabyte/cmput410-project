@@ -28,7 +28,13 @@ class User(AbstractUser):
         A = self.followed_by.all()
         B = self.follows.all()
         return A.exclude(pk__in=B)
-    
+
+    # Those which I follow but do not follow back
+    def getFollowing(self):
+        A = self.followed_by.all()
+        B = self.follows.all()
+        return B.exclude(pk__in=A)
+
     # Get the count of friend requests
     def getFriendRequestCount(self):
         return len(self.getFriendRequests())
