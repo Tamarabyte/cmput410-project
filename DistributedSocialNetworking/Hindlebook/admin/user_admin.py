@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 class UserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
         model = get_user_model()
-        
+
     def clean_username(self):
         username = self.cleaned_data['username']
 
@@ -19,7 +19,11 @@ class UserCreationForm(AdminUserCreationForm):
             self.error_messages['duplicate_username'],
             code='duplicate_username',
         )
-        
+
+def approve_users(modeladmin, request, queryset):
+        queryset.update(is_active=True)
+approve_users.short_description = "Approve user registrations"
+
 class UserAdmin(BaseAdmin):
     
     # List View Attributes
@@ -27,13 +31,17 @@ class UserAdmin(BaseAdmin):
     search_fields = []
     exclude = []
     inlines = []
+    actions = [approve_users]
     
-    list_display = ('username', 'date_joined', 'is_superuser')
+    ordering = ('username',)
+    list_display = ('username', 'date_joined', 'is_active')
     add_form = UserCreationForm
-    
+
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser')}),
         ('Personal', {'fields': ('avatar',)}),
     )
-    
+
+

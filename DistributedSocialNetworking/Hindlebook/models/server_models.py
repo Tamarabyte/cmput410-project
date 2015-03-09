@@ -31,3 +31,6 @@ class Server(models.Model):
     # password to access this server
     password = models.CharField(max_length=128, blank=True, default="")
 
+
+    class Meta:
+        verbose_name_plural = "Server"

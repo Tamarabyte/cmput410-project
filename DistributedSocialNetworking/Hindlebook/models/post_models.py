@@ -1,10 +1,16 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError
+
 import uuid as uuid_import
 from Hindlebook.models import ForeignUser
 
 class Category(models.Model):
     tag = models.CharField(max_length=25, null=False, blank=False)
+
+    class Meta():
+        verbose_name = "Tags"
+        verbose_name_plural = "Tags"
 
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
@@ -55,6 +61,14 @@ class Comment(models.Model):
         if self.author:
             return self.author
         return self.foreign_author
+
+    def clean(self):
+        if not self.author and not self.foreign_author:
+            raise ValidationError("Requires an author.")
+
+        if self.author and self.foreign_author:
+            raise ValidationError("Can't have both an author and a foreign author.")
+
 
 class Image(models.Model):
     """Model for representing an Image attached to Posts"""
