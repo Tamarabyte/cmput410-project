@@ -42,15 +42,7 @@ class CreatePost(View):
 
 
         post = form.save(request.user ,postUUID, commit=False);
-        try:
-            post.full_clean()
-        except ValidationError as e:
-            errors = ""
-            for value in e.message_dict.values():
-                errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("post/post_form.html", {"post_form" : form, "alert" : errors }) }
-            return JsonResponse(response_data, status=400)
-
+        
         post.save()
         response_data = { 'form' : render_to_string( "post/post_form.html", {"post_form" : PostForm()}) }
 
@@ -75,15 +67,6 @@ class CreateComment(View):
 
         post = get_object_or_404(Post, uuid=postUUID)
         comment = form.save(request.user, post, commentUUID, commit=False);
-
-        try:
-            comment.full_clean()
-        except ValidationError as e:
-            errors = ""
-            for value in e.message_dict.values():
-                errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : form, "alert" : errors }) }
-            return JsonResponse(response_data, status=400)
 
         comment.save()
         response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : PostForm()}) }
