@@ -10,5 +10,5 @@ class ProfileEditForm(forms.ModelForm, TemplateMixin):
 
     class Meta:
         model = User
-        fields = ['about']
+        fields = ['about', 'github_id', 'avatar']
         # exclude = ('username', 'password', 'uuid')
