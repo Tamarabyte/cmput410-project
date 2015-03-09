@@ -6,7 +6,7 @@
 <div class="container">
 	<div class="row">
 		<div class="well">
-			<form action="posts" method="post"> {% csrf_token %}
+			<form action="posts" method="post" autocomplete="off" > {% csrf_token %}
 				{{ post_form.as_bootstrap_form }}
 				<input type="submit" name="new_post" value="Create Post" />
 			</form>
@@ -16,7 +16,7 @@
 		<div class="row">
 			<div class="well">
 				<div class="row">
-					<div class="col-md-2 col-sm-2"><img src="{% static "{{ post.author.avatar" %}"  height="75"></img></div>
+					<div class="col-md-2 col-sm-2"><img src="{{ post.author.avatar }}"  height="75"></img></div>
 					<div class="col-md-10 col-sm-10">
 						<div class="row"><h4><b>{{ post.author.username }}</b></h4></div>
 						<div class="row"><h5>{{post.pub_date }}</h5></div>
@@ -33,7 +33,7 @@
 					</div>
 				</div>
 				{% endfor %}
-				<form action="posts/{{ post.uuid }}" method="post">
+				<form action="posts/{{ post.uuid }}" method="post" autocomplete="off">
 					{% csrf_token %}
 					{{ comment_form.as_bootstrap_form }}
 					<input type="submit" name="new_comment" value="Add comment" />
