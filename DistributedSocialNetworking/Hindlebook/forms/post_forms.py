@@ -17,7 +17,7 @@ class PostForm(forms.ModelForm):
         post = super(PostForm, self).save(commit=False)
         post.author = user
         post.guid = postGUID
-
+        
         # Update this with logic to detect content type
         post.content_type = 0
 
@@ -28,7 +28,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['text']
+        fields = ['text', 'privacy']
 
 class CommentForm(forms.ModelForm):
 

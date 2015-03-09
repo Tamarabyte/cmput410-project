@@ -13,6 +13,7 @@
                     <div class="error-container error">{{ alert | safe }}{{ post_form.text.errors.0|escape }}</div>
                 {% endif %}
                 <input id="guid" type="hidden" value="{{ post_form.guid }}" />
+                {% render_field post_form.privacy default="0" %}
             </div>
         </fieldset>
 
