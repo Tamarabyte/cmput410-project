@@ -154,7 +154,7 @@ class AuthorPosts(APIView):
             serializer = PostSerializer(post)
             returnPosts.append(serializer.data)
 
-        return Response(json.dumps(returnPosts))
+        return Response(json.dumps({"posts":returnPosts}))
 
 
 class PublicPosts(APIView):
@@ -164,12 +164,12 @@ class PublicPosts(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, requst, format=None):
-        # Filter to get public posts, 5 is public
-        posts = Post.objects.filter(privacy=5)
+        # Filter to get public posts, 0 is currently public (Should make it a text field)
+        posts = Post.objects.filter(privacy=0)
 
         returnPosts = []
         for post in posts:
             serializer = PostSerializer(post)
             returnPosts.append(serializer.data)
 
-        return Response(json.dumps(returnPosts))
+        return Response(json.dumps({"posts":returnPosts}))

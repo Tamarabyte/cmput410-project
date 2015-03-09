@@ -172,9 +172,13 @@ class APITests(TestCase):
         jsonString = json.loads(response.content.decode('utf-8'))
         jsonObject = json.loads(jsonString)
 
-        self.assertEquals(len(jsonObject), 2, "Author should have 2 posts")
+        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
-        for post in jsonObject:
+        posts = jsonObject['posts']
+
+        self.assertEquals(len(posts), 2, "Author should have 2 posts")
+
+        for post in posts:
             serializer = PostSerializer(data=post)
             self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
             postData = serializer.data
@@ -192,9 +196,13 @@ class APITests(TestCase):
         jsonString = json.loads(response.content.decode('utf-8'))
         jsonObject = json.loads(jsonString)
 
-        self.assertEquals(len(jsonObject), 1, "Author should have 1 post")
+        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
-        for post in jsonObject:
+        posts = jsonObject['posts']
+
+        self.assertEquals(len(posts), 1, "Author should have 1 post")
+
+        for post in posts:
             serializer = PostSerializer(data=post)
             self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
             postData = serializer.data
@@ -207,7 +215,7 @@ class APITests(TestCase):
         publicPost = mommy.make(Post)
 
         # Make a private post
-        privatePost = mommy.make(Post, privacy=0)
+        privatePost = mommy.make(Post, privacy=3)
 
         response = c.get('/api/posts')
 
@@ -216,9 +224,12 @@ class APITests(TestCase):
         jsonString = json.loads(response.content.decode('utf-8'))
         jsonObject = json.loads(jsonString)
 
-        self.assertEquals(len(jsonObject), 3, "Should be 2 public post")
+        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
-        for post in jsonObject:
+        posts = jsonObject['posts']
+        self.assertEquals(len(posts), 3, "Should be 2 public post")
+
+        for post in posts:
             serializer = PostSerializer(data=post)
             self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
             postData = serializer.data
