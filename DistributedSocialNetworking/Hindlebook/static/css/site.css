@@ -215,3 +215,21 @@ float: right!important;
     font-size: 20px;
     margin-right: 5px;
 }
+
+/* Posts  ------------------------------------------ */
+
+
+@media (min-width: 500px) {
+
+.post-row  {
+    text-align: left;
+ }
+}
+
+
+ @media (min-width: 992px) {
+
+    .post-row .post-date {
+        text-align: right;
+     }
+ }

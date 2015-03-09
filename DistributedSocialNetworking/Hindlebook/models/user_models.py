@@ -9,7 +9,7 @@ class User(AbstractUser):
     uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, db_index=True)
 
     github_id = models.CharField(max_length=30, blank=True, default='')
-    avatar = models.ImageField(null=True, blank=True)
+    avatar = models.ImageField(null=False, blank=True, default="default_avatar.jpg")
     about = models.CharField(max_length=250, blank=True, default="")
 
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False, db_index=True)
