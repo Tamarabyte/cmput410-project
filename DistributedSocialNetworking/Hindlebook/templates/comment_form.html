@@ -1,0 +1,22 @@
+{% load widget_tweaks %}
+
+    {% csrf_token %}
+    <fieldset>
+        <div class="form-buttons-inline pull-left">
+            <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
+                <i class="icon-rocket2"></i>
+            </button>
+        </div>
+        <div class="fill-remaining-right">
+                {% render_field comment_form.text rows="1" placeholder="Add a comment..." class+="form-control input-lg" %}
+                {% if comment_form.text.errors %}
+                    <div class="error-container error">{{ comment_form.text.errors.0|escape }}</div>
+                {% endif %}
+                {% if alert %}
+                    <div class="error-container error">{{ alert | safe }}{{ comment_form.text.errors.0|escape }}</div>
+                {% endif %}
+                <input id="comment-uuid" type="hidden" value="{{ comment_form.uuid }}" />
+        </div>
+        <div class="clearfix"></div>
+    </fieldset>
+

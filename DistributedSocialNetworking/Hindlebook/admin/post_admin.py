@@ -7,7 +7,7 @@ class ImagesAdmin(TabularInline):
 
 class CommentsAdmin(TabularInline):
     model = Comment
-    ordering = ("pub_date",)
+    ordering = ("-pub_date",)
     extra = 0
 
 
@@ -20,7 +20,7 @@ class PostAdmin(ModelAdmin):
     inlines = []
 
     list_display = ('pub_date', 'get_authorname', 'uuid')
-    ordering = ("pub_date",)
+    ordering = ("-pub_date",)
 
     inlines = [ImagesAdmin, CommentsAdmin]
 

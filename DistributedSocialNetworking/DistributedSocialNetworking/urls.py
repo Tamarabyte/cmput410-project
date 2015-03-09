@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView, RedirectView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import ProfileView, StreamView, CreatePost, RegistrationView, LogoutRedirect, PostView, CommentView, ProfileUpdateView
+from Hindlebook.views import ProfileView, StreamView, CreatePost, CreateComment, RegistrationView, LogoutRedirect, ProfileUpdateView
 from django.contrib.auth.decorators import login_required
 from django.conf.urls.static import static
 from django.conf import settings
@@ -20,10 +20,7 @@ urlpatterns = patterns('',
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
     url(r'^post/create/(?P<postUUID>[\w-]+)', CreatePost.as_view(), name="create_post"),
-
-    # posting to posts
-    url(r'^posts$', PostView.as_view(), name="posts"),
-    url(r'^posts/(?P<postUUID>[\w-]+)', CommentView.as_view(), name="post_comments"),
+    url(r'^post/(?P<postUUID>[\w-]+)/create/(?P<commentUUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
 
     # Profile URLs
     url(r'^profile$', ProfileView.as_view(), name="personal_profile"),
