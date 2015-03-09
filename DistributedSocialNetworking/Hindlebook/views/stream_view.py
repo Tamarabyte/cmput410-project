@@ -6,6 +6,8 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django import forms
 
+from rest_framework.response import Response
+
 from Hindlebook.models.post_models import Post, Comment
 from Hindlebook.models import user_models
 from Hindlebook.forms import PostForm, CommentForm
@@ -16,7 +18,6 @@ class StreamView(TemplateView):
 	template_name = "stream.html"
 	post_form = PostForm(prefix="pos")
 	comment_form = CommentForm(prefix="com")
-	success_url = "stream"
 
 	@method_decorator(login_required)
 	def dispatch(self, *args, **kwargs):
@@ -41,4 +42,4 @@ class StreamView(TemplateView):
 		if (form.is_valid()):
 			form.on_valid(self.request.user)
 			
-		return redirect(reverse("stream"))
+		return Response("OK")

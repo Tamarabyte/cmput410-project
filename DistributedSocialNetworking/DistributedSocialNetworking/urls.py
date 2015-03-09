@@ -3,8 +3,10 @@ from django.contrib import admin
 from django.contrib.auth.views import login
 from django.views.generic import TemplateView, RedirectView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import ProfileView, StreamView, RegistrationView, LogoutRedirect
+from Hindlebook.views import ProfileView, StreamView, RegistrationView, LogoutRedirect, PostView, CommentView
 from django.contrib.auth.decorators import login_required
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = patterns('',
     # Pre-login URLs
@@ -14,6 +16,10 @@ urlpatterns = patterns('',
 
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
+
+    # posting to posts
+    url(r'^posts$', PostView.as_view(), name="posts"),
+    url(r'^posts/(?P<postUUID>[\w-]+)', CommentView.as_view(), name="post_comments"),
 
     # Profile URLs
     url(r'^profile$', ProfileView.as_view(), name="personal_profile"),
@@ -29,4 +35,4 @@ urlpatterns = patterns('',
 
     # Admin Site
     url(r'^admin/', include(admin.site.urls)),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

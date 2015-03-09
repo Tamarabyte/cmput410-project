@@ -26,14 +26,21 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STATIC_URL = '/static/'
-STATIC_ROOT = '/home/www/hindlebook/static/'
+STATIC_ROOT = '/home/www/hindlebook/static'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'Hindlebook/static'),
 )
+STATIC_URL = '/static/'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'stream'
+
+if DEBUG == True:
+    MEDIA_ROOT = os.path.join(os.path.realpath(BASE_DIR), 'Hindlebook/media')
+else:
+    MEDIA_ROOT = '/home/www/hindlebook/media'
+    
+MEDIA_URL = "/media/"
 
 # Application definition
 
@@ -96,9 +103,3 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-
-STATIC_URL = '/static/'
