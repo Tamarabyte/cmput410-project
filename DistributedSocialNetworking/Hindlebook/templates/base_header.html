@@ -7,47 +7,56 @@
 
 {% block content %}
     
+    <!-- navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
 
-        
         <div class="navbar-header">
           <a class="navbar-brand" href="{% url "stream" %}">Hindleb <i class="title-img icon-glasses"></i> k</a>
         </div> <!-- /navbar-header -->
   
-
         <ul class="nav navbar-nav">
-          <li><a href="{% url "personal_profile" %}"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
-          <li><a><span class="badge">{{ user.getFriendRequestCount }}</span></a></li>
-          <li><a><i class="icon-search navbar-img bold"></i></a></li>
-          <li><input id = "test" type="text" class="form-control input-sm hidden" placeholder="Search"></input></li>
+          <li><a href="{% url "personal_profile" %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
+          <li><a href="#"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
+          <li><a href="#"><span class="badge">{{ user.getFriendRequestCount }}</span></a></li>
         </ul>
- 
         
-        <div class="navbar-right">
-          <ul class="nav navbar-nav">
-            <li><a href="#">logout&nbsp;&nbsp;<i class="icon-sign-out navbar-img"></i></a></li>
+          <ul id="search-nav" class="nav navbar-nav navbar-right">
+            <li><input id="search-bar" type="text" class="form-control input-sm" placeholder="Search"></input></li>
+            <li><a id="search-toggle"><i class="icon-search navbar-img bold"></i></a></li>
           </ul>
-        </div>
         
         </div> <!-- /collapse-->
       </div> <!-- /container-fluid -->
     </nav>
-
-    
-    
-
-
+    <!-- /navbar -->
 
     {% block page %}
     {% endblock %}
 
+    <!-- bottom navbar -->
+    <nav class="navbar navbar-default navbar-fixed-bottom">
+        <div class="navbar-right">
+          <ul class="nav navbar-nav">
+            <li><a href="{% url "logout" %}"><span class="bot-text">logout&nbsp;&nbsp;<i class="icon-sign-out navbar-img"></i></span></a></li>
+          </ul>
+        </div>
+    </nav>
+    <!-- bottom navbar -->
+    
 {% endblock %}
 
 
-{% block scripts%}
+{% block scripts %}
     <script type="text/javascript">
-        jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
+      $(document).ready( function() {
+        $('#search-bar').hide();
+        $("#search-toggle").click(function () {
+          $('#search-bar').toggle();
+          $('#search-nav').toggleClass("active");
+          });
+      });
+    //jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
     </script>
 {% endblock %}
 

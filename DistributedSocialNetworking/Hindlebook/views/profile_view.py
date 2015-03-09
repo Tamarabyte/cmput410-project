@@ -3,7 +3,10 @@ from django.views.generic import TemplateView, UpdateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from Hindlebook.models import Post, User
-from Hindlebook.forms import EditProfileForm
+from Hindlebook.forms import ProfileEditForm
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class ProfileView(TemplateView):
@@ -15,16 +18,11 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
-        profileID = self.kwargs['profileID']
-        try:
-            profile = User.objects.get(id=profileID)
-        except User.DoesNotExist:
-            raise Http404("User does not exist")
 
-        context['author'] = User.objects.filter(id=profileID).first()
-        context['posts'] = Post.objects.filter(author_id=profileID)
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
+        context['author'] = get_object_or_404(User, uuid=authorUUID)
+        context['posts'] = Post.objects.filter(author__uuid=authorUUID)
 
-        context['notification_count'] = getFriendRequestCount()
         return context
 
 
@@ -32,10 +30,6 @@ class ProfileUpdateView(UpdateView):
     model = User
     form_class = ProfileEditForm
     template_name = 'profile_form.html'
-
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
 
     def form_valid(self, form):
         form.save()

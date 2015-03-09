@@ -1,11 +1,19 @@
 from django import forms
 
-class PostForm(forms.Form):
-		post_text = forms.CharField(label="",widget=forms.Textarea)
-		post_privacy = forms.ChoiceField(label = "Privacy", widget=forms.Select(),
-										choices = ([(0,"Self Only"),
-													(1,"Selected author"),
-													(2,"Friends"),
-													(3,"Friends of Friends"),
-													(4,"Friends on host"),
-													(5,"Public")]),required=True)
+from datetime import datetime
+
+from Hindlebook.models.post_models import Post
+from Hindlebook.forms.template_mixin import TemplateMixin
+
+
+class PostForm(forms.Form, TemplateMixin):
+	text = forms.CharField()
+
+	def __init__(self, *args, **kwargs):
+		self.request = kwargs.pop('request', None)
+		super(PostForm, self).__init__(*args, **kwargs)
+
+	def on_valid(self, user):
+		new_p = Post(author=user, text=self.cleaned_data['text'] , pub_date=datetime.now())
+		new_p.save()
+

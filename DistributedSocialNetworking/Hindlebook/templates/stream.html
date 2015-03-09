@@ -2,12 +2,13 @@
 {% load staticfiles %}
 
 {% block page %}
+
 <div class="container">
 	<div class="row">
 		<div class="well">
 			<form action="" method="post"> {% csrf_token %}
-				{{ form.as_p }}
-				<input type="submit" value="Send message" />
+				{{ post_form.as_bootstrap_form }}
+				<input type="submit" name="new_post" value="Create Post" />
 			</form>
 		</div>
 	</div>
@@ -17,7 +18,7 @@
 				<div class="row">
 					<div class="col-md-2 col-sm-2"><img src="{% static "{{ post.author.avatar" %}"  height="75"></img></div>
 					<div class="col-md-10 col-sm-10">
-						<div class="row"><h4><b>{{ post.author.first_name }} {{ post.author.last_name }}</b></h4></div>
+						<div class="row"><h4><b>{{ post.author.username }}</b></h4></div>
 						<div class="row"><h5>{{post.pub_date }}</h5></div>
 					</div>
 				</div>
@@ -27,11 +28,17 @@
 				{% for comment in post.getComments %}
 				<div class="row">
 					<div class="well">
-						<div class="row"><h5><b>{{ comment.author.first_name }} {{ comment.author.last_name }} - {{ comment.pub_date }}</b></h5></div>
+						<div class="row"><h5><b>{{ comment.author.username }} - {{ comment.pub_date }}</b></h5></div>
 						<div class="row">{{ comment.text}}</div>
 					</div>
 				</div>
 				{% endfor %}
+				<form action="" method="post">
+					{% csrf_token %}
+					{{ comment_form.as_bootstrap_form }}
+					<input type="hidden" name="post_id" value="{{post.uuid}}" />
+					<input type="submit" name="new_comment" value="Add comment" />
+				</form>
 			</div>
 		</div>
 	{% endfor %}

@@ -1,22 +1,24 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.views import login
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from Hindlebook.forms import LoginForm
-from Hindlebook.views import ProfileView, StreamView, RegistrationView
+from Hindlebook.views import ProfileView, StreamView, RegistrationView, LogoutRedirect
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = patterns('',
     # Pre-login URLs
-    url(r'^$', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
+    url(r'^login/', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
+    url(r'^logout$', LogoutRedirect.as_view(), name='logout'),
     url(r'^register$', RegistrationView.as_view(), name='register'),
 
     # Stream URLs
-    url(r'^stream$', StreamView.as_view(), name="stream"),
+    url(r'^$', StreamView.as_view(), name="stream"),
 
     # Profile URLs
     url(r'^profile$', ProfileView.as_view(), name="personal_profile"),
-    url(r'^profile/(?P<authorID1>[\w-]+)', ProfileView.as_view(), name="profile"),
+    url(r'^author/(?P<authorUUID>[\w-]+)/edit/?$', login_required(ProfileUpdateView.as_view()), name='edit_profile'),
+    url(r'^profile/(?P<authorUUID>[\w-]+)', ProfileView.as_view(), name="profile"),
 
     # Search URLs
     url(r'^search$', 'Hindlebook.views.search', name="search"),

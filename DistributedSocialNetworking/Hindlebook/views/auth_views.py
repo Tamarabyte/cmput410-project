@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.views.generic.edit import FormView
+from django.views.generic.base import RedirectView
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
+from django.contrib.auth import logout
 
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
@@ -27,5 +29,12 @@ class RegistrationView(FormView):
     
     def get_success_url(self):
         return reverse('login')
-    
 
+class LogoutRedirect(RedirectView):
+    
+    pattern_name = 'login'
+
+    def dispatch(self, *args, **kwargs):
+        logout(self.request)
+        messages.add_message(self.request, messages.SUCCESS, 'You have now logged out of Hindlebook. Goodbye :(')
+        return super(LogoutRedirect, self).dispatch(*args, **kwargs)

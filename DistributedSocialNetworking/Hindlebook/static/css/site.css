@@ -94,13 +94,13 @@ a .btn {
     color: #aea79f;
 }
 
-/* Alerts */
+/* Alerts ------------------------------------------ */
 
 .alert-success {
   color: #38b44a;
   border-color: #38b44a;
+  background-color: #fff;
 }
-
 
 .profile-icon {
     font-size: 20pt;
@@ -110,14 +110,17 @@ a .btn {
     font-size: 20pt;
 }
 
-/* Navbar */
+/* Navbar ------------------------------------------ */
+
+.navbar {
+  min-height: 30px;
+}
 .navbar-header .title-img {
   font-weight: bold;
 }
 
 .navbar .badge {
   left: -15px;
-
 }
 
 .navbar .btn {
@@ -131,6 +134,7 @@ a .btn {
 
 .navbar .input-sm {
   margin-top: 12px;
+  border-color: #97310e;
 }
 
 .navbar-header {
@@ -139,7 +143,7 @@ a .btn {
 }
 
 .navbar-nav>li, .navbar-nav {
-float: left !important;
+  float: left !important;
 }
 
 .navbar-nav.navbar-right:last-child {
@@ -148,6 +152,32 @@ margin-right: -15px !important;
 
 .navbar-right {
 float: right!important;
+}
+
+.navbar-fixed-bottom {
+  height: 35px;
+}
+
+.navbar-fixed-bottom .navbar-nav .bot-text {
+  padding-bottom: 10px;
+  position: absolute;
+  bottom: 2px;
+  right:  30px;
+  
+}
+
+.navbar-fixed-bottom .navbar-nav a, .navbar-fixed-bottom .navbar-nav a:hover {
+  height: 40px;
+  width: 120px;
+}
+
+.navbar #search-bar {
+  width: 200px;
+}
+
+.navbar-fixed-top .navbar-right.active {
+  padding-left: 15px;
+  background-color: #97310e;
 }
 
 .bold {
