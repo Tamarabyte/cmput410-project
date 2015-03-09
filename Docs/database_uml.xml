@@ -37,7 +37,7 @@
 		<type label="SET" length="1" sql="SET" quote=""/>
 		<type label="Bit" length="0" sql="bit" quote=""/>
 	</group>
-</datatypes><table x="103" y="235" name="User">
+</datatypes><table x="103" y="108" name="User">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -77,6 +77,12 @@
 <row name="*date_joined" null="1" autoincrement="0">
 <datatype>DATE</datatype>
 <default>NULL</default></row>
+<row name="uuid" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="github_id (optional)" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
 <row name="avatar (optional)" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
@@ -88,42 +94,64 @@
 <default>NULL</default><relation table="User" row="id" />
 </row>
 <row name="follows_foreign (M2M)" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="Foreign_User" row="id" />
+<datatype>VARCHAR</datatype>
+<default>NULL</default><relation table="Foreign_User" row="uuid" />
+</row>
+<row name="node" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default><relation table="Server" row="id" />
 </row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
 </table>
-<table x="341" y="133" name="Post">
-<row name="id" null="1" autoincrement="1">
+<table x="606" y="157" name="Post">
+<row name="uuid" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="source" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="origin" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="title" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="categories (M2M)" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="Category" row="id" />
+</row>
+<row name="text" null="1" autoincrement="0">
+<datatype>MEDIUMTEXT</datatype>
 <default>NULL</default></row>
 <row name="author" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="User" row="id" />
 </row>
-<row name="permission" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="Permission" row="id" />
-</row>
-<row name="text" null="1" autoincrement="0">
-<datatype>MEDIUMTEXT</datatype>
-<default>NULL</default></row>
 <row name="pub_date" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
+<row name="content_type" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="privacy" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
 <key type="PRIMARY" name="">
-<part>id</part>
+<part>uuid</part>
 </key>
 </table>
-<table x="517" y="324" name="Image">
+<table x="783" y="153" name="Image">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
-<row name="post" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="Post" row="id" />
+<row name="attached_to" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default><relation table="Post" row="uuid" />
 </row>
 <row name="author" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
@@ -138,21 +166,21 @@
 <part>id</part>
 </key>
 </table>
-<table x="513" y="488" name="Comment">
-<row name="id" null="1" autoincrement="1">
-<datatype>INTEGER</datatype>
+<table x="576" y="619" name="Comment">
+<row name="uuid" null="1" autoincrement="1">
+<datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="post" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
-<default>NULL</default><relation table="Post" row="id" />
+<default>NULL</default><relation table="Post" row="uuid" />
 </row>
 <row name="author" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="User" row="id" />
 </row>
 <row name="foreign_author" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="Foreign_User" row="id" />
+<datatype>VARCHAR</datatype>
+<default>NULL</default><relation table="Foreign_User" row="uuid" />
 </row>
 <row name="text" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
@@ -161,26 +189,15 @@
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
-<part>id</part>
+<part>uuid</part>
 </key>
 </table>
-<table x="342" y="28" name="Permission">
+<table x="353" y="768" name="Node">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
-<row name="name" null="1" autoincrement="0">
+<row name="host" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
-<default>NULL</default></row>
-<row name="user (optional)" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default></row>
-<key type="PRIMARY" name="">
-<part>id</part>
-</key>
-</table>
-<table x="362" y="705" name="Node">
-<row name="id" null="1" autoincrement="1">
-<datatype>INTEGER</datatype>
 <default>NULL</default></row>
 <row name="host_name" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
@@ -201,11 +218,14 @@
 <part>id</part>
 </key>
 </table>
-<table x="101" y="88" name="Server">
+<table x="104" y="675" name="Server">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
-<row name="hostname" null="1" autoincrement="0">
+<row name="host" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="host_name" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="connection_limit" null="1" autoincrement="0">
@@ -218,23 +238,30 @@
 <part>id</part>
 </key>
 </table>
-<table x="113" y="703" name="Foreign_User">
-<row name="id" null="1" autoincrement="1">
+<table x="308" y="633" name="Foreign_User">
+<row name="uuid" null="1" autoincrement="1">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="node" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="Node" row="id" />
 </row>
-<row name="node" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default></row>
-<row name="user_id" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default></row>
 <row name="username" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>uuid</part>
+</key>
+</table>
+<table x="797" y="333" name="Category">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="tag" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
 </table>
 </sql>
-
