@@ -9,7 +9,7 @@
     <!-- New Post Form -->
 	<div class="row">
 		<form id="post-form" action=".">
-            {% include "post_form.html" %}
+            {% include "post/post_form.html" %}
 		</form>
 	</div> <!-- /row -->
     <!-- /EndNewPostForm -->
@@ -17,18 +17,18 @@
     <!-- New Comment Form -->
     <div id="comment_form_html" class="row" hidden>
         <form id="comment-form" action=".">
-            {% include "comment_form.html" %}
+            {% include "comment/comment_form.html" %}
         </form>
     </div> <!-- /row -->
 
     <div id="stream">
 
 	{% for post in posts %}
-		{% include "post.html" %}
+		{% include "post/post.html" %}
 			{% for comment in post.getComments %}
-                {% include "comment.html" %}
+                {% include "comment/comment.html" %}
 			{% endfor %}
-            {% include "post_footer.html" %}
+            {% include "post/post_footer.html" %}
 	{% endfor %}
     </div> <!-- /stream -->
 </div> <!-- /container -->

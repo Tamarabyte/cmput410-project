@@ -37,7 +37,7 @@ class CreatePost(View):
         form = PostForm(data=put)
         
         if not form.is_valid():
-            response_data = { 'form' : render_to_string("post_form.html", {"post_form" : form}) }
+            response_data = { 'form' : render_to_string( "post/post_form.html", {"post_form" : form}) }
             return JsonResponse(response_data, status=400)
 
 
@@ -48,14 +48,14 @@ class CreatePost(View):
             errors = ""
             for value in e.message_dict.values():
                 errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("post_form.html", {"post_form" : form, "alert" : errors }) }
+            response_data = { 'form' : render_to_string("post/post_form.html", {"post_form" : form, "alert" : errors }) }
             return JsonResponse(response_data, status=400)
 
         post.save()
-        response_data = { 'form' : render_to_string("post_form.html", {"post_form" : PostForm()}) }
+        response_data = { 'form' : render_to_string( "post/post_form.html", {"post_form" : PostForm()}) }
 
-        response_data["post"] = render_to_string("post.html", {"post" : post, "MEDIA_URL" : settings.MEDIA_URL })
-        response_data["post"] += render_to_string("post_footer.html", {"post" : post})
+        response_data["post"] = render_to_string("post/post.html", {"post" : post, "MEDIA_URL" : settings.MEDIA_URL })
+        response_data["post"] += render_to_string("post/post_footer.html", {"post" : post})
         response_data["created_uuid"] = post.uuid;
         return JsonResponse(response_data, status=201)
 
@@ -70,7 +70,7 @@ class CreateComment(View):
         form = CommentForm(data=put)
 
         if not form.is_valid():
-            response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : form}), 'errors': form.errors }
+            response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : form}), 'errors': form.errors }
             return JsonResponse(response_data, status=400)
 
         post = get_object_or_404(Post, uuid=postUUID)
@@ -82,12 +82,12 @@ class CreateComment(View):
             errors = ""
             for value in e.message_dict.values():
                 errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : form, "alert" : errors }) }
+            response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : form, "alert" : errors }) }
             return JsonResponse(response_data, status=400)
 
         comment.save()
-        response_data = { 'form' : render_to_string("comment_form.html", {"comment_form" : PostForm()}) }
-        response_data["comment"] = render_to_string("comment.html", {"comment" : comment })
+        response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : PostForm()}) }
+        response_data["comment"] = render_to_string("comment/comment.html", {"comment" : comment })
         return JsonResponse(response_data, status=201)
 
 
