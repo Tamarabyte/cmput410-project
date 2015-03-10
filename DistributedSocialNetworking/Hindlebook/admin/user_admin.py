@@ -34,7 +34,7 @@ class UserAdmin(BaseAdmin):
     actions = [approve_users]
     
     ordering = ('username',)
-    list_display = ('username', 'date_joined', 'is_active')
+    list_display = ('username', 'uuid', 'date_joined', 'is_active')
     add_form = UserCreationForm
 
 
