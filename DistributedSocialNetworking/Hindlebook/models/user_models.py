@@ -65,3 +65,6 @@ class ForeignUser(models.Model):
     node = models.ForeignKey(Node, related_name="users")
     username = models.CharField('username', max_length=30, blank=False)
 
+    def __str__(self):
+        return self.username
+

@@ -1,1 +1,1 @@
-from api.serializers.author_serializers import AuthorSerializer, ForeignAuthorSerializer, LocalUserSerializer
+from api.serializers.author_serializers import AuthorSerializer, ForeignAuthorSerializer, UserEditSerializer

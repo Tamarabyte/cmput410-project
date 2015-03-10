@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 from api import views
+from api.routers import CustomSimpleRouter
 
 urlpatterns = [
     # GET, POST, PUT for posts by ID
@@ -22,4 +23,10 @@ urlpatterns = [
     url(r'^posts$', views.PublicPosts.as_view(), name='publicPosts'),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns) 
+router = CustomSimpleRouter()
+router.register('author', views.AuthorViewSet, base_name="User")
+urlpatterns += router.urls
+
+urlpatterns = format_suffix_patterns(urlpatterns)
+
+
