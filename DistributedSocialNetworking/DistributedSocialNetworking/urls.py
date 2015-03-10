@@ -6,6 +6,9 @@ from Hindlebook.views import *
 from django.conf.urls.static import static
 from django.conf import settings
 
+from django.core.urlresolvers import reverse_lazy
+from django.views.generic import RedirectView
+
 urlpatterns = patterns('',
     # Admin Site
     url(r'^admin/', include(admin.site.urls)),
@@ -17,6 +20,7 @@ urlpatterns = patterns('',
 
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
+    url(r'^author/posts', RedirectView.as_view(url=reverse_lazy('stream'))),
     url(r'^post/create/(?P<postGUID>[\w-]+)', CreatePost.as_view(), name="create_post"),
     url(r'^post/(?P<postGUID>[\w-]+)/create/(?P<commentGUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
 
