@@ -72,7 +72,7 @@ class PostTestCases(TestCase):
     def test_getAuthoredPosts(self):
         self.assertQuerysetEqual(self.author2.getAuthoredPosts(),
                                  ["<Post: %s>" % self.post1_by_a2.text])
-        self.assertQuerysetEqual(self.author1.getAuthoredPosts().order_by('id'),
+        self.assertQuerysetEqual(self.author1.getAuthoredPosts().order_by('pub_date'),
                                  ["<Post: %s>" % self.post1_by_a1.text,
                                   "<Post: %s>" % self.post2_by_a1.text])
 
@@ -97,12 +97,12 @@ class CommentTestCases(TestCase):
     # Test fetching Authors Comments
     def test_getAuthoredComments(self):
         self.assertQuerysetEqual(self.author2.getAuthoredComments(),
-                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.id])
+                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.guid])
 
     # Test fetching Posts Comments
     def test_getPostsComments(self):
         self.assertQuerysetEqual(self.post1_by_a1.getComments(),
-                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.id])
+                                 ["<Comment: %s>" % self.comment_by_a2_on_post1_by_a1.guid])
 
 
 class ImageTestCases(TestCase):
