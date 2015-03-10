@@ -5,7 +5,7 @@
         {% csrf_token %}
         <fieldset>
             <div class="col-lg-12">
-                {% render_field post_form.content rows="3" placeholder="Enter a new post..." class+="form-control input-lg" %}
+                {% render_field post_form.content rows="3" placeholder="Enter a new post..." class+="form-control input-lg" autocomplete="off" %}
                 {% if post_form.content.errors %}
                     <div class="error-container error">{{ post_form.content.errors.0|escape }}</div>
                 {% endif %}
