@@ -1,7 +1,9 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from Hindlebook.models import User
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
 
 class FriendsListView(ListView):
@@ -18,3 +20,5 @@ class FriendsListView(ListView):
         context['follows'] = author.getFollowing()
         context['friends'] = author.getFriends()
         return context
+
+

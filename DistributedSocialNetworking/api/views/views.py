@@ -1,4 +1,4 @@
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
 from Hindlebook.models import User, Post
@@ -75,10 +75,9 @@ class FriendRequest(APIView):
 
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
-
+    
     def post(self, request, format=None):
         JSONrequest = json.loads(request.body.decode('utf-8'))
-
         if ('author' not in JSONrequest):
             return HttpResponse(status=400)
         elif (type(JSONrequest['author']) is not dict):
@@ -93,15 +92,18 @@ class FriendRequest(APIView):
             return HttpResponse(status=400)
 
         authorID = JSONrequest['author']['id']
+        print(authorID)
         friendID = JSONrequest['friend']['id']
+        print(friendID)
 
         try:
-            author = User.objects.get(uuid=authorID)
-            friend = User.objects.get(uuid=friendID)
+            author = get_object_or_404(User, uuid=authorID)
+            friend = get_object_or_404(User, uuid=friendID)
 
             if (friend not in author.getFriendRequests()):
                 author.follows.add(friend)
         except:
+            print("author or friend not found")
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
