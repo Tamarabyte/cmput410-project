@@ -3,9 +3,10 @@ from django.db import IntegrityError, transaction
 from rest_framework import serializers
 from Hindlebook.models import Post
 
+
 class PostSerializer(serializers.Serializer):
-    text = serializers.CharField()
-    pub_date = serializers.DateTimeField()
+    content = serializers.CharField()
+    pubDate = serializers.DateTimeField()
     guid = serializers.CharField(max_length=40)
     title = serializers.CharField(max_length=40)
     description = serializers.CharField(max_length=40)
@@ -17,7 +18,7 @@ class PostSerializer(serializers.Serializer):
         """
         Create and return a new `Post` instance, given the validated data.
         """
-        with transaction.atomic():
+        with transaction.atomic(): # TODO: remove this?
             post = Post.objects.create(**validated_data)
         return post
 
@@ -25,9 +26,9 @@ class PostSerializer(serializers.Serializer):
         """
         Update and return an existing `Post` instance, given the validated data.
         """
-        with transaction.atomic():
-            instance.text = validated_data.get('text', instance.text)
-            instance.pub_date = validated_data.get('pub_date', instance.pub_date)
+        with transaction.atomic(): # TODO: remove this?
+            instance.content = validated_data.get('text', instance.text)
+            instance.pubDate = validated_data.get('pub_date', instance.pub_date)
             instance.guid = validated_data.get('guid', instance.guid)
             instance.title = validated_data.get('title', instance.title)
             instance.description = validated_data.get('description', instance.description)

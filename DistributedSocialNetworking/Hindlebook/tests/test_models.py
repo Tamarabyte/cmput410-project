@@ -71,10 +71,10 @@ class PostTestCases(TestCase):
     # Test fetching own Posts
     def test_getAuthoredPosts(self):
         self.assertQuerysetEqual(self.author2.getAuthoredPosts(),
-                                 ["<Post: %s>" % self.post1_by_a2.text])
-        self.assertQuerysetEqual(self.author1.getAuthoredPosts().order_by('pub_date'),
-                                 ["<Post: %s>" % self.post1_by_a1.text,
-                                  "<Post: %s>" % self.post2_by_a1.text])
+                                 ["<Post: %s>" % self.post1_by_a2.content])
+        self.assertQuerysetEqual(self.author1.getAuthoredPosts().order_by('pubDate'),
+                                 ["<Post: %s>" % self.post1_by_a1.content,
+                                  "<Post: %s>" % self.post2_by_a1.content])
 
 
 class CommentTestCases(TestCase):
