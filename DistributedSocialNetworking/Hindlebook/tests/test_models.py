@@ -1,4 +1,7 @@
 from django.test import TestCase
+
+from itertools import chain
+
 from Hindlebook.models import User, Post, Comment
 from model_mommy import mommy
 
@@ -56,7 +59,7 @@ class PostTestCases(TestCase):
         self.author2 = mommy.make(User)
         self.post1_by_a1 = mommy.make(Post, author=self.author1, visibility="PUBLIC")
         self.post2_by_a1 = mommy.make(Post, author=self.author1, visibility="PRIVATE")
-        self.post1_by_a2 = mommy.make(Post, author=self.author2)
+        self.post1_by_a2 = mommy.make(Post, author=self.author2, visibility="PUBLIC")
 
     # Test Post creation
     def test_post_create(self):
@@ -66,7 +69,8 @@ class PostTestCases(TestCase):
 
     # Test Post privacy
     def test_post_privacy(self):
-        pass
+        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author1), chain(self.post1_by_a1, self.post1_by_a2, self.post2_by_a1))
+        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author2), chain(self.post1_by_a1, self.post2_by_a1))
 
     # Test fetching own Posts
     def test_getAuthoredPosts(self):
