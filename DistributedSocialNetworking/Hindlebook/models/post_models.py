@@ -19,34 +19,45 @@ class Category(models.Model):
 
 class ExtendedPostManager(models.Manager):
 
-    def get_all_visibile_posts(self, user):
-        friends = user.getFriends()
-        friends_ext = user.getFriendsOfFriends()
-        my_posts = Post.objects.filter(author=user)  # My posts
-        public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=user) # Public Posts
-        friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=user)
-        foff_posts = Post.objects.filter(visibility="FOAF", author__in=friends_ext).exclude(author=user)
+    def get_all_visibile_posts(self, active_user):
+        """Gets all the posts visible to the provided user"""
+        friends = active_user.getFriends()
+        friends_ext = active_user.getFriendsOfFriends()
+        my_posts = Post.objects.filter(author=active_user)  # My posts
+        public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=active_user) # Public Posts
+        friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=active_user) #  Friend Posts from my frineds
+        foff_posts = Post.objects.filter(visibility="FOAF", author__in=friends_ext).exclude(author=active_user) #  FOAF posts from FOAFS
 
+        #  Merge lists
         all_visible_posts = sorted(
             chain(my_posts, public_posts, friend_posts, foff_posts,),
             key=lambda instance: instance.pubDate, reverse=True)
         return all_visible_posts
 
     def get_profile_visibile_posts(self, active_user, page_user):
+        """Get all the posts made by page_user that are visible to active_user"""
+
+        #  Is the active user the user they are looking at
         if active_user == page_user:
             return Post.objects.filter(author=page_user).ordered_by(-pubDate)
 
+        #  Get list of friends 
         friends = active_user.getFriends()
+        #  Get list of friends of friends
         friends_ext = active_user.getFriendsOfFriends()
 
+        #  Get the public posts by the page_user
         public_posts = Post.objects.filter(visibility="PUBLIC", author=page_user)
         friend_posts = {}
         foff_posts = {}
+        #  Is the page_user a friend then get their friends only posts
         if page_user in friends:
             friend_posts = Post.objects.filter(visibility="FRIENDS", author=page_user)
+        #  Is the page_user a friend of a friend then get their FOAF only posts
         if page_user in friends_ext:
             foff_posts = Post.objects.filter(visibility="FOAF", author=page_user)
 
+        #  Merge into one set sorted by inverse date
         all_visible_posts = sorted(
             chain(public_posts, friend_posts, foff_posts,),
             key=lambda instance: instance.pubDate, reverse=True)
