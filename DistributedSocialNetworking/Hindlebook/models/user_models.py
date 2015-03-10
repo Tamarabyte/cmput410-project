@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+
+from itertools import chain
+
 import uuid as uuid_import
+
 from Hindlebook.models import Node, Server, UuidValidator
 
 class User(AbstractUser):
@@ -22,6 +26,13 @@ class User(AbstractUser):
     # Two way following implies "real" friendship
     def getFriends(self):
         return self.follows.all() & self.followed_by.all()
+
+    def getFriendsOfFriends(self):
+        friends = self.getFriends()
+        friends_ext = friends
+        for f in friends:
+            friends_ext = chain(friends_ext, f.getFriends())
+        return friends_ext
 
     # Those which are following me but I am not following back
     def getFriendRequests(self):

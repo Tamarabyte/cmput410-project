@@ -10,7 +10,6 @@ from django.conf import settings
 
 from itertools import chain
 
-from Hindlebook.models.user_models import User
 from Hindlebook.models.post_models import Post
 from Hindlebook.forms import PostForm, CommentForm
 
@@ -31,9 +30,7 @@ class StreamView(TemplateView):
 
     def get_posts(self):
         friends = self.request.user.getFriends()
-        friends_ext = friends
-        for f in friends:
-            friends_ext = chain(friends_ext, f.getFriends())
+        friends_ext = self.request.user.getFriendsOfFriends()
         my_posts = Post.objects.filter(author=self.request.user)  # My posts
         public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=self.request.user) # Public Posts
         friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=self.request.user)
