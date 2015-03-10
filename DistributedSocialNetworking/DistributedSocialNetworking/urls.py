@@ -20,7 +20,7 @@ urlpatterns = patterns('',
 
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
-    url(r'^author/posts', RedirectView.as_view(url=reverse_lazy('stream'))),
+    url(r'^author/posts', RedirectView.as_view(pattern_name='stream')),
     url(r'^post/create/(?P<postGUID>[\w-]+)', CreatePost.as_view(), name="create_post"),
     url(r'^post/(?P<postGUID>[\w-]+)/create/(?P<commentGUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
 
@@ -42,5 +42,3 @@ urlpatterns = patterns('',
     # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
