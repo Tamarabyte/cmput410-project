@@ -32,7 +32,7 @@ class Post(models.Model):
     content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/html")
 
     visibility_choices = (("PUBLIC", "PUBLIC"), ("FOAF", "FOAF"), ("FRIENDS", "FRIENDS"), ("PRIVATE", "PRIVATE"), ("SERVERONLY", "SERVERONLY"))
-    visibility = models.CharField(default="PUBLIC", max_length=10, choices=visibility_choices, db_index=True)
+    visibility = models.CharField(default="PUBLIC", max_length=10, blank=False, choices=visibility_choices, db_index=True)
 
     def __str__(self):
         return str(self.content)
@@ -69,7 +69,7 @@ class Comment(models.Model):
 
         if self.author and self.foreign_author:
             raise ValidationError("Can't have both an author and a foreign author.")
-        
+
         return super(Comment, self).save(*args, **kwargs)
 
 
