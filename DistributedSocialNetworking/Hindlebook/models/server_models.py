@@ -17,6 +17,9 @@ class Node(models.Model):
     # password to access this node
     password = models.CharField(max_length=128, blank=True, default="")
 
+    def __str__(self):
+        return self.host
+
 class Server(models.Model):
     """Model for our server."""
 
@@ -31,6 +34,9 @@ class Server(models.Model):
     # password to access this server
     password = models.CharField(max_length=128, blank=True, default="")
 
+
+    def __str__(self):
+        return self.host
 
     class Meta:
         verbose_name_plural = "Server"

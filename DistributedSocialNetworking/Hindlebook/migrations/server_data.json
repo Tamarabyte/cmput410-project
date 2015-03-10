@@ -1,0 +1,12 @@
+[
+  {
+    "model": "Hindlebook.server",
+    "pk": 1,
+    "fields": {
+      "host": "localhost",
+      "host_name": "Hindlebook",
+      "connection_limit" : 10,
+      "password" : ""
+    }
+  }
+]
