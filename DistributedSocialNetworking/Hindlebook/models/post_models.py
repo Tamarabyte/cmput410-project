@@ -56,7 +56,7 @@ class Comment(models.Model):
     pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
     def __str__(self):
-        return str(self.uuid)
+        return str(self.guid)
 
     def getAuthor(self):
         if self.author:
@@ -69,7 +69,7 @@ class Comment(models.Model):
 
         if self.author and self.foreign_author:
             raise ValidationError("Can't have both an author and a foreign author.")
-        
+
         return super(Comment, self).save(*args, **kwargs)
 
 
