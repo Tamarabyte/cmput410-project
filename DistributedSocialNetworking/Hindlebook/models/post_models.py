@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 import uuid as uuid_import
 from Hindlebook.models import ForeignUser
+from Hindlebook.models import UuidValidator
 
 class Category(models.Model):
     tag = models.CharField(max_length=25, null=False, blank=False)
@@ -15,7 +16,7 @@ class Category(models.Model):
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
 
-    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True)
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
     source = models.CharField(max_length=100, blank=True, default='Unknown source')
     origin = models.CharField(max_length=100, blank=True, default='Unknown origin')
 
@@ -44,7 +45,7 @@ class Post(models.Model):
 class Comment(models.Model):
     """Model for representing a Comment on a Post made by an Author"""
 
-    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True)
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
     post = models.ForeignKey(Post, related_name="comments")
 
     # only author or foreign author should be set

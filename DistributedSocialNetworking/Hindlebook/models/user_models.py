@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import uuid as uuid_import
-from Hindlebook.models import Node, Server
+from Hindlebook.models import Node, Server, UuidValidator
 
 class User(AbstractUser):
     """Model for represting a User"""
 
-    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, db_index=True)
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, db_index=True, validators=[UuidValidator()])
 
     github_id = models.CharField(max_length=30, blank=True, default='')
     avatar = models.ImageField(null=False, blank=True, default="default_avatar.jpg")
@@ -50,7 +50,7 @@ class User(AbstractUser):
 class ForeignUser(models.Model):
     """Model for represting a Foreign Users"""
 
-    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True)
+    uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
     node = models.ForeignKey(Node, related_name="users")
     username = models.CharField('username', max_length=30, blank=False)
 
