@@ -79,3 +79,6 @@ class Image(models.Model):
     image = models.ImageField(null=False)
     date_added = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.image
+

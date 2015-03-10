@@ -215,7 +215,7 @@ float: right!important;
 .logout-tab, .logout-tab:hover {
     background-color: #dd4814;
     color: #fff;
-    position: absolute;
+    position: fixed;
     bottom: 10px;
     right: 0;
     font-size: 25px;
