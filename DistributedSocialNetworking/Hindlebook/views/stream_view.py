@@ -8,8 +8,6 @@ from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-from itertools import chain
-
 from Hindlebook.models.post_models import Post
 from Hindlebook.forms import PostForm, CommentForm
 
@@ -23,23 +21,12 @@ class StreamView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(StreamView, self).get_context_data(**kwargs)
-        context['posts'] = self.get_posts()
+        context['posts'] = Post.objects_ext.get_all_visibile_posts(self.request.user)
         context['post_form'] = PostForm()
         context['comment_form'] = CommentForm()
         return context
 
-    def get_posts(self):
-        friends = self.request.user.getFriends()
-        friends_ext = self.request.user.getFriendsOfFriends()
-        my_posts = Post.objects.filter(author=self.request.user)  # My posts
-        public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=self.request.user) # Public Posts
-        friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=self.request.user)
-        foff_posts = Post.objects.filter(visibility="FOAF", author__in=friends_ext).exclude(author=self.request.user)
-
-        all_visible_posts = sorted(
-            chain(my_posts, public_posts, friend_posts, foff_posts,),
-            key=lambda instance: instance.pubDate, reverse=True)
-        return all_visible_posts
+    
 
 
 class CreatePost(View):

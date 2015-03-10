@@ -3,6 +3,9 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 import uuid as uuid_import
+
+from itertools import chain
+
 from Hindlebook.models import ForeignUser
 from Hindlebook.models import UuidValidator
 
@@ -13,8 +16,28 @@ class Category(models.Model):
         verbose_name = "Tags"
         verbose_name_plural = "Tags"
 
+
+class ExtendedPostManager(models.Manager):
+
+    def get_all_visibile_posts(self, user):
+        friends = user.getFriends()
+        friends_ext = user.getFriendsOfFriends()
+        my_posts = Post.objects.filter(author=user)  # My posts
+        public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=user) # Public Posts
+        friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=user)
+        foff_posts = Post.objects.filter(visibility="FOAF", author__in=friends_ext).exclude(author=user)
+
+        all_visible_posts = sorted(
+            chain(my_posts, public_posts, friend_posts, foff_posts,),
+            key=lambda instance: instance.pubDate, reverse=True)
+        return all_visible_posts
+
+
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
+
+    objects = models.Manager()
+    objects_ext = ExtendedPostManager()
 
     guid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
     source = models.CharField(max_length=100, blank=True, default='Unknown source')

@@ -54,8 +54,8 @@ class PostTestCases(TestCase):
     def setUp(self):
         self.author1 = mommy.make(User)
         self.author2 = mommy.make(User)
-        self.post1_by_a1 = mommy.make(Post, author=self.author1)
-        self.post2_by_a1 = mommy.make(Post, author=self.author1)
+        self.post1_by_a1 = mommy.make(Post, author=self.author1, visibility="PUBLIC")
+        self.post2_by_a1 = mommy.make(Post, author=self.author1, visibility="PRIVATE")
         self.post1_by_a2 = mommy.make(Post, author=self.author2)
 
     # Test Post creation
