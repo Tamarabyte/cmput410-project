@@ -26,8 +26,6 @@ class StreamView(TemplateView):
         context['comment_form'] = CommentForm()
         return context
 
-    
-
 
 class CreatePost(View):
     @method_decorator(login_required)

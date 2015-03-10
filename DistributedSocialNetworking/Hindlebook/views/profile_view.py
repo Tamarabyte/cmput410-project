@@ -9,6 +9,8 @@ from Hindlebook.models import Post, User
 from Hindlebook.forms import ProfileEditForm
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from Hindlebook.forms import CommentForm
+
 User = get_user_model()
 
 
@@ -52,3 +54,17 @@ class ProfileUpdateView(UpdateView):
         context = super(ProfileUpdateView, self).get_context_data(**kwargs)
         return context
 
+class ProfileStreamView(TemplateView):
+    template_name = "profile_stream.html"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProfileStreamView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileStreamView, self).get_context_data(**kwargs)
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
+        profile_user = User.objects.filter(uuid=authorUUID)
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user, page_user=profile_user )
+        context['comment_form'] = CommentForm()
+        return context

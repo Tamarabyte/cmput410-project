@@ -32,6 +32,26 @@ class ExtendedPostManager(models.Manager):
             key=lambda instance: instance.pubDate, reverse=True)
         return all_visible_posts
 
+    def get_profile_visibile_posts(self, active_user, page_user):
+        if active_user == page_user:
+            return Post.objects.filter(author=page_user).ordered_by(-pubDate)
+
+        friends = active_user.getFriends()
+        friends_ext = active_user.getFriendsOfFriends()
+
+        public_posts = Post.objects.filter(visibility="PUBLIC", author=page_user)
+        friend_posts = {}
+        foff_posts = {}
+        if page_user in friends:
+            friend_posts = Post.objects.filter(visibility="FRIENDS", author=page_user)
+        if page_user in friends_ext:
+            foff_posts = Post.objects.filter(visibility="FOAF", author=page_user)
+
+        all_visible_posts = sorted(
+            chain(public_posts, friend_posts, foff_posts,),
+            key=lambda instance: instance.pubDate, reverse=True)
+        return all_visible_posts
+
 
 class Post(models.Model):
     """Model for representing a Post made by an Author"""
