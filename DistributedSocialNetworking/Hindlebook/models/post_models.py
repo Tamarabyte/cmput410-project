@@ -23,19 +23,19 @@ class Post(models.Model):
     title = models.CharField(max_length=40, blank=True, default='No title')
     description = models.CharField(max_length=40, blank=True, default='No description')
     categories = models.ManyToManyField(Category, blank=True, related_name='tagged_posts')
-    text = models.TextField(blank=False)
+    content = models.TextField(blank=False)
 
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
-    pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
+    pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
-    content_type_choices = ((0,"text/plain"), (1,"text/x-markdown"), (2,"text/html"))
-    content_type = models.IntegerField(max_length=1, blank=True, choices=content_type_choices, default=0)
+    content_type_choices = (("text/plain", "text/plain"), ("text/x-markdown", "text/x-markdown"), ("text/html", "text/html"))
+    content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/html")
 
-    privacy_choices = ((0, "PUBLIC"), (1, "FOAF"), (2, "FRIENDS"), (3, "PRIVATE"), (4, "SERVERONLY"))
-    privacy = models.IntegerField(default=0, max_length=1, choices=privacy_choices, db_index=True)
+    visibility_choices = (("PUBLIC", "PUBLIC"), ("FOAF", "FOAF"), ("FRIENDS", "FRIENDS"), ("PRIVATE", "PRIVATE"), ("SERVERONLY", "SERVERONLY"))
+    visibility = models.CharField(default="PUBLIC", max_length=10, choices=visibility_choices, db_index=True)
 
     def __str__(self):
-        return str(self.text)
+        return str(self.content)
 
     # Get the comments for this Post
     def getComments(self):
@@ -52,11 +52,11 @@ class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="comments")
     foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
 
-    text = models.CharField(max_length=2048)
-    pub_date = models.DateTimeField('date published', auto_now_add=True, db_index=True)
+    comment = models.CharField(max_length=2048)
+    pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
     def __str__(self):
-        return str(self.uuid)
+        return str(self.guid)
 
     def getAuthor(self):
         if self.author:

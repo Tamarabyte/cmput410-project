@@ -7,7 +7,7 @@ class ImagesAdmin(TabularInline):
 
 class CommentsAdmin(TabularInline):
     model = Comment
-    ordering = ("-pub_date",)
+    ordering = ("-pubDate",)
     extra = 0
 
 
@@ -19,15 +19,15 @@ class PostAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('pub_date', 'get_authorname', 'guid')
-    ordering = ("-pub_date",)
+    list_display = ('pubDate', 'get_authorname', 'guid')
+    ordering = ("-pubDate",)
 
     inlines = [ImagesAdmin, CommentsAdmin]
 
 
     fieldsets = (
-        (None, {'fields': ('author', 'privacy')}),
-        ('Post', {'fields': ('title', 'description', 'text')}),
+        (None, {'fields': ('author', 'visibility')}),
+        ('Post', {'fields': ('title', 'description', 'content')}),
         ('Server Details', {'fields': ('guid',)}),
     )
 

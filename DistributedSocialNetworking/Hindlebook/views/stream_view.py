@@ -22,7 +22,7 @@ class StreamView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(StreamView, self).get_context_data(**kwargs)
-        context['posts'] = Post.objects.all().order_by('-pub_date')
+        context['posts'] = Post.objects.all().order_by('-pubDate')
         context['post_form'] = PostForm()
         context['comment_form'] = CommentForm()
         return context
