@@ -1,1 +1,2 @@
 from api.serializers.author_serializers import AuthorSerializer, ForeignAuthorSerializer, UserEditSerializer
+from api.serializers.post_serializer import PostSerializer, CommentSerializer

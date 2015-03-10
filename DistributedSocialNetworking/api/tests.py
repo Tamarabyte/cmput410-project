@@ -1,7 +1,9 @@
 from django.test import TestCase, Client
 from Hindlebook.models import User, Post
-from Hindlebook.serializers import PostSerializer
+from api.serializers.post_serializer import PostSerializer
 from model_mommy import mommy
+from django.utils.six import BytesIO
+from rest_framework.parsers import JSONParser
 import json
 
 c = Client()
@@ -35,10 +37,12 @@ class APITests(TestCase):
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         # Decode the JSON response
-        decoded = json.loads(response.content.decode('utf-8'))
+        # decoded = json.loads(response.content.decode('utf-8'))
+        stream = BytesIO(response.content)
+        data = JSONParser().parse(stream)
 
         # Serialize the response
-        serializer = PostSerializer(data=decoded)
+        serializer = PostSerializer(data=data)
 
         self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
         responsePost = serializer.data
@@ -169,8 +173,7 @@ class APITests(TestCase):
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
-        jsonString = json.loads(response.content.decode('utf-8'))
-        jsonObject = json.loads(jsonString)
+        jsonObject = json.loads(response.content.decode('utf-8'))
 
         self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
@@ -178,10 +181,9 @@ class APITests(TestCase):
 
         self.assertEquals(len(posts), 2, "Author should have 2 posts")
 
-        for post in posts:
-            serializer = PostSerializer(data=post)
-            self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-            postData = serializer.data
+        serializer = PostSerializer(data=posts)
+        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
+        postData = serializer.data
 
     def testGETAuthorPostText(self):
         """ Test GET post text from given author """
@@ -193,8 +195,7 @@ class APITests(TestCase):
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
-        jsonString = json.loads(response.content.decode('utf-8'))
-        jsonObject = json.loads(jsonString)
+        jsonObject = json.loads(response.content.decode('utf-8'))
 
         self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
@@ -202,11 +203,10 @@ class APITests(TestCase):
 
         self.assertEquals(len(posts), 1, "Author should have 1 post")
 
-        for post in posts:
-            serializer = PostSerializer(data=post)
-            self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-            postData = serializer.data
-            self.assertEquals(postData['text'], post1.text, "Post has wrong text")
+        serializer = PostSerializer(data=posts, many=True)
+        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
+        postData = serializer.data
+        self.assertEquals(postData['content'], post1.content, "Post has wrong text")
 
     def testGETPublicPosts(self):
         """ Test GET all public posts """
@@ -215,21 +215,19 @@ class APITests(TestCase):
         publicPost = mommy.make(Post)
 
         # Make a private post
-        privatePost = mommy.make(Post, privacy=3)
+        privatePost = mommy.make(Post, visibility='PRIVATE')
 
         response = c.get('/api/posts')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
-        jsonString = json.loads(response.content.decode('utf-8'))
-        jsonObject = json.loads(jsonString)
+        jsonObject = json.loads(response.content.decode('utf-8'))
 
         self.assertTrue('posts' in jsonObject, "Invalid JSON response")
 
         posts = jsonObject['posts']
         self.assertEquals(len(posts), 3, "Should be 2 public post")
 
-        for post in posts:
-            serializer = PostSerializer(data=post)
-            self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-            postData = serializer.data
+        serializer = PostSerializer(data=posts, many=True)
+        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
+        postData = serializer.data

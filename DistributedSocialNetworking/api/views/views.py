@@ -2,43 +2,15 @@ from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
 from Hindlebook.models import User, Post
-from Hindlebook.serializers import PostSerializer
+# from Hindlebook.serializers import PostSerializer
+from api.serializers.post_serializer import PostSerializer
 import json
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
-
-
-class PostDetail(APIView):
-    """ GET, POST, or PUT an author post """
-
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
-    def get_object(self, guid):
-        try:
-            return Post.objects.get(guid=guid)
-        except Post.DoesNotExist:
-            raise Http404
-
-    def get(self, request, postID, format=None):
-        post = self.get_object(postID)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
-
-    def post(self, request, postID, format=None):
-        post = self.get_object(postID)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
-
-    def put(self, request, postID, format=None):
-        post = self.get_object(postID)
-        serializer = PostSerializer(post, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
 
 
 class Friend2Friend(APIView):
@@ -135,43 +107,3 @@ class FriendRequest(APIView):
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
-
-
-class AuthorPosts(APIView):
-    """ GET posts from given author """
-
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
-    def get(self, request, authorID, format=None):
-        try:
-            postAuthor = User.objects.get(uuid=authorID)
-        except User.DoesNotExist:
-            return HttpResponse(status=404)
-
-        posts = postAuthor.getAuthoredPosts()
-
-        returnPosts = []
-        for post in posts:
-            serializer = PostSerializer(post)
-            returnPosts.append(serializer.data)
-
-        return Response(json.dumps({"posts": returnPosts}))
-
-
-class PublicPosts(APIView):
-    """ GET all public posts """
-
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
-    def get(self, request, format=None):
-        # Filter to get public posts, 0 is currently public (Should make it a text field)
-        posts = Post.objects.filter(privacy=0)
-
-        returnPosts = []
-        for post in posts:
-            serializer = PostSerializer(post)
-            returnPosts.append(serializer.data)
-
-        return Response(json.dumps({"posts": returnPosts}))
