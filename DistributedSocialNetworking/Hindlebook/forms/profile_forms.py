@@ -12,3 +12,12 @@ class ProfileEditForm(forms.ModelForm, TemplateMixin):
         model = User
         fields = ['about', 'github_id', 'avatar']
         # exclude = ('username', 'password', 'uuid')
+
+class FriendRequestForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(FriendRequestForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = User
+        fields = ['follows', 'uuid']
+        # exclude = ('username', 'password', 'uuid')
