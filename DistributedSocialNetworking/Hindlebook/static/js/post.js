@@ -15,7 +15,7 @@ $(function() {
 
     function beforeSubmit(arr, form, options) {
         console.log(options["url"]);
-        options["url"] = base_url + $("#uuid").val();
+        options["url"] = base_url + $("#guid").val();
         console.log(options["url"]);
     }
 
@@ -24,7 +24,7 @@ $(function() {
         $('#post-form').html(response["form"]);
         $('#post-form').clearForm();
         $('#stream').prepend(response["post"]);
-        $('.add_comment_button[data-postUUID="' + response["created_uuid"] +'"]').click(showCommentForm);
+        $('.add_comment_button[data-postGUID="' + response["created_guid"] +'"]').click(showCommentForm);
     }
 
     function ajaxError(xhr, errmsg, err) {
@@ -36,7 +36,7 @@ $(function() {
 
     /* End Post Ajax */
     function showCommentForm(event) {
-        var data = $(this).attr("data-postUUID");
+        var data = $(this).attr("data-postGUID");
         console.log(data);
 
         $(".add_comment_button").show();
@@ -44,8 +44,8 @@ $(function() {
         $("#comment_form_html").hide();
         $("#"+ data ).after($("#comment_form_html"))
         $("#comment_form_html").show();
-        $("#comment-form").data("postUUID", data);
-        console.log($("#comment-form").data("postUUID"));
+        $("#comment-form").data("postGUID", data);
+        console.log($("#comment-form").data("postGUID"));
     };
 
 });

@@ -33,7 +33,7 @@ class CreatePost(View):
     def dispatch(self, *args, **kwargs):
         return super(CreatePost, self).dispatch(*args, **kwargs)
 
-    def put(self, request, postUUID, *args, **kwargs):
+    def put(self, request, postGUID, *args, **kwargs):
         put = QueryDict(request.body)
         form = PostForm(data=put)
 
@@ -41,7 +41,7 @@ class CreatePost(View):
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": form})}
             return JsonResponse(response_data, status=400)
 
-        post = form.save(request.user, postUUID, commit=False)
+        post = form.save(request.user, postGUID, commit=False)
 
         # Validate all remaining fields not included in the post form, based on model constraints
         try:
@@ -58,7 +58,7 @@ class CreatePost(View):
 
         response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
         response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
-        response_data["created_uuid"] = post.uuid
+        response_data["created_guid"] = post.guid
         return JsonResponse(response_data, status=201)
 
 
@@ -67,7 +67,7 @@ class CreateComment(View):
     def dispatch(self, *args, **kwargs):
         return super(CreateComment, self).dispatch(*args, **kwargs)
 
-    def put(self, request, postUUID, commentUUID, *args, **kwargs):
+    def put(self, request, postGUID, commentGUID, *args, **kwargs):
         put = QueryDict(request.body)
         form = CommentForm(data=put)
 
@@ -75,8 +75,8 @@ class CreateComment(View):
             response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": form}), 'errors': form.errors}
             return JsonResponse(response_data, status=400)
 
-        post = get_object_or_404(Post, uuid=postUUID)
-        comment = form.save(request.user, post, commentUUID, commit=False)
+        post = get_object_or_404(Post, guid=postGUID)
+        comment = form.save(request.user, post, commentGUID, commit=False)
 
 
         # Validate all remaining fields not included in the comment form, based on model constraints

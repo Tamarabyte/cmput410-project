@@ -15,7 +15,7 @@
                 {% if alert %}
                     <div class="error-container error">{{ alert | safe }}{{ comment_form.text.errors.0|escape }}</div>
                 {% endif %}
-                <input id="comment-uuid" type="hidden" value="{{ comment_form.uuid }}" />
+                <input id="comment-guid" type="hidden" value="{{ comment_form.guid }}" />
         </div>
         <div class="clearfix"></div>
     </fieldset>

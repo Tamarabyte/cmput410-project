@@ -4,7 +4,7 @@ $(function() {
     });
 
     var base_comment_url = "/post/";
-    var commentPostUUID;
+    var commentPostGUID;
 
     var comment_form_options = {
         success: commentSuccess,
@@ -19,17 +19,17 @@ $(function() {
 
     function beforeSubmitComment(arr, form, options) {
         console.log(options["url"]);
-        options["url"] = base_comment_url + $("#comment-form").data("postUUID") +"/create/" + $("#comment-uuid").val();
+        options["url"] = base_comment_url + $("#comment-form").data("postGUID") +"/create/" + $("#comment-guid").val();
         console.log(options["url"]);
     }
 
     function commentSuccess(response, status, xhr, form) {
         console.log("Form was valid!");
         console.log(response["comment"]);
-        var postUUID = $("#comment-form").data("postUUID");
+        var postGUID = $("#comment-form").data("postGUID");
         $('#comment-form').html(response["form"]);
         $('#comment-form').clearForm();
-        $('#' + postUUID).before(response["comment"]);
+        $('#' + postGUID).before(response["comment"]);
         $("#comment_form_html").hide();
         $(".add_comment_button").show();
     }
@@ -42,7 +42,7 @@ $(function() {
     }
 
     function showCommentForm(event) {
-        var data = $(this).attr("data-postUUID");
+        var data = $(this).attr("data-postGUID");
         console.log(data);
 
         $(".add_comment_button").show();
@@ -50,8 +50,8 @@ $(function() {
         $("#comment_form_html").hide();
         $("#"+ data ).after($("#comment_form_html"))
         $("#comment_form_html").show();
-        $("#comment-form").data("postUUID", data);
-        console.log($("#comment-form").data("postUUID"));
+        $("#comment-form").data("postGUID", data);
+        console.log($("#comment-form").data("postGUID"));
     };
 
 });

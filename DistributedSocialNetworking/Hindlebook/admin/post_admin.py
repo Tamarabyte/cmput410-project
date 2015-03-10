@@ -19,7 +19,7 @@ class PostAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('pub_date', 'get_authorname', 'uuid')
+    list_display = ('pub_date', 'get_authorname', 'guid')
     ordering = ("-pub_date",)
 
     inlines = [ImagesAdmin, CommentsAdmin]
@@ -28,7 +28,7 @@ class PostAdmin(ModelAdmin):
     fieldsets = (
         (None, {'fields': ('author', 'privacy')}),
         ('Post', {'fields': ('title', 'description', 'text')}),
-        ('Server Details', {'fields': ('uuid',)}),
+        ('Server Details', {'fields': ('guid',)}),
     )
 
 

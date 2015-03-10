@@ -12,7 +12,7 @@
                 {% if alert %}
                     <div class="error-container error">{{ alert | safe }}{{ post_form.text.errors.0|escape }}</div>
                 {% endif %}
-                <input id="uuid" type="hidden" value="{{ post_form.uuid }}" />
+                <input id="guid" type="hidden" value="{{ post_form.guid }}" />
             </div>
         </fieldset>
 
