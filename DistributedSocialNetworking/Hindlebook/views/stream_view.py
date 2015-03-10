@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic import View
 from django.http import JsonResponse, QueryDict
+from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -42,6 +43,16 @@ class CreatePost(View):
 
         post = form.save(request.user, postUUID, commit=False)
 
+        # Validate all remaining fields not included in the post form, based on model constraints
+        try:
+            post.full_clean()
+        except ValidationError as e:
+            errors = ""
+            for value in e.message_dict.values():
+                errors += ' '.join(value);
+            response_data = { 'form' : render_to_string("post/post_form.html", {"post_form" : form, "alert" : errors }) }
+            return JsonResponse(response_data, status=400)
+
         post.save()
         response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
 
@@ -66,6 +77,17 @@ class CreateComment(View):
 
         post = get_object_or_404(Post, uuid=postUUID)
         comment = form.save(request.user, post, commentUUID, commit=False)
+
+
+        # Validate all remaining fields not included in the comment form, based on model constraints
+        try:
+            comment.full_clean()
+        except ValidationError as e:
+            errors = ""
+            for value in e.message_dict.values():
+                errors += ' '.join(value);
+            response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : form, "alert" : errors }) }
+            return JsonResponse(response_data, status=400)
 
         comment.save()
         response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
