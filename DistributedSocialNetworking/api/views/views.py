@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class Friend2Friend(APIView):
@@ -73,9 +75,9 @@ class FriendQuery(APIView):
 class FriendRequest(APIView):
     """ POST a friend query """
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
+    authentication_classes = (SessionAuthentication,BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    
     def post(self, request, format=None):
         JSONrequest = json.loads(request.body.decode('utf-8'))
         if ('author' not in JSONrequest):
@@ -92,18 +94,50 @@ class FriendRequest(APIView):
             return HttpResponse(status=400)
 
         authorID = JSONrequest['author']['id']
-        print(authorID)
         friendID = JSONrequest['friend']['id']
-        print(friendID)
 
         try:
             author = get_object_or_404(User, uuid=authorID)
             friend = get_object_or_404(User, uuid=friendID)
 
-            if (friend not in author.getFriendRequests()):
+            if (friend not in author.follows.all()):
                 author.follows.add(friend)
         except:
-            print("author or friend not found")
+            return HttpResponse(status=404)
+
+        return HttpResponse(status=200)
+
+class UnfriendRequest(APIView):
+    """ POST a friend query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+    
+    def post(self, request, format=None):
+        JSONrequest = json.loads(request.body.decode('utf-8'))
+        if ('author' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['author']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['author']):
+            return HttpResponse(status=400)
+        elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['friend']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+
+        authorID = JSONrequest['author']['id']
+        friendID = JSONrequest['friend']['id']
+
+        try:
+            author = get_object_or_404(User, uuid=authorID)
+            friend = get_object_or_404(User, uuid=friendID)
+
+            if (friend in author.follows.all()):
+                author.follows.remove(friend)
+        except:
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
