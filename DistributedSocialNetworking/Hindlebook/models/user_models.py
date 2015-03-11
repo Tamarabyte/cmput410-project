@@ -8,7 +8,6 @@ from itertools import chain
 import uuid as uuid_import
 
 from Hindlebook.models import Node, Server, UuidValidator
-from Hindlebook.models.post_models import Post, Comment
 
 
 class User(AbstractUser):

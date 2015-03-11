@@ -1,16 +1,13 @@
+from Hindlebook.models.user_models import ForeignUser
+from Hindlebook.models import UuidValidator
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 import uuid as uuid_import
-
 import operator
-
 from itertools import chain
-
-from Hindlebook.models import UuidValidator
-from Hindlebook.models.user_models import ForeignUser
-
 
 class Category(models.Model):
     tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
