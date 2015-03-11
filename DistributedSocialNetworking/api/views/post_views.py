@@ -39,11 +39,11 @@ class PostDetails(APIView):
         if Post.objects.filter(guid=guid).exists():
             # PUT as update
             post = Post.objects.get(guid=guid)
-            serializer = PostSerializer(post, data=request.data)
+            serializer = PostSerializer(post, data=request.data, partial=True)
             stat = status.HTTP_200_OK
         else:
             # PUT as create
-            serializer = PostSerializer(data=request.data)
+            serializer = PostSerializer(data=request.data, partial=True)
             stat = status.HTTP_201_CREATED
 
         if serializer.is_valid(raise_exception=True):

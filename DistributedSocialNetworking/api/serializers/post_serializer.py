@@ -24,6 +24,16 @@ class PostSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         # Instantiate the superclass normally
+        # foreign_author = kwargs.get('fields')
+        # data = str(kwargs.pop('data', None))
+
+        # if data is not None:
+        #     print(str(data))
+        #     data['foreign_author'] = None
+        #     kwargs['data'] = data
+
+        print(str(kwargs))
+
         super(PostSerializer, self).__init__(*args, **kwargs)
 
     def to_representation(self, instance):
@@ -35,6 +45,8 @@ class PostSerializer(serializers.ModelSerializer):
 
         for field in fields:
             if field.field_name == 'foreign_author':
+            #     del self.fields['foreign_author']
+                # del self.declared_fields['foreign_author']
                 continue
             try:
                 attribute = field.get_attribute(instance)
