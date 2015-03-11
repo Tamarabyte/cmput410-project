@@ -8,7 +8,9 @@ from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-from Hindlebook.models.post_models import Post
+import datetime
+
+from Hindlebook.models.post_models import Post, Comment
 from Hindlebook.forms import PostForm, CommentForm
 
 
@@ -21,10 +23,31 @@ class StreamView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(StreamView, self).get_context_data(**kwargs)
-        context['posts'] = Post.objects_ext.get_all_visibile_posts(self.request.user)
+        context['posts'] = None  # Post.objects_ext.get_all_visibile_posts(self.request.user)
         context['post_form'] = PostForm()
         context['comment_form'] = CommentForm()
         return context
+
+    def post(self, *args, **kwargs):
+        if 'application/json' in self.request.META['HTTP_ACCEPT']:
+            posts = []
+            comments = []
+            print(self.request.POST)  # 2015-03-11T07:23:05.146
+            # time = datetime.datetime.strptime("%Y-%m-%dT%H:%M:%S%f", self.request.POST['last_time'])
+            for post in Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, reversed=False):
+                response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
+                response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+                response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
+                response_data["created_guid"] = post.guid
+                posts.append(response_data)
+
+            for comment in Comment.objects.all():
+                response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
+                response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+                response_data["postGUID"] = comment.post.guid
+                comments.append(response_data)
+
+            return JsonResponse({'posts': posts, 'comments': comments, 'time': {}})
 
 
 class CreatePost(View):
@@ -48,8 +71,8 @@ class CreatePost(View):
         except ValidationError as e:
             errors = ""
             for value in e.message_dict.values():
-                errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("post/post_form.html", {"post_form" : form, "alert" : errors }) }
+                errors += ' '.join(value)
+            response_data = {'form': render_to_string("post/post_form.html", {"post_form": form, "alert": errors})}
             return JsonResponse(response_data, status=400)
 
         post.save()
@@ -77,15 +100,14 @@ class CreateComment(View):
         post = get_object_or_404(Post, guid=postGUID)
         comment = form.save(request.user, post, commentGUID, commit=False)
 
-
         # Validate all remaining fields not included in the comment form, based on model constraints
         try:
             comment.full_clean()
         except ValidationError as e:
             errors = ""
             for value in e.message_dict.values():
-                errors += ' '.join(value);
-            response_data = { 'form' : render_to_string("comment/comment_form.html", {"comment_form" : form, "alert" : errors }) }
+                errors += ' '.join(value)
+            response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": form, "alert": errors})}
             return JsonResponse(response_data, status=400)
 
         comment.save()

@@ -5,16 +5,15 @@ from Hindlebook.forms import LoginForm
 from Hindlebook.views import *
 from django.conf.urls.static import static
 from django.conf import settings
-
-from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 
 urlpatterns = patterns('',
+
     # Admin Site
     url(r'^admin/', include(admin.site.urls)),
 
     # Pre-login URLs
-    url(r'^login/', login, {'template_name' : 'login.html', 'authentication_form' : LoginForm}, name='login'),
+    url(r'^login/', login, {'template_name': 'login.html', 'authentication_form': LoginForm}, name='login'),
     url(r'^logout$', LogoutRedirect.as_view(), name='logout'),
     url(r'^register$', RegistrationView.as_view(), name='register'),
 

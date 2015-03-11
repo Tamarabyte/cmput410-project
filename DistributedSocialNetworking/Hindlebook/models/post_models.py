@@ -20,8 +20,9 @@ class Category(models.Model):
 
 class ExtendedPostManager(models.Manager):
 
-    def get_all_visibile_posts(self, active_user):
+    def get_all_visibile_posts(self, active_user, reversed=True, min_time=None):
         """Gets all the posts visible to the provided user"""
+        print(min_time)
         friends = active_user.getFriends()
         friends_ext = active_user.getFriendsOfFriends()
         my_posts = Post.objects.filter(author=active_user)  # My posts
@@ -32,7 +33,7 @@ class ExtendedPostManager(models.Manager):
         #  Merge lists
         all_visible_posts = sorted(
             chain(my_posts, public_posts, friend_posts, foff_posts,),
-            key=lambda instance: instance.pubDate, reverse=True)
+            key=lambda instance: instance.pubDate, reverse=reversed)
         return all_visible_posts
 
     def get_profile_visibile_posts(self, active_user, page_user):
