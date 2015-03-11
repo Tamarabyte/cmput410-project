@@ -3,9 +3,9 @@ import uuid as uuid_import
 
 class Node(models.Model):
     """Model for representing different servers"""
-    
+
     # address of the nodes host
-    host = models.CharField(max_length=100, blank=False, unique=True)
+    host = models.CharField(max_length=100, blank=False, unique=True, primary_key=True)
     # short name for identifying the nodes host
     host_name = models.CharField(max_length=50, blank=True, default='', unique=True)
 
@@ -30,7 +30,7 @@ class Server(models.Model):
     host_name = models.CharField(max_length=50, blank=True, default='', unique=True)
 
     connection_limit = models.IntegerField(blank=True, default=10)
-    
+
     # password to access this server
     password = models.CharField(max_length=128, blank=True, default="")
 
