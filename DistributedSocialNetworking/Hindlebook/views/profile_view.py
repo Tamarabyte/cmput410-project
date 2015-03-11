@@ -27,12 +27,15 @@ class ProfileView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
+        profile_user = User.objects.filter(uuid=authorUUID)
+
 
         if (self.request.user.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user)
 
         context['author'] = get_object_or_404(User, uuid=authorUUID)
-        context['posts'] = Post.objects.filter(author__uuid=authorUUID)
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user, page_user=profile_user )
+        context['comment_form'] = CommentForm()
 
         if self.request.user in list(context["author"].followed_by.all()):
             context['isFollowing'] = 1
@@ -63,7 +66,7 @@ class ProfileView(TemplateView):
             all_comments = Comment.objects.filter(post__in=all_posts)
 
         for comment in all_comments:
-            response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
+            response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": CommentForm()})}
             response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
             response_data["postGUID"] = comment.post.guid
             comments.append(response_data)

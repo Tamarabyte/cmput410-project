@@ -1,20 +1,19 @@
 <!-- New Comment Form -->
-<div id="stream">
-    <div id="comment_form_html" class="row comment-form" hidden>
-        <form id="comment-form" action=".">
-            {% include "comment/comment_form.html" %}
-        </form>
-    </div> <!-- /row -->
+
+<div id="comment_form_html" class="row comment-form" hidden>
+    <form id="comment-form" action=".">
+        {% include "comment/comment_form.html" %}
+    </form>
+</div> <!-- /row -->
 
 
 
-    <div class="posts">
-    {% for post in posts %}
-        {% include "post/post.html" %}
-        {% for comment in post.getComments %}
-                {% include "comment/comment.html" %}
-        {% endfor %}
-            {% include "post/post_footer.html" %}
+<div class="posts">
+{% for post in posts %}
+    {% include "post/post.html" %}
+    {% for comment in post.getComments %}
+            {% include "comment/comment.html" %}
     {% endfor %}
-    </div> <!-- /stream -->
-</div>
+        {% include "post/post_footer.html" %}
+{% endfor %}
+</div> <!-- /stream -->

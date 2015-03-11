@@ -199,6 +199,10 @@ a .btn {
     font-size: 20pt;
 }
 
+.profile-stream {
+    margin-top: 80px;
+}
+
 /* Navbar ------------------------------------------ */
 
 .navbar {
