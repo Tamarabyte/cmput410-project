@@ -65,6 +65,7 @@ class PostSerializer(serializers.ModelSerializer):
         # TODO: FIX ME: Do something with comments?? Waiting on Hindle Response
         author_data = validated_data.pop('author')
         comment_data = validated_data.pop('comments')
+        categories_data = validated_data.pop('categories')
         return super(PostSerializer, self).update(instance, validated_data)
 
     class Meta:

@@ -27,6 +27,10 @@ class ProfileView(TemplateView):
         authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
         context['author'] = get_object_or_404(User, uuid=authorUUID)
         context['posts'] = Post.objects.filter(author__uuid=authorUUID)
+        if self.request.user in list(context["author"].followed_by.all()):
+            context['isFollowing'] = 1
+        else:
+            context['isFollowing'] = 0
         print(get_object_or_404(User, uuid=authorUUID).uuid)
         print(self.request.user.uuid)
         return context
