@@ -1,8 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 import uuid as uuid_import
+
+import operator
 
 from itertools import chain
 
@@ -20,19 +23,28 @@ class Category(models.Model):
 
 class ExtendedPostManager(models.Manager):
 
-    def get_all_visibile_posts(self, active_user):
+    def get_all_visibile_posts(self, active_user, reversed=True, min_time=None):
         """Gets all the posts visible to the provided user"""
+        #  Get list of friends
         friends = active_user.getFriends()
+        #  Get list of friends of friends
         friends_ext = active_user.getFriendsOfFriends()
-        my_posts = Post.objects.filter(author=active_user)  # My posts
-        public_posts = Post.objects.filter(visibility="PUBLIC").exclude(author=active_user) # Public Posts
-        friend_posts = Post.objects.filter(visibility="FRIENDS", author__in=friends).exclude(author=active_user) #  Friend Posts from my frineds
-        foff_posts = Post.objects.filter(visibility="FOAF", author__in=friends_ext).exclude(author=active_user) #  FOAF posts from FOAFS
+
+        #  This is a safe way to add values to the filters that could be None
+        q_list = [Q()]
+        if min_time is not None:
+            q_list.append(Q(pubDate__gt=min_time))
+        q_reduced = reduce(operator.and_, q_list)
+
+        my_posts = Post.objects.filter(q_reduced, author=active_user)  # My posts
+        public_posts = Post.objects.filter(q_reduced, visibility="PUBLIC").exclude(author=active_user)  # Public Posts
+        friend_posts = Post.objects.filter(q_reduced, visibility="FRIENDS", author__in=friends).exclude(author=active_user)  # Friend Posts from my frineds
+        foff_posts = Post.objects.filter(q_reduced, visibility="FOAF", author__in=friends_ext).exclude(author=active_user)  # FOAF posts from FOAFS
 
         #  Merge lists
         all_visible_posts = sorted(
             chain(my_posts, public_posts, friend_posts, foff_posts,),
-            key=lambda instance: instance.pubDate, reverse=True)
+            key=lambda instance: instance.pubDate, reverse=reversed)
         return all_visible_posts
 
     def get_profile_visibile_posts(self, active_user, page_user):
