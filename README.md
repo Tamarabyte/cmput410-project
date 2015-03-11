@@ -1,18 +1,18 @@
 # cmput410-project  
 
 ### Requirements Part 1  
-- [ ] Provide a webservice interface that is restful  
+- [X] Provide a webservice interface that is restful  
 - [ ] Enforce some authentication  
   - Consider HTTP Basic Auth
-- [ ] implement a restful API for service/post/postid  
+- [X] implement a restful API for service/post/postid  
   - a PUT should insert/update a post
   - a POST should get the post
   - a GET should get the post
-- [ ] Allow users to accept or reject friend requests  
+- [X] Allow users to accept or reject friend requests  
 - [X] implement author profiles via service/author/userid  
 - [X] friend querying via POSTs to service/friends/userid  
 - [X] friend2friend querying via GETs to service/friends/userid1/userid2  
-- [ ] Provide a web UI interface that is usable  
+- [X] Provide a web UI interface that is usable  
 - [X] friend requests can be made by POSTing a friend request to service/friendrequest  
 - [X] service/author/posts (posts that are visible to the currently authenticated user)   
 - [X] service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
