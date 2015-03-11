@@ -2,7 +2,7 @@
 <div class="row">
     <div class="well">
         <div class="col-lg-12 col-md-12 col-sm-12">
-            <b><a href="profile/{{ comment.author.uuid }}">{{ comment.author }}</a></b> ({{ comment.pubDate }}): {{ comment.comment }}
+            <b><a href="{% url "profile" comment.author.uuid %}">{{ comment.author }}</a></b> ({{ comment.pubDate }}): {{ comment.comment }}
         </div> <!-- /col -->
     </div> <!-- well -->
 </div> <!-- row -->
