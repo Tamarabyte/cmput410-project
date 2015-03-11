@@ -25,10 +25,8 @@ urlpatterns = patterns('',
     url(r'^post/(?P<postGUID>[\w-]+)/create/(?P<commentGUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
 
     # Profile URLs
-    url(r'^profile$', ProfileView.as_view(), name="personal_profile"),
-    url(r'^author/(?P<pk>[\d]+)/edit', ProfileUpdateView.as_view(), name='edit_profile'),
-    # url(r'^author/edit$', ProfileUpdateView.as_view(), name='edit_profile'),
-    url(r'^profile/(?P<authorUUID>[\w-]+)', ProfileView.as_view(), name="profile"),
+    url(r'^profile/(?P<authorUUID>[\w-]+)/edit', ProfileUpdateView.as_view(), name='edit_profile'),
+    url(r'^profile/(?P<authorUUID>[\w-]+)$', ProfileView.as_view(), name="profile"),
     url(r'^author/(?P<authorUUID>[\w-]+)/posts', ProfileStreamView.as_view(), name="profile_stream"),
 
     # Friends URLs

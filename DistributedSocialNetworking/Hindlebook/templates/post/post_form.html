@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
 
-<div class="well">
+<div class="well post-form">
     <div class="row">
         {% csrf_token %}
         <fieldset>
@@ -13,14 +13,14 @@
                     <div class="error-container error">{{ alert | safe }}{{ post_form.content.errors.0|escape }}</div>
                 {% endif %}
                 <input id="guid" type="hidden" value="{{ post_form.guid }}" />
-                {% render_field post_form.visibility default="PUBLIC" %}
+                {% render_field post_form.visibility default="PUBLIC" class+="pull-left form-control input-sm post-vis" %}
             </div>
         </fieldset>
 
         <!-- Submit Button -->
         <div class="form-buttons col-lg-12">
           <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
-            <i class="icon-rocket2"></i> Post
+            <i class="icon-kub-speech-02"></i> Post
           </button>
        </div> <!-- buttons -->
     <div class="clearfix"></div>

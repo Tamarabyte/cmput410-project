@@ -1,6 +1,5 @@
 {% extends "base_login.html" %}
 {% load staticfiles %}
-
 {% block alerts %}
     <!-- Django Messages -->
    {% if messages  %}
@@ -32,6 +31,7 @@
         
         {% csrf_token %}
         <fieldset>
+
             {{ form.as_bootstrap_form }}
         </fieldset>
         
@@ -48,7 +48,7 @@
         <input type="hidden" name="next" value="{{ next }}" />
     
     </form>
-    
+
 {% endblock %}
         
 {% block trailing %}
