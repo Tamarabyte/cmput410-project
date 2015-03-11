@@ -1,8 +1,5 @@
 $(function() {
     /* Post Ajax */
-    var base_url = "";
-    var time = "";
-
     var options = {
         success: getSuccess,
         dataType: "JSON",
@@ -13,16 +10,13 @@ $(function() {
     }
 
     function beforeSubmit(arr, form, options) {
-        console.log(options["url"]);
-        // options["url"] = base_url + $("#guid").val();
-        console.log(options["url"]);
     }
 
     function getSuccess(response, status, xhr, form) {
         console.log(response);
         $.each(response['posts'], function(count, post){
-             $('#stream').prepend(post["post"]);
-             $('.add_comment_button[data-postGUID="' + post["created_guid"] +'"]').click(showCommentForm);
+            $('#stream').prepend(post["post"]);
+            $('.add_comment_button[data-postGUID="' + post["created_guid"] +'"]').click(showCommentForm);
         });
         $.each(response['comments'], function(count, comment){
             $('#' + comment['postGUID']).before(comment['comment']);
