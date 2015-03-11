@@ -5,9 +5,11 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-import uuid as uuid_import
-import operator
 from itertools import chain
+import uuid as uuid_import
+import functools
+import operator
+
 
 class Category(models.Model):
     tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
@@ -30,7 +32,7 @@ class ExtendedPostManager(models.Manager):
         q_list = [Q()]
         if min_time is not None:
             q_list.append(Q(pubDate__gt=min_time))
-        q_reduced = reduce(operator.and_, q_list)
+        q_reduced = functools.reduce(operator.and_, q_list)
 
         my_posts = Post.objects.filter(q_reduced, author=active_user)  # My posts
         public_posts = Post.objects.filter(q_reduced, visibility="PUBLIC").exclude(author=active_user)  # Public Posts
