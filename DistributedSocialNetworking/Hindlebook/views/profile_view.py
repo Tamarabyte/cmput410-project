@@ -1,15 +1,18 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.views.generic import TemplateView, UpdateView
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
-from Hindlebook.models import Post, User
-from Hindlebook.forms import ProfileEditForm
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from Hindlebook.forms import CommentForm
+
+import dateutil
+import datetime
+
+from Hindlebook.models import Post, User, Comment
+from Hindlebook.forms import ProfileEditForm, CommentForm
 
 User = get_user_model()
 
@@ -34,6 +37,35 @@ class ProfileView(TemplateView):
         print(get_object_or_404(User, uuid=authorUUID).uuid)
         print(self.request.user.uuid)
         return context
+
+    def post(self, *args, **kwargs):
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
+        page_user = get_object_or_404(User, uuid=authorUUID)
+        posts = []
+        comments = []
+        time = None
+        if self.request.POST['last_time'] != '':
+            time = dateutil.parser.parse(self.request.POST['last_time'])
+        all_posts = Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, page_user=page_user, reversed=False, min_time=time)
+        for post in all_posts:
+            response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+            response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
+            response_data["created_guid"] = post.guid
+            posts.append(response_data)
+
+        if time is not None:
+            all_comments = Comment.objects.filter(pubDate__gt=time, post__in=all_posts)
+        else:
+            all_comments = Comment.objects.filter(post__in=all_posts)
+
+        for comment in all_comments:
+            response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
+            response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+            response_data["postGUID"] = comment.post.guid
+            comments.append(response_data)
+
+        return JsonResponse({'posts': posts, 'comments': comments, 'time': datetime.datetime.now(dateutil.tz.tzutc()).isoformat()})
 
 
 class ProfileUpdateView(UpdateView):
