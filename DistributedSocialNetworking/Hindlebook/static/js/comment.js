@@ -24,11 +24,8 @@ $(function() {
     }
 
     function commentSuccess(response, status, xhr, form) {
-        console.log("Form was valid!");
-        console.log(response["comment"]);
         var postGUID = $("#comment-form").data("postGUID");
         $('#comment-form').html(response["form"]);
-        $('#comment-form').clearForm();
         $('#' + postGUID).before(response["comment"]);
         $("#comment_form_html").hide();
         $(".add_comment_button").show();
