@@ -55,7 +55,7 @@ $(function() {
 
 });
 
-function clicker() {
+function follow() {
     // Cheap little hack to make the heart the button
     // to submit the form, can't just say
     // onclick=submit() in the html because then it
@@ -83,6 +83,8 @@ function clicker() {
             "author": author,
             "friend": friend
         };
+
+
     // THIS NEEDS TO BE RESOLVED, just a quick hack
     // to at least get it working... basically
     // JSON when stringifying everything is adding
@@ -91,10 +93,8 @@ function clicker() {
     var myJSONString = JSON.stringify(jsonData);
     var regex = new RegExp("/", 'g');
     var myEscapedJSONString = myJSONString.replace(regex,"");
-    console.log(myEscapedJSONString);
     $.ajax({
         success: requestSuccess,
-        dataType: "json",
         clearForm : false,
         contentType: "application/json; charset=utf-8",
         //error: ajaxError,
@@ -102,9 +102,7 @@ function clicker() {
         url : base_url,
         data : myEscapedJSONString,
         beforeSubmit : beforeSubmit
-    }).done(function (data) {
-         console.log("Response "+ data);
-         })
+    })
 
     function beforeSubmit(arr, form, options) {
         console.log("setting url");
@@ -123,6 +121,73 @@ function clicker() {
     
     function requestSuccess(response, status, xhr, form) {
         console.log("friend request sent!");
+        // On request success we succesfully followed this person...
+        // Time to hide this button and show the unfriend button
+        $("#friend-button").hide()
+        $("#unfriend-button").show();
   
     };
+}
+
+function unfollow() {
+    var base_url = "/api/unfriend";
+    var friend = {
+                "id": $("#friend-uuid").val(),
+                "host": $("friend-host").val(),
+                "displayname": $("#friend-dn").val(),
+                "url": $("#friend-url").val()
+            };
+    var author = {
+                "id":$("#author-uuid").val(),
+                "host":$("#author-host").val(),
+                "displayname":$("#author-dn").val()
+            };
+   
+
+    var jsonData = {
+            "query": "friendrequest",
+            "author": author,
+            "friend": friend
+        };
+
+
+    // THIS NEEDS TO BE RESOLVED, just a quick hack
+    // to at least get it working... basically
+    // JSON when stringifying everything is adding
+    // backslashes so I'm fucking removing them fuck that
+    // it was making the IDs not match up
+    var myJSONString = JSON.stringify(jsonData);
+    var regex = new RegExp("/", 'g');
+    var myEscapedJSONString = myJSONString.replace(regex,"");
+    $.ajax({
+        success: requestSuccess,
+        clearForm : false,
+        contentType: "application/json; charset=utf-8",
+        //error: ajaxError,
+        type : "POST",
+        url : base_url,
+        data : myEscapedJSONString,
+        beforeSubmit : beforeSubmit
+    })
+
+    function beforeSubmit(arr, form, options) {
+        console.log("setting url");
+        options["url"] = base_url;
+        console.log(options["data"]);
+        console.log(options["url"]);
+    }
+
+    function ajaxError(xhr, errmsg, err) {
+        var response;
+
+        console.log("we errored out yo");
+        console.log(xhr.responseText)
+
+    }
+    function requestSuccess(response, status, xhr, form) {
+        console.log("in unfollow")
+        $("#unfriend-button").hide();
+        $("#friend-button").show()
+    };
+
 }
