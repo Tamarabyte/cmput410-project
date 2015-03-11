@@ -38,10 +38,10 @@ a {
     max-width: 800px;
 }
 .post-block, .post-form {
-    background-color: #222;
+    background-color: #444;
     border-radius: 20px;
     color: #fff;
-    border-color: #222;
+    border-color: #444;
 }
 
 .auth-forms .control-label {
