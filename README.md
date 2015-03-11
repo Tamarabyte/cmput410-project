@@ -27,10 +27,10 @@
 
 ### User Story Modules  
 - [X] [Login Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#login)   
-- [ ] [Feed Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#feed)  
-- [ ] [User Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#user)  
-- [ ] [Friends Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#friends)  
+- [X] [Feed Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#feed)  
+- [X] [User Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#user)  
+- [X] [Friends Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#friends)  
 - [ ] [Image Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#image)  
-- [ ] [Permissions Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#perms)  
+- [X] [Permissions Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#perms)  
 - [ ] [Search Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#search)  (optional)
 - [ ] [Connect Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#connect)  
