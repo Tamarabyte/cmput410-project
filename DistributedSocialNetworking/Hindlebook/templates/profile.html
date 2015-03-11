@@ -24,17 +24,18 @@
             </div>
             <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{user.getFriendRequestCount}}</span></a></div>
         {% else %}
-            {% csrf_token %}
-            <form id="friendrequestform" action=".">
-             <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
-             <input type="hidden"  id="author-host" value={{ user.node.host }}/>
-             <input type="hidden" id="author-dn" value={{ user.username }}/>
-             <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
-             <input type="hidden" id="friend-host" value={{ author.node.host }}/>
-             <input type="hidden" id="friend-dn" value={{ author.username }}/>
-             <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
-             <div id="friend-button" class="profile-icon"><a href="#"><span class="icon-favourite-3"  onclick="clicker()"></span></a></div>
-            </form>
+                {% csrf_token %}
+                <form id="friendrequestform" action=".">
+                 <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
+                 <input type="hidden"  id="author-host" value={{ user.node.host }}/>
+                 <input type="hidden" id="author-dn" value={{ user.username }}/>
+                 <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
+                 <input type="hidden" id="friend-host" value={{ author.node.host }}/>
+                 <input type="hidden" id="friend-dn" value={{ author.username }}/>
+                 <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
+                 <div id="friend-button" hidden class="profile-icon"><a href="#"><span class="icon-favourite-3"  onClick="follow()"></span></a></div>
+                <div id="unfriend-button" hidden class="profile-icon"><a href="#"><span class="icon-broken-heart"  onClick="unfollow()"></span></a></div>
+                </form>
         {% endif %}
 
         </div>
@@ -50,7 +51,13 @@
 </div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 {% block scripts %}
-
+<script type="text/javascript">
+{% if isFollowing = 0 %}
+$("#friend-button").show()
+{% else %}
+$("#unfriend-button").show()
+{% endif %}
+</script>
 <script type="text/javascript" src="{% static "js/friendRequest.js" %}" ></script>
 {% endblock scripts %}
 
