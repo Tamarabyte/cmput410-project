@@ -34,4 +34,5 @@ $(function() {
         response = JSON.parse(xhr.responseText);
         $('#post-form').html(response["form"]);
     }
+    
 });

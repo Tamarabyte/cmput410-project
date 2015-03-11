@@ -4,34 +4,26 @@
 
 {% block page %}
 
-<div class="container">
-
-    <!-- New Comment Form -->
-    <div id="comment_form_html" class="row comment-form" hidden>
-        <form id="comment-form" action=".">
-            {% include "comment/comment_form.html" %}
-        </form>
-    </div> <!-- /row -->
-
-    <div id="stream">
-
-    <div class="posts">
-    {% for post in posts %}
-    <div id={{post.guid}}>
-        {% include "post/post.html" %}
-        {% for comment in post.getComments %}
-            <div id={{comment.guid}}>
-                {% include "comment/comment.html" %}
-            </div>
-        {% endfor %}
-            {% include "post/post_footer.html" %}
-    </div>
-    {% endfor %}
-    </div> <!-- /stream -->
+<div class="container stream">
+    {% include 'posts_and_comments.html' %}
 </div> <!-- /container -->
 {% endblock %}
 
 {% block scripts %}
+<script>
+    function showCommentForm(event) {
+    $("#comment-errors").text("");
+    var data = $(this).attr("data-postGUID");
+    console.log(data);
+
+    $(".add_comment_button").show();
+    $(this).hide();
+    $("#comment_form_html").hide();
+    $("#"+ data ).after($("#comment_form_html"));
+    $("#comment_form_html").show();
+    $("#comment-form").data("postGUID", data);
+    console.log($("#comment-form").data("postGUID"));
+}; </script>
 <script type="text/javascript" src="{% static "js/post.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/comment.js" %}" ></script>
 {% endblock scripts %}

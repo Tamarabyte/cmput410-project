@@ -38,4 +38,6 @@ $(function() {
         response = JSON.parse(xhr.responseText);
         $('#comment-form').html(response["form"]);
     }
+
+    
 });
