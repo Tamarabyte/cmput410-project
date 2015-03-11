@@ -27,10 +27,10 @@ class ProfileView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
-        
+
         if (self.request.user.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user)
-            
+
         context['author'] = get_object_or_404(User, uuid=authorUUID)
         context['posts'] = Post.objects.filter(author__uuid=authorUUID)
 
@@ -73,7 +73,6 @@ class ProfileView(TemplateView):
 
 class ProfileUpdateView(View):
 
-
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
@@ -95,7 +94,6 @@ class ProfileUpdateView(View):
 
 class ProfileStreamView(TemplateView):
     template_name = "profile_stream.html"
-
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
