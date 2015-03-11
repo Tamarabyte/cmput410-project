@@ -23,7 +23,7 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
-        
+
         authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
         context['author'] = get_object_or_404(User, uuid=authorUUID)
         context['posts'] = Post.objects.filter(author__uuid=authorUUID)
@@ -57,6 +57,7 @@ class ProfileUpdateView(UpdateView):
         # raise Http404("wtf3")
         context = super(ProfileUpdateView, self).get_context_data(**kwargs)
         return context
+
 
 class ProfileStreamView(TemplateView):
     template_name = "profile_stream.html"

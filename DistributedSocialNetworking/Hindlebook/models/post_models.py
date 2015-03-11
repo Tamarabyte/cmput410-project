@@ -1,17 +1,13 @@
+from Hindlebook.models.user_models import ForeignUser, GenericUser
+from Hindlebook.models import UuidValidator
+
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-
 import uuid as uuid_import
-
 import operator
-
 from itertools import chain
-
-from Hindlebook.models import ForeignUser
-from Hindlebook.models import UuidValidator
-
 
 class Category(models.Model):
     tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
@@ -92,7 +88,15 @@ class Post(models.Model):
     categories = models.ManyToManyField(Category, blank=True, related_name='tagged_posts')
     content = models.TextField(blank=False)
 
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="posts")
+    # only author or foreign author should be set
+    genericAuthor = models.ForeignKey(GenericUser, null=True, blank=True, related_name="posts")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="posts")
+    # foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="posts")
+    # user_or_foreignUser = {'app_label__in': ('hindlebook',), 'model__in': ('User', 'ForeignUser', ), }
+    # object_type = models.ForeignKey(ContentType, verbose_name=('author'), null=True, blank=True)
+    # object_id = models.PositiveIntegerField()
+    # content_object = GenericForeignKey('object_type', 'object_id')
+
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
     content_type_choices = (("text/plain", "text/plain"), ("text/x-markdown", "text/x-markdown"), ("text/html", "text/html"))
@@ -116,8 +120,13 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, related_name="comments")
 
     # only author or foreign author should be set
+    genericAuthor = models.ForeignKey(GenericUser, null=True, blank=True, related_name="comments")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="comments")
-    foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
+    # foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
+    # user_or_foreignUser = {'app_label__in': ('Hindlebook',), 'model__in': ('User', 'ForeignUser', ), }
+    # object_type = models.ForeignKey(ContentType, verbose_name=('author'), null=True, blank=True)
+    # object_id = models.PositiveIntegerField()
+    # content_object = GenericForeignKey('object_type', 'object_id')
 
     comment = models.CharField(max_length=2048)
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
