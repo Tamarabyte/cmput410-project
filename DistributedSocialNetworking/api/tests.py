@@ -1,21 +1,27 @@
 from django.test import TestCase, Client
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import  APITestCase
 from Hindlebook.models import User, Post
+from api.testclient import TestClient, APITestClient
 from api.serializers.post_serializer import PostSerializer
 from model_mommy import mommy
 from django.utils.six import BytesIO
 from rest_framework import status
+from django.conf import settings
+from django.contrib.auth import login
+from django.http import HttpRequest
 import json
+import base64
 import uuid as uuid_import
 
-c = Client()
-client = APIClient()
+c = TestClient()
+client = APITestClient()
 server = "http://localhost:8000"
 
 
 class APITests(APITestCase):
     """ Test some of the GET/POST API """
 
+    
     def setUp(self):
         self.author1 = mommy.make(User)
         self.author2 = mommy.make(User)
@@ -32,6 +38,7 @@ class APITests(APITestCase):
         """ GET a post by given GUID """
         url = server + "/api/post/%s" % self.post1.guid
         response = self.client.get(url)
+
         serializer = PostSerializer(self.post1)
         self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
         self.assertTrue('posts' in response.data, "No 'posts' in response")
@@ -71,6 +78,8 @@ class APITests(APITestCase):
 
         url = server + "/api/post/%s" % newPost.guid
         serializer = PostSerializer(newPost)
+
+
         response = self.client.put(url, serializer.data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
         self.assertTrue('posts' in response.data, "No 'posts' in response")
@@ -111,7 +120,7 @@ class APITests(APITestCase):
 
         JSONdata = json.dumps({"query": "friends", "author": id1, "authors": [5, 6, 7, id2, 3]})
 
-        response = c.post('/api/friends/%s' % id1, data=JSONdata, content_type='application/json; charset=utf')
+        response = c.post('/api/friends/%s' % id1,user=self.author1, data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -131,7 +140,7 @@ class APITests(APITestCase):
         JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1"},
                                "friend": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2",
                                           "url": "http://127.0.0.1:8000/author/"+authorID2}})
-
+        c.login_user(self.author1)
         response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
@@ -145,7 +154,7 @@ class APITests(APITestCase):
         JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2"},
                                "friend": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1",
                                           "url": "http://127.0.0.1:8000/author/"+authorID1}})
-
+        c.login_user(self.author2)
         response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
@@ -155,6 +164,17 @@ class APITests(APITestCase):
 
         self.assertTrue(self.author1 in self.author2.follows.all())
         self.assertTrue(len(self.author2.follows.all()) == 1)
+
+    def testIllegalFriendRequest(self):
+        """ Test sending a friend request from the not currently logged in user """
+        authorID1 = str(self.author1.uuid)
+        authorID2 = str(self.author2.uuid)
+        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1"},
+                               "friend": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2",
+                                          "url": "http://127.0.0.1:8000/author/"+authorID2}})
+        c.login_user(self.author2)
+        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        self.assertEquals(response.status_code, 200, "Response not 200")
 
     def testGETAuthorPosts(self):
         """ Test GET post text from given author """

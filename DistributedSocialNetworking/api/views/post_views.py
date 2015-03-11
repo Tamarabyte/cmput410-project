@@ -60,11 +60,11 @@ class AuthoredPosts(APIView):
 
     def get(self, request, uuid, format=None):
         # Get the specified Author
-        postAuthor = get_object_or_404(User, uuid=uuid)
+        pageAuthor = get_object_or_404(User, uuid=uuid)
 
         # Get the Author's Posts
         # TODO: FIX ME: change to (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
-        posts = postAuthor.getAuthoredPosts()
+        posts = Post.objects_ext.get_profile_visibile_posts(self.request.user, pageAuthor)
 
         # Serialize the Authors Posts
         serializer = PostSerializer(posts, many=True)
@@ -94,9 +94,9 @@ class VisiblePosts(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
-        # Filter to get public posts
-        # TODO: FIX ME: change to (all posts visible to the currently authenticated user)
-        serializer = PostSerializer(Post.objects.filter(visibility='PUBLIC'), many=True)
+        # Filter to get all posts visible to the currently authenticated user
+        posts = Post.objects_ext.get_all_visibile_posts(self.request.user)
+        serializer = PostSerializer(posts, many=True)
 
         # Return JSON
         return Response({"posts": serializer.data})

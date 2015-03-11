@@ -26,6 +26,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
 STATIC_ROOT = '/home/www/hindlebook/static'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'Hindlebook/static'),
@@ -39,7 +40,7 @@ if DEBUG == True:
     MEDIA_ROOT = os.path.join(os.path.realpath(BASE_DIR), 'Hindlebook/media')
 else:
     MEDIA_ROOT = '/home/www/hindlebook/media'
-    
+
 MEDIA_URL = "/media/"
 
 # Application definition
@@ -87,7 +88,11 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+       'rest_framework.authentication.BasicAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
+   ]
 }
 
 AUTH_USER_MODEL = 'Hindlebook.User'

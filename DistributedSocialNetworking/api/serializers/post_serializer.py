@@ -29,23 +29,26 @@ class PostSerializer(serializers.ModelSerializer):
 
         # Get Author/Host info
         author_id = author_data.get('uuid')
-        host = author_data.get('node')
+        host = author_data.pop('node')
 
+        user = None
+        foreignUser = None
         # Check whether this is a local or foreign post
         server = Server.objects.filter(host=host).first()
         if server is not None:
             # It's local! Get the user, or 404 if the user doesn't exist
             # TODO: FIX ME 400 instead??
             user = get_object_or_404(User, uuid=author_id)
+            # Create the post
+            post = Post.objects.create(author=user, **validated_data)
         else:
             # Foreign Node: Add it if we haven't seen it before
-            Node.objects.get_or_create(host=host)
+            node = Node.objects.get_or_create(host=host)[0]
             # Add the ForeignUser if we haven't seen them before
-            user = ForeignUser.objects.get_or_create(**author_data)
+            foreignUser = ForeignUser.objects.get_or_create(node=node, **author_data)[0]
+            # Create the post
 
-
-        # Create the post
-        post = Post.objects.create(author=user, **validated_data)
+        post = Post.objects.create(author=user, foreign_author=foreignUser, **validated_data)
 
         # # Add the categories
         # for category in categories_data:
@@ -56,7 +59,7 @@ class PostSerializer(serializers.ModelSerializer):
 
         # Create the comments
         for comment in comment_data:
-            Comment.objects.create(author=user, post=post, **comment)
+            Comment.objects.create(author=user, foreign_author=foreignUser, post=post, **comment)
 
         return post
 

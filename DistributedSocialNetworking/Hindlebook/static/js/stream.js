@@ -1,5 +1,7 @@
 $(function() {
     /* Post Ajax */
+    var time = "";
+
     var options = {
         success: getSuccess,
         dataType: "JSON",
