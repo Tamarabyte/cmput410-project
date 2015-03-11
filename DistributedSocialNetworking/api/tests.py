@@ -146,7 +146,7 @@ class APITests(TestCase):
         self.assertEquals(decoded['friends'][0], id2, "Authors are not friends but they should be")
 
     def testFriendRequestSuccess(self):
-        """ Test sending a successful friend request """
+        """ Test sending a successful bidirectional friend request """
 
         authorID1 = str(self.author1.uuid)
         authorID2 = str(self.author2.uuid)
@@ -161,6 +161,23 @@ class APITests(TestCase):
 
         self.assertTrue(self.author2 in self.author1.follows.all())
         self.assertTrue(len(self.author1.follows.all()) == 1)
+
+        self.assertFalse(self.author1 in self.author2.follows.all())
+        self.assertTrue(len(self.author2.follows.all()) == 0)
+
+        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID2, "host": "http://127.0.0.1:8000/", "displayname": "Author2"},
+                               "friend": {"id": authorID1, "host": "http://127.0.0.1:8000/", "displayname": "Author1",
+                                          "url": "http://127.0.0.1:8000/author/"+authorID1}})
+
+        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+
+        self.assertEquals(response.status_code, 200, "Response not 200")
+
+        self.assertTrue(self.author2 in self.author1.follows.all())
+        self.assertTrue(len(self.author1.follows.all()) == 1)
+
+        self.assertTrue(self.author1 in self.author2.follows.all())
+        self.assertTrue(len(self.author2.follows.all()) == 1)
 
     def testGETAuthorPosts(self):
         """ Test GET posts from given author """

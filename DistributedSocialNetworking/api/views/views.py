@@ -92,18 +92,15 @@ class FriendRequest(APIView):
             return HttpResponse(status=400)
 
         authorID = JSONrequest['author']['id']
-        print(authorID)
         friendID = JSONrequest['friend']['id']
-        print(friendID)
 
         try:
             author = get_object_or_404(User, uuid=authorID)
             friend = get_object_or_404(User, uuid=friendID)
 
-            if (friend not in author.getFriendRequests()):
+            if (friend not in author.follows.all()):
                 author.follows.add(friend)
         except:
-            print("author or friend not found")
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
