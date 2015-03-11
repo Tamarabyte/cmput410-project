@@ -1,17 +1,19 @@
 from django.test import TestCase, Client
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 from Hindlebook.models import User, Post
 from api.serializers.post_serializer import PostSerializer
 from model_mommy import mommy
 from django.utils.six import BytesIO
-from rest_framework.parsers import JSONParser
+from rest_framework import status
 import json
+import uuid as uuid_import
 
 c = Client()
 client = APIClient()
+server = "http://localhost:8000"
 
 
-class APITests(TestCase):
+class APITests(APITestCase):
     """ Test some of the GET/POST API """
 
     def setUp(self):
@@ -27,85 +29,59 @@ class APITests(TestCase):
         User.objects.all().delete()
 
     def testGETPost(self):
-        """ Test GET an author post by given post ID """
-
-        serializerOld = PostSerializer(self.post1)
-        originalPost = serializerOld.data
-
-        # Send a GET request with the post id
-        response = client.get('/api/post/%s' % self.post1.guid)
-
-        # Expects a 200 Ok with a JSON response
-        self.assertEquals(response.status_code, 200, "Response not 200")
-
-        stream = BytesIO(response.content)
-        responsePost = JSONParser().parse(stream)
-
-        self.assertEquals(originalPost, responsePost, "Returned incorrect information")
-
-        # Serialize the response
-        serializerNew = PostSerializer(data=responsePost)
-
-        self.assertTrue(serializerNew.is_valid(), "Returned invalid JSON")
-
-        self.assertEquals(serializerNew.validated_data, serializerOld.validated_data, "Returned incorrect information")
+        """ GET a post by given GUID """
+        url = server + "/api/post/%s" % self.post1.guid
+        response = self.client.get(url)
+        serializer = PostSerializer(self.post1)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertTrue(len(response.data['posts']) == 1, "Should return exactly one post")
+        self.assertEqual(response.data['posts'][0], serializer.data, "Didn't get correct post information")
 
     def testPOSTPost(self):
-        """ Test POST an author post by given post ID """
+        """ POST to retrieve a post by given GUID """
 
+        url = server + "/api/post/%s" % self.post1.guid
+        response = self.client.post(url)
         serializer = PostSerializer(self.post1)
-        originalPost = serializer.data
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertTrue(len(response.data['posts']) == 1, "Should return exactly one post")
+        self.assertEqual(response.data['posts'][0], serializer.data, "Didn't get correct post information")
 
-        # Send a POST request with the post id
-        response = c.post('/api/post/%s' % self.post1.guid)
+    def testPUTUpdatePost(self):
+        """ PUT to update an existing post by GUID"""
 
-        # Expects a 200 Ok with a JSON response
-        self.assertEquals(response.status_code, 200, "Response not 200")
+        newPost = self.post1
+        newPost.content = "Hello"
 
-        # Decode the JSON response
-        decoded = json.loads(response.content.decode('utf-8'))
+        url = server + "/api/post/%s" % self.post1.guid
+        serializer = PostSerializer(newPost)
+        response = self.client.put(url, serializer.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertTrue(len(response.data['posts']) == 1, "Should return exactly one post")
+        self.assertEqual(response.data['posts'][0]['content'], "Hello", "Didn't return correct content")
+        self.assertEqual(self.post1.content, "Hello", "Didn't return correct content")
 
-        # Serialize the response
-        serializer = PostSerializer(data=decoded)
+    def testPUTCreatePost(self):
+        """ PUT to create a new post with new GUID """
 
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        responsePost = serializer.data
+        newPost = mommy.make(Post)
 
-        self.assertEquals(originalPost, responsePost, "Returned incorrect information")
+        url = server + "/api/post/%s" % newPost.guid
+        serializer = PostSerializer(newPost)
+        response = self.client.put(url, serializer.data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertTrue(len(response.data['posts']) == 1, "Should return exactly one post")
+        self.assertEqual(response.data['posts'][0], serializer.data, "Didn't create the post correctly")
 
-    def testPUTPost(self):
-        """ Test PUT an author post by given post ID """
-
-        # Send a GET request with post id
-        response = c.get('/api/post/%s' % self.post1.guid)
-
-        # Decode the JSON response
-        decoded = json.loads(response.content.decode('utf-8'))
-        serializer = PostSerializer(data=decoded)
-
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        originalPost = serializer.data
-
-        serializer = PostSerializer(self.post2)
-        newPost = serializer.data
-
-        JSONdata = json.dumps(newPost)
-
-        # Send a PUT request to update the existing post
-        response = c.put('/api/post/%s' % self.post1.guid, data=JSONdata, content_type='application/json; charset=utf')
-
-        # Decode the JSON response
-        decoded = json.loads(response.content.decode('utf-8'))
-        serializer = PostSerializer(data=decoded)
-
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-
-        self.assertEquals(response.status_code, 200, "Response not 200")
-
-        responsePost = serializer.data
-
-        self.assertNotEquals(responsePost, originalPost, "Post not updated")
-        self.assertEquals(responsePost, newPost, "Post not updated correctly")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertTrue(len(response.data['posts']) == 1, "Should return exactly one post")
+        self.assertEqual(response.data['posts'][0], serializer.data, "Didn't create the post correctly")
 
     def testFriend2FriendGetQuerySuccess(self):
         """ Test a successful friend2friend query """
@@ -181,50 +157,25 @@ class APITests(TestCase):
         self.assertTrue(len(self.author2.follows.all()) == 1)
 
     def testGETAuthorPosts(self):
-        """ Test GET posts from given author """
+        """ Test GET post text from given author """
 
         post1 = mommy.make(Post, author=self.author1)
         post2 = mommy.make(Post, author=self.author1)
         different_post = mommy.make(Post, author=self.author2)
 
-        response = c.get('/api/author/%s/posts' % self.author1.uuid)
+        url = server + "/api/author/%s/posts" % self.author1.uuid
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 2, "Should return exactly two posts")
 
-        self.assertEquals(response.status_code, 200, "Response not 200")
-
-        jsonObject = json.loads(response.content.decode('utf-8'))
-
-        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
-
-        posts = jsonObject['posts']
-
-        self.assertEquals(len(posts), 2, "Author should have 2 posts")
-
-        serializer = PostSerializer(data=posts)
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        postData = serializer.data
-
-    def testGETAuthorPostText(self):
-        """ Test GET post text from given author """
-
-        post1 = mommy.make(Post, author=self.author1)
-        different_post = mommy.make(Post, author=self.author2)
-
-        response = c.get('/api/author/%s/posts' % self.author1.uuid)
-
-        self.assertEquals(response.status_code, 200, "Response not 200")
-
-        jsonObject = json.loads(response.content.decode('utf-8'))
-
-        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
-
-        posts = jsonObject['posts']
-
-        self.assertEquals(len(posts), 1, "Author should have 1 post")
-
-        serializer = PostSerializer(data=posts, many=True)
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        postData = serializer.data
-        self.assertEquals(postData['content'], post1.content, "Post has wrong text")
+        url = server + "/api/author/%s/posts" % self.author2.uuid
+        response = self.client.get(url)
+        serializer = PostSerializer(different_post)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 1, "Should return exactly one post")
+        self.assertEquals(response.data['posts'][0], serializer.data, "Didn't get correct post information")
 
     def testGETPublicPosts(self):
         """ Test GET all public posts """
@@ -235,17 +186,8 @@ class APITests(TestCase):
         # Make a private post
         privatePost = mommy.make(Post, visibility='PRIVATE')
 
-        response = c.get('/api/posts')
-
-        self.assertEquals(response.status_code, 200, "Response not 200")
-
-        jsonObject = json.loads(response.content.decode('utf-8'))
-
-        self.assertTrue('posts' in jsonObject, "Invalid JSON response")
-
-        posts = jsonObject['posts']
-        self.assertEquals(len(posts), 3, "Should be 2 public post")
-
-        serializer = PostSerializer(data=posts, many=True)
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        postData = serializer.data
+        url = server + "/api/posts"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 3, "Should return 3 posts, not " + str(len(response.data['posts'])))
