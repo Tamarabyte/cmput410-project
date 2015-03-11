@@ -9,8 +9,9 @@ from itertools import chain
 from Hindlebook.models import ForeignUser
 from Hindlebook.models import UuidValidator
 
+
 class Category(models.Model):
-    tag = models.CharField(max_length=25, null=False, blank=False)
+    tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
 
     class Meta():
         verbose_name = "Tags"
@@ -41,7 +42,7 @@ class ExtendedPostManager(models.Manager):
         if active_user == page_user:
             return Post.objects.filter(author=page_user).ordered_by(-pubDate)
 
-        #  Get list of friends 
+        #  Get list of friends
         friends = active_user.getFriends()
         #  Get list of friends of friends
         friends_ext = active_user.getFriendsOfFriends()

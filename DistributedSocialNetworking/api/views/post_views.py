@@ -1,7 +1,8 @@
 from django.shortcuts import get_object_or_404
 from Hindlebook.models import Post, User
-from api.serializers.post_serializer import PostSerializer
+from api.serializers import PostSerializer
 from rest_framework.views import APIView
+from rest_framework import generics, mixins
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
 
@@ -20,7 +21,7 @@ class PostDetails(APIView):
         serializer = PostSerializer(post)
 
         # Return JSON
-        return Response(serializer.data)
+        return Response({"posts": [serializer.data]})
 
     def post(self, request, guid, format=None):
         # Get the specified Post
@@ -30,14 +31,22 @@ class PostDetails(APIView):
         serializer = PostSerializer(post)
 
         # Return JSON
-        return Response(serializer.data)
+        return Response({"posts": [serializer.data]})
 
     def put(self, request, guid, format=None):
-        post = get_object_or_404(Post, guid=guid)
-        serializer = PostSerializer(post, data=request.data)
-        if serializer.is_valid():
+        if Post.objects.filter(guid=guid).exists():
+            # PUT as update
+            post = Post.objects.get(guid=guid)
+            serializer = PostSerializer(post, data=request.data)
+            stat = status.HTTP_200_OK
+        else:
+            # PUT as create
+            serializer = PostSerializer(data=request.data)
+            stat = status.HTTP_201_CREATED
+
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data)
+            return Response({"posts": [serializer.data]}, status=stat)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

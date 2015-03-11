@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from rest_framework.test import APIClient
 from Hindlebook.models import User, Post
 from api.serializers.post_serializer import PostSerializer
 from model_mommy import mommy
@@ -7,6 +8,7 @@ from rest_framework.parsers import JSONParser
 import json
 
 c = Client()
+client = APIClient()
 
 
 class APITests(TestCase):
@@ -27,27 +29,26 @@ class APITests(TestCase):
     def testGETPost(self):
         """ Test GET an author post by given post ID """
 
-        serializer = PostSerializer(self.post1)
-        originalPost = serializer.data
+        serializerOld = PostSerializer(self.post1)
+        originalPost = serializerOld.data
 
         # Send a GET request with the post id
-        response = c.get('/api/post/%s' % self.post1.guid)
+        response = client.get('/api/post/%s' % self.post1.guid)
 
         # Expects a 200 Ok with a JSON response
         self.assertEquals(response.status_code, 200, "Response not 200")
 
-        # Decode the JSON response
-        # decoded = json.loads(response.content.decode('utf-8'))
         stream = BytesIO(response.content)
-        data = JSONParser().parse(stream)
-
-        # Serialize the response
-        serializer = PostSerializer(data=data)
-
-        self.assertTrue(serializer.is_valid(), "Returned invalid JSON")
-        responsePost = serializer.data
+        responsePost = JSONParser().parse(stream)
 
         self.assertEquals(originalPost, responsePost, "Returned incorrect information")
+
+        # Serialize the response
+        serializerNew = PostSerializer(data=responsePost)
+
+        self.assertTrue(serializerNew.is_valid(), "Returned invalid JSON")
+
+        self.assertEquals(serializerNew.validated_data, serializerOld.validated_data, "Returned incorrect information")
 
     def testPOSTPost(self):
         """ Test POST an author post by given post ID """
