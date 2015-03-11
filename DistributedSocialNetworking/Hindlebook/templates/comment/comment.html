@@ -1,8 +1,6 @@
 
 <div class="row">
-    <div class="well">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-            <b><a href="{% url "profile" comment.author.uuid %}">{{ comment.author }}</a></b> ({{ comment.pubDate }}): {{ comment.comment }}
-        </div> <!-- /col -->
+    <div class="well comment-block">
+            <span class="comment-author"><a href="{% url "profile" comment.author.uuid %}">{{ comment.author }}</a></span> <span class="comment-date pull-right">{{ comment.pubDate }}</span>: <span class=comment-comment>{{ comment.comment }}</span>
     </div> <!-- well -->
 </div> <!-- row -->

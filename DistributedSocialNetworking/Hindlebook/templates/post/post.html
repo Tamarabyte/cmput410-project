@@ -1,13 +1,14 @@
 {% load static %}
 
 <div class="row">
-    <div class="well">
+    <div class="well post-block">
         <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-3 post-img"><img src="{{ MEDIA_URL }}{{ post.author.avatar }}"  height="100"></img></div>
-            <div class="row col-lg-10 col-md-10 col-sm-9 post-row">
-                <div class="row col-lg-8 col-md-8 col-sm-12"><h4><b><a href="{% url "profile" post.author.uuid %}">{{ post.author.username }}</a></b></h4></div>
-                <div class="row col-lg-4 col-md-4 col-sm-12 post-date"><h5>{{ post.pubDate }}</h5></div>
-                <div class="row col-lg-8 col-md-8 col-sm-12">{{ post.content }}</div>
+            <div class="pull-left"><img class="post-img" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="100"></img></div>
+            <div class="post-row">
+                <div class="post-author pull-left"><a href="{% url "profile" post.author.uuid %}">{{ post.author.username }}</a></div>
+                <div class="post-date">{{ post.pubDate }}</div>
+                <br>
+                <div class="post-content">{{ post.content }}</div>
             </div>
         </div> <!-- /row -->
     </div>   <!-- /well -->

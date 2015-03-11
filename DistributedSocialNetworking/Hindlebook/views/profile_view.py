@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.http import Http404, JsonResponse
-from django.views.generic import TemplateView, UpdateView
+from django.http import Http404, JsonResponse, QueryDict
+from django.views.generic import TemplateView, UpdateView, View
 from django.core.urlresolvers import reverse
 from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
@@ -26,16 +26,19 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
-
         authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
+        
+        if (self.request.user.uuid == authorUUID):
+            context['author_form'] = ProfileEditForm(instance=self.request.user)
+            
         context['author'] = get_object_or_404(User, uuid=authorUUID)
         context['posts'] = Post.objects.filter(author__uuid=authorUUID)
+
         if self.request.user in list(context["author"].followed_by.all()):
             context['isFollowing'] = 1
         else:
             context['isFollowing'] = 0
-        print(get_object_or_404(User, uuid=authorUUID).uuid)
-        print(self.request.user.uuid)
+
         return context
 
     def post(self, *args, **kwargs):
@@ -68,31 +71,31 @@ class ProfileView(TemplateView):
         return JsonResponse({'posts': posts, 'comments': comments, 'time': datetime.datetime.now(dateutil.tz.tzutc()).isoformat()})
 
 
-class ProfileUpdateView(UpdateView):
-    template_name = 'edit_profile.html'
-    model = User
-    form_class = ProfileEditForm
+class ProfileUpdateView(View):
+
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        # uuid = kwargs.get('uuid', self.request.user.uuid)
-        # self.user = get_object_or_404(User, uuid=self.uuid)
         return super(ProfileUpdateView, self).dispatch(*args, **kwargs)
 
-    def form_valid(self, form):
-        form.save()
-        # return HttpResponse(render_to_string('profile.html'))
-        # return HttpResponse(render_to_string('profile.html', {'loan': loan}))
-        return HttpResponseRedirect(reverse('personal_profile'))
+    def post(self, request, authorUUID, *args, **kwargs):
+        template_name = 'edit_profile.html'
+        form_name_in_template = "author_form"
+        form_class = ProfileEditForm
 
-    def get_context_data(self, **kwargs):
-        # raise Http404("wtf3")
-        context = super(ProfileUpdateView, self).get_context_data(**kwargs)
-        return context
+        form = form_class(request.POST, request.FILES, instance=self.request.user)
+
+        if not form.is_valid():
+            response_data = {'form': render_to_string(template_name, {form_name_in_template : form})}
+            return JsonResponse(response_data, status=400)
+
+        obj = form.save(commit=True)
+        return JsonResponse({}, status=200)
 
 
 class ProfileStreamView(TemplateView):
     template_name = "profile_stream.html"
+
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):

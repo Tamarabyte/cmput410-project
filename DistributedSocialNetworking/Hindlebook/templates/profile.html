@@ -3,54 +3,109 @@
 
 {% block page %}
 
-<!-- Modal -->
+{% if user.uuid == author.uuid %}
+<!-- Author Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
+            {% include 'edit_profile.html' %}
         </div> <!-- /.modal-content -->
     </div> <!-- /.modal-dialog -->
 </div><!-- /.modal -->
+{% endif %}
 
-<div class="container">
-    <div class="profile row">
-        <div class="col-md-2 col-sm-2"></div>
-        <div class="col-md-1 col-sm-1 text-right">
-        {% if user.uuid == author.uuid %}
-            <div class="profile-icon">
-                <a data-toggle="modal" href="{% url 'edit_profile' user.id %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
-            </div>
-            <div class="profile-icon">
-                <a data-toggle="modal" href="{% url 'friends_view' user.uuid %}" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-avatar-02"></span></a>
-            </div>
-            <div class="profile-icon "><a href="#"><span class="badge profile-badge">{{user.getFriendRequestCount}}</span></a></div>
-        {% else %}
-                {% csrf_token %}
-                <form id="friendrequestform" action=".">
-                 <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
-                 <input type="hidden"  id="author-host" value={{ user.node.host }}/>
-                 <input type="hidden" id="author-dn" value={{ user.username }}/>
-                 <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
-                 <input type="hidden" id="friend-host" value={{ author.node.host }}/>
-                 <input type="hidden" id="friend-dn" value={{ author.username }}/>
-                 <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
-                 <div id="friend-button" hidden class="profile-icon"><a href="#"><span class="icon-favourite-3"  onClick="follow()"></span></a></div>
-                <div id="unfriend-button" hidden class="profile-icon"><a href="#"><span class="icon-broken-heart"  onClick="unfollow()"></span></a></div>
-                </form>
-        {% endif %}
+<div class = "container">
+    <div class="profile-banner">
+            <!-- User Buttons -->
+            {% if user.uuid == author.uuid %}
+                <div class="profile-icon profile-edit-icon text-right">
+                    <a data-toggle="modal" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
+                </div>
+            {% else %}
+                    <form id="friendrequestform" action=".">
+                        {% csrf_token %}
+                     <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
+                     <input type="hidden"  id="author-host" value={{ user.node.host }}/>
+                     <input type="hidden" id="author-dn" value={{ user.username }}/>
+                     <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
+                     <input type="hidden" id="friend-host" value={{ author.node.host }}/>
+                     <input type="hidden" id="friend-dn" value={{ author.username }}/>
+                     <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
+                     <div class="profile-icon text-right">
+                        <div id="friend-button" hidden ><a href="#"><span class="icon-favourite-3"  onClick="follow()"></span></a></div>
+                       <div id="unfriend-button" hidden><a href="#"><span class="icon-broken-heart"  onClick="unfollow()"></span></a></div>
+                        </div>
+                    </form>
 
-        </div>
-        <div class="col-md-1 text-right">
-            <img class="img-responsive" src="{{ MEDIA_URL }}{{ author.avatar }}"></img>
-        </div>
-        <div class="col-md-8">
-            <div class="row text-left"><h4><b>{{ author.username }}</b></h4></div>
-            <div class="row text-left"><h4><b>About Me:</b></h4></div>
-            <div class="row text-left">{{ author.about }}</div>
-        </div>
-    </div>
-</div>
+            {% endif %}
+
+<div class="stream">
+
+        
+            <!-- End User Buttons -->
+
+                <!-- User Text and Avatar -->
+            <div class="profile">
+                    <div class="pull-left profile-img">
+                        <img class="avatar" src="{{ MEDIA_URL }}{{ author.avatar }}" height="200"></img>
+                    </div>
+                    <div class="profile-text">
+                        <div class="profile-name">{{ author.username }}</b></div>
+                        <div class="row">
+                            <br>
+                            <div class="profile-about-title pull-left">About Me: </div>
+                            <div class="profile-about">
+                                {% if author.about %}
+                                    {{ author.about }}
+                            {% else %}
+                                This user has not entered any information about themselves yet! How mysterious!
+                            {% endif %}
+                            </div>
+                            <br>
+                            <div class="profile-about-title pull-left">Github ID: </div>
+                            {% if author.github_id %}
+                                    {{ author.github_id }}
+                            {% else %}
+                                Not Available
+                            {% endif %}
+                        </div>
+                    </div>
+            </div>
+                <!-- End User Text and Avatar-->
+                <div class="clearfix"></div>
+    </div> <!-- profile banner -->
+
+
+</div> <!-- container -->
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 {% block scripts %}
+<script>
+
+    var form_options = {
+        url : '{% url 'edit_profile' user.uuid %}',
+        type : 'post',
+        dataType: "json",
+        success : profileSuccess,
+        error : profileError
+    }
+
+    function profileSuccess(response, status, xhr, form) {
+        window.location.replace("{% url "profile" authorUUID=author.uuid %}");
+    }
+
+    function profileError(xhr, errmsg, err) {
+        var response;
+        console.log(xhr.status + ": " + xhr.responseText);
+        response = JSON.parse(xhr.responseText);
+        $('#profile_update_form').html(response["form"]);
+    }
+
+    //setUpAjaxForm($('#profile_update_form'), formOptions);
+    $(document).ready(function (){
+        $('#profile_update_form').ajaxForm(form_options);
+    });
+</script>
+
 <script type="text/javascript">
 {% if isFollowing = 0 %}
 $("#friend-button").show()

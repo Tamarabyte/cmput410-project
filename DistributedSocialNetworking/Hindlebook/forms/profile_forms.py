@@ -8,10 +8,10 @@ class ProfileEditForm(forms.ModelForm, TemplateMixin):
     def __init__(self, *args, **kwargs):
         super(ProfileEditForm, self).__init__(*args, **kwargs)
 
+
     class Meta:
         model = User
         fields = ['about', 'github_id', 'avatar']
-        # exclude = ('username', 'password', 'uuid')
 
 class FriendRequestForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

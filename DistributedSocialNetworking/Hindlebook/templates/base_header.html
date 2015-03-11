@@ -16,7 +16,7 @@
         </div> <!-- /navbar-header -->
   
         <ul class="nav navbar-nav">
-          <li><a href="{% url "personal_profile" %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
+          <li><a href="{% url "profile" authorUUID=user.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
           <li><a href="#"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
           <li><a href="#"><span class="badge">{{ user.getFriendRequestCount }}</span></a></li>
         </ul>
