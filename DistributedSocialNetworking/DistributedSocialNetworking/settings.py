@@ -40,7 +40,7 @@ if DEBUG == True:
     MEDIA_ROOT = os.path.join(os.path.realpath(BASE_DIR), 'Hindlebook/media')
 else:
     MEDIA_ROOT = '/home/www/hindlebook/media'
-    
+
 MEDIA_URL = "/media/"
 
 # Application definition
