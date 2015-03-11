@@ -1,7 +1,7 @@
 $(function() {
     /* Post Ajax */
     var base_url = "";
-    var time = "2015-03-11T07:23:05.146";
+    var time = "";
 
     var options = {
         success: getSuccess,
@@ -27,7 +27,7 @@ $(function() {
         $.each(response['comments'], function(count, comment){
             $('#' + comment['postGUID']).before(comment['comment']);
         });
-        // time = response['time'];
+        time = response['time'];
     }
 
     function ajaxError(xhr, errmsg, err) {
@@ -47,7 +47,15 @@ $(function() {
         $("#comment-form").data("postGUID", data);
         console.log($("#comment-form").data("postGUID"));
     };
-    f = 
+    $.ajax({
+            success: getSuccess,
+            dataType: "JSON",
+            data: {'last_time': time},
+            error: ajaxError,
+            type : "POST",
+            beforeSubmit : beforeSubmit
+        });
+
     setInterval(function() {
         $.ajax({
             success: getSuccess,
@@ -56,6 +64,6 @@ $(function() {
             error: ajaxError,
             type : "POST",
             beforeSubmit : beforeSubmit});
-    }, 1000);
+    }, 2000);
 
 });

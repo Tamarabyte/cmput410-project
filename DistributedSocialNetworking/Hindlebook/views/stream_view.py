@@ -9,8 +9,9 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 
 import datetime
+import dateutil.parser
 
-from Hindlebook.models.post_models import Post, Comment
+from Hindlebook.models import Post, Comment
 from Hindlebook.forms import PostForm, CommentForm
 
 
@@ -23,31 +24,37 @@ class StreamView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(StreamView, self).get_context_data(**kwargs)
-        context['posts'] = None  # Post.objects_ext.get_all_visibile_posts(self.request.user)
+        context['posts'] = None
         context['post_form'] = PostForm()
         context['comment_form'] = CommentForm()
         return context
 
     def post(self, *args, **kwargs):
-        if 'application/json' in self.request.META['HTTP_ACCEPT']:
-            posts = []
-            comments = []
-            print(self.request.POST)  # 2015-03-11T07:23:05.146
-            # time = datetime.datetime.strptime("%Y-%m-%dT%H:%M:%S%f", self.request.POST['last_time'])
-            for post in Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, reversed=False):
-                response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
-                response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
-                response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
-                response_data["created_guid"] = post.guid
-                posts.append(response_data)
+        posts = []
+        comments = []
+        time = None
+        if self.request.POST['last_time'] != '':
+            time = dateutil.parser.parse(self.request.POST['last_time'])
 
-            for comment in Comment.objects.all():
-                response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
-                response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
-                response_data["postGUID"] = comment.post.guid
-                comments.append(response_data)
+        for post in Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, reversed=False, min_time=time):
+            response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+            response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
+            response_data["created_guid"] = post.guid
+            posts.append(response_data)
 
-            return JsonResponse({'posts': posts, 'comments': comments, 'time': {}})
+        if time is not None:
+            all_comments = Comment.objects.filter(pubDate__gt=time)
+        else:
+            all_comments = Comment.objects.all()
+
+        for comment in all_comments:
+            response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
+            response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+            response_data["postGUID"] = comment.post.guid
+            comments.append(response_data)
+
+        return JsonResponse({'posts': posts, 'comments': comments, 'time': datetime.datetime.now(dateutil.tz.tzutc()).isoformat()})
 
 
 class CreatePost(View):
