@@ -44,10 +44,6 @@ a {
     border-color: #222;
 }
 
-.auth-forms .form-control {
-    border-width: 2px;
-}
-
 .auth-forms .control-label {
     font-size: 22px;
     color: #333;
