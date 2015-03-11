@@ -118,7 +118,8 @@ class CreateComment(View):
             return JsonResponse(response_data, status=400)
 
         comment.save()
-        respone_data["time"] = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
+
         response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
         response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+        response_data["time"] = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
         return JsonResponse(response_data, status=201)
