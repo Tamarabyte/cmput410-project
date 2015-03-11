@@ -35,7 +35,26 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{% static "js/stream.js" %}"></script>
+
+<script>
+var time = "";
+
+function showCommentForm(event) {
+    $("#comment-errors").text("");
+    var data = $(this).attr("data-postGUID");
+    console.log(data);
+
+    $(".add_comment_button").show();
+    $(this).hide();
+    $("#comment_form_html").hide();
+    $("#"+ data ).after($("#comment_form_html"));
+    $("#comment_form_html").show();
+    $("#comment-form").data("postGUID", data);
+    console.log($("#comment-form").data("postGUID"));
+};
+</script>
 <script type="text/javascript" src="{% static "js/post.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/comment.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/stream.js" %}"></script>
+</script>
 {% endblock scripts %}

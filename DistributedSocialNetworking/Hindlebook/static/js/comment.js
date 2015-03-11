@@ -32,6 +32,7 @@ $(function() {
         $('#' + postGUID).before(response["comment"]);
         $("#comment_form_html").hide();
         $(".add_comment_button").show();
+        time = response['time'];
     }
 
     function ajaxErrorComment(xhr, errmsg, err) {
@@ -40,18 +41,4 @@ $(function() {
         response = JSON.parse(xhr.responseText);
         $('#comment-form').html(response["form"]);
     }
-
-    function showCommentForm(event) {
-        var data = $(this).attr("data-postGUID");
-        console.log(data);
-
-        $(".add_comment_button").show();
-        $(this).hide();
-        $("#comment_form_html").hide();
-        $("#"+ data ).after($("#comment_form_html"))
-        $("#comment_form_html").show();
-        $("#comment-form").data("postGUID", data);
-        console.log($("#comment-form").data("postGUID"));
-    };
-
 });

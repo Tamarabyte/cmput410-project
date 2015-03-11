@@ -9,12 +9,14 @@
         </div>
         <div class="fill-remaining-right">
                 {% render_field comment_form.comment rows="1" placeholder="Add a comment..." class+="form-control input-lg" autocomplete="off" %}
+                <div id="comment-errors" class="error-container error">
                 {% if comment_form.comment.errors %}
-                    <div class="error-container error">{{ comment_form.comment.errors.0|escape }}</div>
+                    {{ comment_form.comment.errors.0|escape }}
                 {% endif %}
                 {% if alert %}
-                    <div class="error-container error">{{ alert | safe }}{{ comment_form.comment.errors.0|escape }}</div>
+                    {{ alert | safe }}{{ comment_form.comment.errors.0|escape }}
                 {% endif %}
+                </div>
                 <input id="comment-guid" type="hidden" value="{{ comment_form.guid }}" />
         </div>
         <div class="clearfix"></div>

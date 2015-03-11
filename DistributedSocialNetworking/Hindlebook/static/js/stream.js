@@ -1,7 +1,5 @@
 $(function() {
     /* Post Ajax */
-    var time = "";
-
     var options = {
         success: getSuccess,
         dataType: "JSON",
@@ -31,18 +29,6 @@ $(function() {
         }
 
     /* End Post Ajax */
-    function showCommentForm(event) {
-        var data = $(this).attr("data-postGUID");
-        console.log(data);
-
-        $(".add_comment_button").show();
-        $(this).hide();
-        $("#comment_form_html").hide();
-        $("#"+ data ).after($("#comment_form_html"))
-        $("#comment_form_html").show();
-        $("#comment-form").data("postGUID", data);
-        console.log($("#comment-form").data("postGUID"));
-    };
     $.ajax({
             success: getSuccess,
             dataType: "JSON",
