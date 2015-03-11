@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class Friend2Friend(APIView):
@@ -73,8 +75,8 @@ class FriendQuery(APIView):
 class FriendRequest(APIView):
     """ POST a friend query """
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    authentication_classes = (SessionAuthentication,BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)
     
     def post(self, request, format=None):
         JSONrequest = json.loads(request.body.decode('utf-8'))

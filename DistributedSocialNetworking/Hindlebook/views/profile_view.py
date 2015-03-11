@@ -61,6 +61,7 @@ class ProfileUpdateView(View):
         obj = form.save(commit=True)
         return JsonResponse({}, status=200)
 
+
 class ProfileStreamView(TemplateView):
     template_name = "profile_stream.html"
 

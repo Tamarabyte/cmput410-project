@@ -8,7 +8,7 @@
             </button>
         </div>
         <div class="fill-remaining-right">
-                {% render_field comment_form.comment rows="1" placeholder="Add a comment..." class+="form-control input-lg" %}
+                {% render_field comment_form.comment rows="1" placeholder="Add a comment..." class+="form-control input-lg" autocomplete="off" %}
                 {% if comment_form.comment.errors %}
                     <div class="error-container error">{{ comment_form.comment.errors.0|escape }}</div>
                 {% endif %}

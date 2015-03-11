@@ -33,6 +33,7 @@ a {
 }
 
 
+
 .stream {
     max-width: 800px;
 }
@@ -43,8 +44,7 @@ a {
     border-color: #222;
 }
 
-
-.auth-forms form-control {
+.auth-forms .form-control {
     border-width: 2px;
 }
 
@@ -267,6 +267,7 @@ float: right!important;
 
 .navbar #search-bar {
   width: 200px;
+  border-color: #aaa;
 }
 
 .navbar-fixed-top .navbar-right.active {
@@ -368,6 +369,15 @@ float: right!important;
     padding-bottom: 5px;
     padding-left: 5px;
 }
+
+.comment-block a:hover, .comment-block a:focus {
+    text-decoration: none;
+}
+
+.post-block a:hover, .post-block a:focus {
+    text-decoration: none;
+}
+
 
 #comment_form_html {
     margin-bottom: 50px;
