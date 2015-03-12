@@ -1,4 +1,4 @@
-from Hindlebook.models import Post, User, Server
+from Hindlebook.models import Post, User, Server, Category
 from api.serializers import LocalPostSerializer, ForeignPostSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -60,13 +60,19 @@ class PostDetails(APIView):
         """
         Creates or Updates an instance of Post
         """
+
+        # Add new categories to our database... Yeah...
+        categories = request.data.get('categories', None)
+        for category in categories:
+            if not Category.objects.filter(tag=category).exists():
+                Category.objects.create(tag=category)
+
         if Post.objects.filter(guid=guid).exists():
             # PUT as update
 
             # Get the serializer
             host = request.data.get('author').get('host')
             serializer_class = get_serializer_class(None, host)
-
             # Serialize the post
             post = Post.objects.get(guid=guid)
             serializer = serializer_class(post, data=request.data)

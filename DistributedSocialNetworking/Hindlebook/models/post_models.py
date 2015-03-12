@@ -12,7 +12,7 @@ import operator
 
 
 class Category(models.Model):
-    tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
+    tag = models.CharField(max_length=25, null=False, blank=False, primary_key=True)
 
     class Meta():
         verbose_name = "Tags"

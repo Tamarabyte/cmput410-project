@@ -7,38 +7,26 @@ from django.shortcuts import get_object_or_404
 from collections import OrderedDict
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """A Serializer for the Category Model"""
-    class Meta:
-        model = Category
-        fields = ('tag',)
-
-
 class PostSerializer(serializers.ModelSerializer):
-    """A Serializer for the Post Model"""
+    """
+    A Serializer for the Post Model
+    """
     comments = CommentSerializer(many=True, read_only=False)
-    categories = CategorySerializer(many=True, read_only=False)
 
     def create(self, validated_data):
-        """Create and return a new `Post` instance, given the validated data."""
+        """
+        Creates and return a new `Post` instance, given the validated data.
+        """
 
-        print(str(validated_data))
-
-        # Pop nested relationships
+        # Pop nested relationships, we need to handle them separately
         author_data = validated_data.pop('author')
         comment_data = validated_data.pop('comments')
-        categories_data = validated_data.pop('categories') # TODO FIX ME: These aren't working?
-
-        print(str(author_data))
+        categories_data = validated_data.pop('categories')
 
         # Get Author/Host info
         uuid = author_data.get('uuid')
         host = author_data.get('node')
         username = author_data.get('username')
-
-        print(str(uuid))
-        print(str(host))
-        print(str(username))
 
         user = None
         foreign_user = None
@@ -57,12 +45,9 @@ class PostSerializer(serializers.ModelSerializer):
         # Create the post
         post = Post.objects.create(author=user, foreign_author=foreign_user, **validated_data)
 
-        # # Add the categories
-        # for category in categories_data:
-        #     print(category)
-        #     cat = Category.objects.get_or_create(tag = category)
-        #     print(cat)
-        #     post.categories.add(cat)
+        # Add the categories
+        for category in categories_data:
+            post.categories.add(category)
 
         # Create the comments
         for comment in comment_data:
@@ -74,7 +59,6 @@ class PostSerializer(serializers.ModelSerializer):
         """Updates an instance of the Post Model"""
         # TODO: FIX ME: Do something with comments?? Waiting on Hindle Response
         comment_data = validated_data.pop('comments')
-        categories_data = validated_data.pop('categories')
         return super(PostSerializer, self).update(instance, validated_data)
 
     class Meta:
@@ -99,7 +83,9 @@ class LocalPostSerializer(PostSerializer):
 
 
 class ForeignPostSerializer(PostSerializer):
-    """A Serializer for a Post made by a Foreign Author"""
+    """
+    A Serializer for a Post made by a Foreign Author
+    """
     author = ForeignAuthorSerializer(read_only=False, source='foreign_author')
 
     def create(self, validated_data):
@@ -117,7 +103,6 @@ class ForeignPostSerializer(PostSerializer):
         Updates an instance of the Post Model
         """
         validated_data.pop('foreign_author')
-
         return super(ForeignPostSerializer, self).update(instance, validated_data)
 
     class Meta(PostSerializer.Meta):
