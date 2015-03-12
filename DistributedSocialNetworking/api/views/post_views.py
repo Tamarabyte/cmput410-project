@@ -36,7 +36,6 @@ class PostDetails(APIView):
     """
     GET, POST, or PUT an author post
     """
-
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
@@ -101,7 +100,6 @@ class AuthoredPosts(APIView):
         pageAuthor = get_object_or_404(User, uuid=uuid)
 
         # Get the Author's Posts
-        # TODO: FIX ME: change to (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
         posts = Post.objects_ext.get_profile_visibile_posts(self.request.user, pageAuthor)
 
         # Serialize all of the posts
