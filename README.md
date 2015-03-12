@@ -1,4 +1,15 @@
-# cmput410-project  
+# cmput410-project
+Hindlebook: A distributed social networking platform
+
+### API Documentation
+[API Docs](https://github.com/Tamarabyte/cmput410-project/wiki/API-Documentation)  
+
+
+### Tests
+
+[API Tests](https://github.com/Tamarabyte/cmput410-project/blob/master/DistributedSocialNetworking/api/tests.py)
+
+[Model Tests](https://github.com/Tamarabyte/cmput410-project/blob/master/DistributedSocialNetworking/Hindlebook/tests/test_models.py)
 
 ### Requirements Part 1  
 - [X] Provide a webservice interface that is restful  
