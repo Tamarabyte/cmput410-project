@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """A Serializer for the Category Model"""
     class Meta:
         model = Category
-        fields = ('tag')
+        fields = ('tag',)
 
 
 class PostSerializer(serializers.ModelSerializer):

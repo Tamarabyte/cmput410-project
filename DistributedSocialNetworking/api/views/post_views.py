@@ -1,15 +1,16 @@
-from django.shortcuts import get_object_or_404
 from Hindlebook.models import Post, User, Server
-from api.serializers import PostSerializer, LocalPostSerializer, ForeignPostSerializer
+from api.serializers import LocalPostSerializer, ForeignPostSerializer
 from rest_framework.views import APIView
-from rest_framework import generics, mixins
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
-from rest_framework.parsers import JSONParser
+from django.shortcuts import get_object_or_404
 
 
 def get_serializer_class(author, host=None):
-        """Returns the serializer class based on local/foreign author status"""
+        """
+        Returns the correct Post serializer class based
+        on local/foreign author status
+        """
         if host is not None:
             if Server.objects.filter(host=host).first() is None:
                 serializer = ForeignPostSerializer
@@ -23,6 +24,14 @@ def get_serializer_class(author, host=None):
         return serializer
 
 
+def serialize(post):
+    """
+    Serializes a Post instance
+    """
+    serializer_class = get_serializer_class(post.author)
+    return serializer_class(post)
+
+
 class PostDetails(APIView):
     """
     GET, POST, or PUT an author post
@@ -30,7 +39,6 @@ class PostDetails(APIView):
 
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
-    parser_classes = (JSONParser,)
 
     def get(self, request, guid, format=None):
         """
@@ -82,8 +90,9 @@ class PostDetails(APIView):
 
 
 class AuthoredPosts(APIView):
-    """ GET posts from given author """
-
+    """
+    GET posts from given author
+    """
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
@@ -95,37 +104,44 @@ class AuthoredPosts(APIView):
         # TODO: FIX ME: change to (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
         posts = Post.objects_ext.get_profile_visibile_posts(self.request.user, pageAuthor)
 
-        # Serialize the Authors Posts
-        serializer = PostSerializer(posts, many=True)
+        # Serialize all of the posts
+        data = [serialize(post).data for post in posts]
 
         # Return JSON
-        return Response({"posts": serializer.data})
+        return Response({"posts": data})
 
 
 class PublicPosts(APIView):
-    """ GET all public posts """
-
+    """
+    GET all public posts
+    """
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
         # Filter to get public posts
-        serializer = PostSerializer(Post.objects.filter(visibility='PUBLIC'), many=True)
+        posts = Post.objects.filter(visibility='PUBLIC')
+
+        # Serialize all of the posts
+        data = [serialize(post).data for post in posts]
 
         # Return JSON
-        return Response({"posts": serializer.data})
+        return Response({"posts": data})
 
 
 class VisiblePosts(APIView):
-    """ GET all posts visbile to the current logged in user """
-
+    """
+    GET all posts visbile to the current logged in user
+    """
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
         # Filter to get all posts visible to the currently authenticated user
         posts = Post.objects_ext.get_all_visibile_posts(self.request.user)
-        serializer = PostSerializer(posts, many=True)
+
+        # Serialize all of the posts
+        data = [serialize(post).data for post in posts]
 
         # Return JSON
-        return Response({"posts": serializer.data})
+        return Response({"posts": data})
