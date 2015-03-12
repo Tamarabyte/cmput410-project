@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
-from Hindlebook.models import Post, User
-from api.serializers import PostSerializer
+from Hindlebook.models import Post, User, Server
+from api.serializers import PostSerializer, LocalPostSerializer, ForeignPostSerializer
 from rest_framework.views import APIView
 from rest_framework import generics, mixins
 from rest_framework.response import Response
@@ -8,47 +8,76 @@ from rest_framework import authentication, permissions, status
 from rest_framework.parsers import JSONParser
 
 
+def get_serializer_class(author, host=None):
+        """Returns the serializer class based on local/foreign author status"""
+        if host is not None:
+            if Server.objects.filter(host=host).first() is None:
+                serializer = ForeignPostSerializer
+            else:
+                serializer = LocalPostSerializer
+        elif author is None:
+            serializer = ForeignPostSerializer
+        else:
+            serializer = LocalPostSerializer
+
+        return serializer
+
+
 class PostDetails(APIView):
-    """ GET, POST, or PUT an author post """
+    """
+    GET, POST, or PUT an author post
+    """
 
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
     parser_classes = (JSONParser,)
 
     def get(self, request, guid, format=None):
-        # Get the specified Post
+        """
+        Get, serialize, and return an instance of Post
+        """
         post = get_object_or_404(Post, guid=guid)
 
-        # Serialize
-        serializer = PostSerializer(post)
+        serializer_class = get_serializer_class(post.author)
+        serializer = serializer_class(post)
 
-        # Return JSON
         return Response({"posts": [serializer.data]})
 
     def post(self, request, guid, format=None):
-        # Get the specified Post
-        post = get_object_or_404(Post, guid=guid)
-
-        # Serialize
-        serializer = PostSerializer(post)
-
-        # Return JSON
-        return Response({"posts": [serializer.data]})
+        """
+        Get, serialize, and return an instance of Post
+        """
+        return self.get(request, guid)
 
     def put(self, request, guid, format=None):
+        """
+        Creates or Updates an instance of Post
+        """
         if Post.objects.filter(guid=guid).exists():
             # PUT as update
+
+            # Get the serializer
+            host = request.data.get('author').get('host')
+            serializer_class = get_serializer_class(None, host)
+
+            # Serialize the post
             post = Post.objects.get(guid=guid)
-            serializer = PostSerializer(post, data=request.data, partial=True)
-            stat = status.HTTP_200_OK
+            serializer = serializer_class(post, data=request.data)
+            status_code = status.HTTP_200_OK
         else:
             # PUT as create
-            serializer = PostSerializer(data=request.data, partial=True)
-            stat = status.HTTP_201_CREATED
+
+            # Get the serializer
+            host = request.data.get('author').get('host')
+            serializer_class = get_serializer_class(None, host)
+
+            # Serialize the post data
+            serializer = serializer_class(data=request.data)
+            status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response({"posts": [serializer.data]}, status=stat)
+            return Response({"posts": [serializer.data]}, status=status_code)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

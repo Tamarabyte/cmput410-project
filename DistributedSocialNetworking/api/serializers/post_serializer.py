@@ -16,56 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class PostSerializer(serializers.ModelSerializer):
     """A Serializer for the Post Model"""
-
-    author = AuthorSerializer(read_only=False)
-    foreign_author = ForeignAuthorSerializer(read_only=False)
     comments = CommentSerializer(many=True, read_only=False)
     categories = CategorySerializer(many=True, read_only=False)
-
-    def __init__(self, *args, **kwargs):
-        # Instantiate the superclass normally
-        # foreign_author = kwargs.get('fields')
-        # data = str(kwargs.pop('data', None))
-
-        # if data is not None:
-        #     print(str(data))
-        #     data['foreign_author'] = None
-        #     kwargs['data'] = data
-
-        print(str(kwargs))
-
-        super(PostSerializer, self).__init__(*args, **kwargs)
-
-    def to_representation(self, instance):
-        """
-        Object instance -> Dict of primitive datatypes.
-        """
-        ret = OrderedDict()
-        fields = [field for field in self.fields.values() if not field.write_only]
-
-        for field in fields:
-            if field.field_name == 'foreign_author':
-            #     del self.fields['foreign_author']
-                # del self.declared_fields['foreign_author']
-                continue
-            try:
-                attribute = field.get_attribute(instance)
-            except SkipField:
-                continue
-
-            if attribute is None:
-                # Rename foreign_author to author (a bit hacky)
-                if field.field_name == 'author':
-                    ret[field.field_name] = field.to_representation(fields[-1].get_attribute(instance))
-
-                # We skip `to_representation` for `None` values so that
-                # fields do not have to explicitly deal with that case.
-                else:
-                    ret[field.field_name] = None
-            else:
-                ret[field.field_name] = field.to_representation(attribute)
-
-        return ret
 
     def create(self, validated_data):
         """Create and return a new `Post` instance, given the validated data."""
@@ -121,12 +73,52 @@ class PostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Updates an instance of the Post Model"""
         # TODO: FIX ME: Do something with comments?? Waiting on Hindle Response
-        author_data = validated_data.pop('author')
         comment_data = validated_data.pop('comments')
         categories_data = validated_data.pop('categories')
         return super(PostSerializer, self).update(instance, validated_data)
 
     class Meta:
         model = Post
-        fields = ('title', 'source', 'origin', 'description', 'content_type', 'content', 'author', 'categories',
-                  'comments', 'pubDate', 'guid', 'visibility', 'foreign_author')
+        fields = ('title', 'source', 'origin', 'description', 'content_type', 'content',
+                  'categories', 'comments', 'pubDate', 'guid', 'visibility')
+
+
+class LocalPostSerializer(PostSerializer):
+    """A Serializer for a Post made by a Local Author"""
+    author = AuthorSerializer(read_only=False)
+
+    def update(self, instance, validated_data):
+        """
+        Updates an instance of the Post Model
+        """
+        validated_data.pop('author')
+        return super(LocalPostSerializer, self).update(instance, validated_data)
+
+    class Meta(PostSerializer.Meta):
+        fields = PostSerializer.Meta.fields + ('author',)
+
+
+class ForeignPostSerializer(PostSerializer):
+    """A Serializer for a Post made by a Foreign Author"""
+    author = ForeignAuthorSerializer(read_only=False, source='foreign_author')
+
+    def create(self, validated_data):
+        """
+        Creates an instance of the Post Model
+        """
+        # Rename 'foreign_author' to 'author'
+        foreign_author = validated_data.pop('foreign_author')
+        validated_data['author'] = foreign_author
+
+        return super(ForeignPostSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Updates an instance of the Post Model
+        """
+        validated_data.pop('foreign_author')
+
+        return super(ForeignPostSerializer, self).update(instance, validated_data)
+
+    class Meta(PostSerializer.Meta):
+        fields = PostSerializer.Meta.fields + ('author',)
