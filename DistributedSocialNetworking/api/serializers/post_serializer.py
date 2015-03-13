@@ -31,10 +31,6 @@ class PostSerializer(serializers.ModelSerializer):
         if author is None:
             ret['author'] = foreign_author
 
-        # Rename content_type to `content-type`
-        content_type = ret.pop('content_type')
-        ret['content-type'] = content_type
-
         return ret
 
     def get_author(self, author_data):

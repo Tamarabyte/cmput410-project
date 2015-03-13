@@ -13,6 +13,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = User;
         fields = ["displayname", "host", "id"]
 
+
 class ForeignAuthorSerializer(serializers.ModelSerializer):
     """ Used for sending/retrieving foreign author JSON data to/from other nodes """
     displayname = serializers.CharField(source='username')
@@ -22,6 +23,7 @@ class ForeignAuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ForeignUser;
         fields = ["displayname", "host", "id"]
+
 
 class UserEditSerializer(serializers.ModelSerializer):
     """ Used locally to allow users to edit their user profile"""
