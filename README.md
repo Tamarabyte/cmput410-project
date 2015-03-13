@@ -40,7 +40,7 @@ Hindlebook: A distributed social networking platform
 - [X] [Login Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#login)   
 - [X] [Feed Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#feed)  
 - [X] [User Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#user)  
-- [X] [Friends Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#friends)  
+- [ ] [Friends Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#friends)  
 - [ ] [Image Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#image)  
 - [X] [Permissions Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#perms)  
 - [ ] [Search Module](https://github.com/Tamarabyte/cmput410-project/wiki/Project-Roadmap#search)  (optional)
