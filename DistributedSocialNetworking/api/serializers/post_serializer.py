@@ -67,8 +67,10 @@ class PostSerializer(serializers.ModelSerializer):
         Creates the comments for `post` stored in `comment_data`
         """
         for comment in comment_data:
-            print(comment)
-            author, foreign_author = self.get_author(comment.pop('author'))
+            author = comment.pop('author', None)
+            if author is None:
+                raise serializers.ValidationError('The Author field of a Comment is required.')
+            author, foreign_author = self.get_author(author)
             Comment.objects.create(author=author, foreign_author=foreign_author,
                                    post=post, **comment)
 

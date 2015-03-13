@@ -18,9 +18,10 @@ class PostDetails(APIView):
         Adds Categories to the database if necessary
         """
         categories = data.get('categories', None)
-        for category in categories:
-            if not Category.objects.filter(tag=category).exists():
-                Category.objects.create(tag=category)
+        if categories is not None:
+            for category in categories:
+                if not Category.objects.filter(tag=category).exists():
+                    Category.objects.create(tag=category)
 
     def get(self, request, guid, format=None):
         """
