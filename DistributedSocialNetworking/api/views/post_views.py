@@ -22,21 +22,6 @@ class PostDetails(APIView):
             if not Category.objects.filter(tag=category).exists():
                 Category.objects.create(tag=category)
 
-    def put_as_update(self, request, guid):
-        """
-        Updates an instance of Post
-        """
-        # Fetch the post
-        post = Post.objects.get(guid=guid)
-
-        # Purge old comments, if necessary
-        if request.data.get('comments', None) is not None:
-            post.comments.all().delete()
-
-        # Serialize the post
-        serializer = PostSerializer(post, data=request.data)
-        return (serializer, status.HTTP_200_OK)
-
     def get(self, request, guid, format=None):
         """
         Get, serialize, and return an instance of Post
@@ -80,8 +65,19 @@ class PostDetails(APIView):
         self.add_categories(request.data)
 
         if Post.objects.filter(guid=guid).exists():
-            serializer, status_code = self.put_as_update(request, guid)
+            # Put as Update
+            # Fetch the post
+            post = Post.objects.get(guid=guid)
+
+            # Purge old comments, if necessary
+            if request.data.get('comments', None) is not None:
+                post.comments.all().delete()
+
+            # Serialize the post
+            serializer = PostSerializer(post, data=request.data, partial=True)
+            status_code = status.HTTP_200_OK
         else:
+            # Put as Create
             serializer = PostSerializer(data=request.data)
             status_code = status.HTTP_201_CREATED
 
