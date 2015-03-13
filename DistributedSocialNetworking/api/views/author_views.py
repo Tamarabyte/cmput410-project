@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework import permissions
 
+
 class AllowReadonlyOrAdminOrSelf(permissions.BasePermission):
     """
     Allow access to admin users or the user himself.

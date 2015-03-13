@@ -12,7 +12,7 @@ import operator
 
 
 class Category(models.Model):
-    tag = models.CharField(max_length=25, null=False, blank=False, unique=True)
+    tag = models.CharField(max_length=25, null=False, blank=False, primary_key=True)
 
     class Meta():
         verbose_name = "Tags"
@@ -91,7 +91,6 @@ class Post(models.Model):
     content = models.TextField(blank=False)
 
     # only author or foreign author should be set
-    # genericAuthor = models.ForeignKey(GenericUser, null=True, blank=True, related_name="posts")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="posts")
     foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="posts")
 
@@ -118,7 +117,6 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, related_name="comments")
 
     # only author or foreign author should be set
-    # genericAuthor = models.ForeignKey(GenericUser, null=True, blank=True, related_name="comments")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="comments")
     foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
 

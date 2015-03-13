@@ -7,86 +7,47 @@ from django.shortcuts import get_object_or_404
 from collections import OrderedDict
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    """A Serializer for the Category Model"""
-    class Meta:
-        model = Category
-        fields = ('tag')
-
-
 class PostSerializer(serializers.ModelSerializer):
-    """A Serializer for the Post Model"""
-
-    author = AuthorSerializer(read_only=False)
-    foreign_author = ForeignAuthorSerializer(read_only=False)
+    """
+    A Serializer for the Post Model
+    """
     comments = CommentSerializer(many=True, read_only=False)
-    categories = CategorySerializer(many=True, read_only=False)
-
-    def __init__(self, *args, **kwargs):
-        # Instantiate the superclass normally
-        # foreign_author = kwargs.get('fields')
-        # data = str(kwargs.pop('data', None))
-
-        # if data is not None:
-        #     print(str(data))
-        #     data['foreign_author'] = None
-        #     kwargs['data'] = data
-
-        print(str(kwargs))
-
-        super(PostSerializer, self).__init__(*args, **kwargs)
+    author = AuthorSerializer(read_only=False, required=True)
+    foreign_author = ForeignAuthorSerializer(read_only=False, required=False)
 
     def to_representation(self, instance):
         """
         Object instance -> Dict of primitive datatypes.
         """
-        ret = OrderedDict()
-        fields = [field for field in self.fields.values() if not field.write_only]
 
-        for field in fields:
-            if field.field_name == 'foreign_author':
-            #     del self.fields['foreign_author']
-                # del self.declared_fields['foreign_author']
-                continue
-            try:
-                attribute = field.get_attribute(instance)
-            except SkipField:
-                continue
+        # Get the superclass representation
+        ret = super(PostSerializer, self).to_representation(instance)
 
-            if attribute is None:
-                # Rename foreign_author to author (a bit hacky)
-                if field.field_name == 'author':
-                    ret[field.field_name] = field.to_representation(fields[-1].get_attribute(instance))
+        # Pop foreign_author... we don't want to print that
+        foreign_author = ret.pop('foreign_author', None)
 
-                # We skip `to_representation` for `None` values so that
-                # fields do not have to explicitly deal with that case.
-                else:
-                    ret[field.field_name] = None
-            else:
-                ret[field.field_name] = field.to_representation(attribute)
+        # Rename 'foreign_author' to 'author' if needed
+        author = ret.get('author', None)
+        if author is None:
+            ret['author'] = foreign_author
+
+        # Rename content_type to `content-type`
+        content_type = ret.pop('content_type')
+        ret['content-type'] = content_type
 
         return ret
 
-    def create(self, validated_data):
-        """Create and return a new `Post` instance, given the validated data."""
-
-        print(str(validated_data))
-
-        # Pop nested relationships
-        author_data = validated_data.pop('author')
-        comment_data = validated_data.pop('comments')
-        categories_data = validated_data.pop('categories') # TODO FIX ME: These aren't working?
-
-        print(str(author_data))
+    def get_author(self, author_data):
+        """
+        gets the local/foreign authors and adds the foreign user/node if necessry
+        """
+        if author_data is None:
+            return None
 
         # Get Author/Host info
         uuid = author_data.get('uuid')
         host = author_data.get('node')
         username = author_data.get('username')
-
-        print(str(uuid))
-        print(str(host))
-        print(str(username))
 
         user = None
         foreign_user = None
@@ -100,33 +61,64 @@ class PostSerializer(serializers.ModelSerializer):
             # Foreign Node: Add it if we haven't seen it before
             node = Node.objects.get_or_create(host=host)[0]
             # Add the ForeignUser if we haven't seen them before
-            foreign_user = ForeignUser.objects.get_or_create(node=node, uuid=uuid, username=username)[0]
+            foreign_user = ForeignUser.objects.get_or_create(node=node, uuid=uuid,
+                                                             username=username)[0]
+
+        return (user, foreign_user)
+
+    def create_comments(self, post, comment_data):
+        """
+        Creates the comments for `post` stored in `comment_data`
+        """
+        for comment in comment_data:
+            print(comment)
+            author, foreign_author = self.get_author(comment.pop('author'))
+            Comment.objects.create(author=author, foreign_author=foreign_author,
+                                   post=post, **comment)
+
+    def create(self, validated_data):
+        """
+        Creates and return a new `Post` instance, given the validated data.
+        """
+
+        # Pop nested relationships, we need to handle them separately
+        author_data = validated_data.pop('author')
+        comment_data = validated_data.pop('comments')
+        categories_data = validated_data.pop('categories')
+
+        # Get the Author
+        author, foreign_author = self.get_author(author_data)
 
         # Create the post
-        post = Post.objects.create(author=user, foreign_author=foreign_user, **validated_data)
+        post = Post.objects.create(author=author, foreign_author=foreign_author, **validated_data)
 
-        # # Add the categories
-        # for category in categories_data:
-        #     print(category)
-        #     cat = Category.objects.get_or_create(tag = category)
-        #     print(cat)
-        #     post.categories.add(cat)
+        # Add the categories
+        for category in categories_data:
+            post.categories.add(category)
 
         # Create the comments
-        for comment in comment_data:
-            Comment.objects.create(author=user, foreign_author=foreign_user, post=post, **comment)
+        self.create_comments(post, comment_data)
 
         return post
 
     def update(self, instance, validated_data):
         """Updates an instance of the Post Model"""
-        # TODO: FIX ME: Do something with comments?? Waiting on Hindle Response
-        author_data = validated_data.pop('author')
-        comment_data = validated_data.pop('comments')
-        categories_data = validated_data.pop('categories')
-        return super(PostSerializer, self).update(instance, validated_data)
+
+        # Pop nested relationships, we need to handle them separately
+        author_data = validated_data.pop('author', None)
+        comment_data = validated_data.pop('comments', None)
+
+        # Call Super to create the Post instance
+        instance = super(PostSerializer, self).update(instance, validated_data)
+
+        # Create the comments, if provided
+        if comment_data is not None:
+            self.create_comments(instance, comment_data)
+
+        return instance
 
     class Meta:
         model = Post
-        fields = ('title', 'source', 'origin', 'description', 'content_type', 'content', 'author', 'categories',
-                  'comments', 'pubDate', 'guid', 'visibility', 'foreign_author')
+        fields = ('title', 'source', 'origin', 'description', 'content_type', 'content',
+                  'author', 'categories', 'comments', 'pubDate', 'guid', 'visibility',
+                  'foreign_author')
