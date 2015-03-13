@@ -21,7 +21,7 @@ server = "http://localhost:8000"
 class APITests(APITestCase):
     """ Test some of the GET/POST API """
 
-    
+
     def setUp(self):
         self.author1 = mommy.make(User)
         self.author2 = mommy.make(User)

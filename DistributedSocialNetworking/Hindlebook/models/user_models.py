@@ -1,32 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-# from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-# from django.contrib.contenttypes.models import ContentType
 
 from itertools import chain
 
 import uuid as uuid_import
 
 from Hindlebook.models import Node, Server, UuidValidator
-
-
-# class GenericUser(models.Model):
-#     """Model for representing a Generic User"""
-#     content_type = models.ForeignKey(ContentType)
-#     object_id = models.PositiveIntegerField()
-#     content_object = GenericForeignKey('content_type', 'object_id')
-
-#     @property
-#     def uuid(self):
-#         return self.content_object.uuid
-
-#     @property
-#     def node(self):
-#         return self.content_object.node
-
-#     @property
-#     def username(self):
-#         return self.content_object.username
 
 
 class User(AbstractUser):
@@ -41,8 +20,6 @@ class User(AbstractUser):
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False, db_index=True)
     follows_foreign = models.ManyToManyField('self', blank=True, related_name='followed_by', db_index=True)
     node = models.ForeignKey(Server, related_name="users", blank=True, default=1)
-
-    # generics = GenericRelation(GenericUser)
 
     def __str__(self):
         return self.username

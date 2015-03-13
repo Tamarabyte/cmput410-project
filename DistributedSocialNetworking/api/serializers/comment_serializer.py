@@ -1,27 +1,32 @@
 from django.forms import widgets
 from rest_framework import serializers
-from Hindlebook.models import Post, User, Comment
-from api.serializers import AuthorSerializer
+from Hindlebook.models import User, Comment
+from api.serializers import AuthorSerializer, ForeignAuthorSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
     """A Serializer for the Comment Model"""
-    author = AuthorSerializer(read_only=True)
+    author = AuthorSerializer(read_only=False)
+    foreign_author = ForeignAuthorSerializer(read_only=False, required=False)
 
-    def create(self, validated_data):
-        """Create and return a new `Comment` instance, given the validated data."""
+    def to_representation(self, instance):
+        """
+        Object instance -> Dict of primitive datatypes.
+        """
 
-        # TODO: What to do with author data??
-        # If not our host, add as foreign???
-        # If our host but unseen, add a new user??? Or reject as invalid??
-        author_data = validated_data.pop('author')
+        # Get the superclass representation
+        ret = super(CommentSerializer, self).to_representation(instance)
 
-        # # Create the comments
-        # comment_data = validated_data.pop('comments')
-        # Comment.objects.create(**comment_data)
+        # Pop foreign_author... we don't want to print that
+        foreign_author = ret.pop('foreign_author', None)
 
-        return super(CommentSerializer, self).update(validated_data)
+        # Rename 'foreign_author' to 'author' if needed
+        author = ret.get('author', None)
+        if author is None:
+            ret['author'] = foreign_author
+
+        return ret
 
     class Meta:
             model = Comment
-            fields = ('author', 'comment', 'pubDate', 'guid')
+            fields = ('author', 'comment', 'pubDate', 'guid', 'foreign_author')
