@@ -1,6 +1,9 @@
 # cmput410-project
 Hindlebook: A distributed social networking platform
 
+### Live Server
+[hindlebook.tamarabyte.com](https://hindlebook.tamarabyte.com)  
+
 ### API Documentation
 [API Docs](https://github.com/Tamarabyte/cmput410-project/wiki/API-Documentation)  
 
