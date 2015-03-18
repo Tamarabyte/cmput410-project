@@ -9,8 +9,7 @@ from Hindlebook.admin.server_admin import ServerAdmin, NodeAdmin
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-# Register your models here.
-admin.site.unregister(Group)
+# Register your models here
 admin.site.register(User, UserAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Server, ServerAdmin)

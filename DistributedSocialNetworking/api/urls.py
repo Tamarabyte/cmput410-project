@@ -21,6 +21,12 @@ urlpatterns = [
     # POST for unfriending
     url(r'^unfriend$', views.UnfriendRequest.as_view(), name='unfriendRequest'),
 
+    # POST for following
+    url(r'^follow$', views.FollowRequest.as_view(), name='followRequest'),
+
+    # POST for unfollowing
+    url(r'^unfollow$', views.UnfollowRequest.as_view(), name='unfollowRequest'),
+
     # GET for author posts by ID
     # http://service/author/{AUTHOR_ID}/posts (all posts made by {AUTHOR_ID} visible to the currently authenticated user)
     url(r'^author/(?P<uuid>[-\w]+)/posts$', AuthoredPosts.as_view(), name='authoredPosts'),
