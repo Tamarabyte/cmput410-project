@@ -19,14 +19,18 @@ class User(AbstractUser):
 
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False, db_index=True)
     follows_foreign = models.ManyToManyField('self', blank=True, related_name='followed_by', db_index=True)
+    
+    friends = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='friends_of', db_index=True)
+    friends_foreign = models.ManyToManyField('self', blank=True, related_name='friends', db_index=True)
+    
     node = models.ForeignKey(Server, related_name="users", blank=True, default=1)
 
     def __str__(self):
         return self.username
 
-    # Two way following implies "real" friendship
+    # Two way friends implies "real" friendship
     def getFriends(self):
-        return self.follows.all() & self.followed_by.all()
+        return self.friends.all() & self.friends_of.all()
 
     def getFriendsOfFriends(self):
         friends = self.getFriends()
@@ -35,16 +39,16 @@ class User(AbstractUser):
             friends_ext = chain(friends_ext, f.getFriends())
         return friends_ext
 
-    # Those which are following me but I am not following back
+    # Friend requests that I haven't accepted
     def getFriendRequests(self):
-        A = self.followed_by.all()
-        B = self.follows.all()
+        A = self.friends_of.all()
+        B = self.friends.all()
         return A.exclude(pk__in=B)
 
-    # Those which I follow but do not follow back
-    def getFollowing(self):
-        A = self.followed_by.all()
-        B = self.follows.all()
+    # Those which I friend but do not friend back
+    def getUnacceptedFriends(self):
+        A = self.friends_of.all()
+        B = self.friends.all()
         return B.exclude(pk__in=A)
 
     # Get the count of friend requests
