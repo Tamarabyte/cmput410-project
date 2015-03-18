@@ -59,7 +59,7 @@ function follow() {
         console.log("friend request sent!");
         // On request success we succesfully followed this person...
         // Time to change icon look and functionality.
-        $("#follow-icon").toggleClass("icon-screenshot icon-broken-heart");
+        $("#follow-icon").toggleClass("icon-screenshot icon-tl-undo");
         $("#follow-icon").attr("onclick","unfollow()");
   
     };
@@ -122,7 +122,7 @@ function unfollow() {
     }
     function requestSuccess(response, status, xhr, form) {
         console.log("in unfollow")
-        $("#follow-icon").toggleClass("icon-screenshot icon-broken-heart");
+        $("#follow-icon").toggleClass("icon-screenshot icon-tl-undo");
         $("#follow-icon").attr("onclick","follow()");
   
     };
