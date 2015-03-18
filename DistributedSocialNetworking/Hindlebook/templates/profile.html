@@ -33,9 +33,30 @@
                      <input type="hidden" id="friend-dn" value={{ author.username }}/>
                      <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
                      <div class="profile-icon text-right">
-                        <div id="friend-button" hidden ><a href="#"><span class="icon-favourite-3"  onClick="follow()"></span></a></div>
-                       <div id="unfriend-button" hidden><a href="#"><span class="icon-broken-heart"  onClick="unfollow()"></span></a></div>
+                    {% if isFriends = 0 %}
+                       <div id="follow-button"><a href="#"><span id="friend-icon" class="icon-favourite-3" onClick="friend()"></span></a></div>
+                    {% else %}
+                        <div id="follow-button"><a href="#"><span id="friend-icon" class="icon-broken-heart"  onClick="unfriend()"></span></a></div>
+                    {% endif %}
                         </div>
+                    </form>
+
+                    <form id="followform" action=".">
+                        {% csrf_token %}
+                     <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
+                     <input type="hidden"  id="author-host" value={{ user.node.host }}/>
+                     <input type="hidden" id="author-dn" value={{ user.username }}/>
+                     <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
+                     <input type="hidden" id="friend-host" value={{ author.node.host }}/>
+                     <input type="hidden" id="friend-dn" value={{ author.username }}/>
+                     <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
+                     <div class="profile-icon text-right">
+                    {% if isFollowing = 0 %}
+                       <div id="follow-button"><a href="#"><span id="follow-icon" class="icon-screenshot" onClick="follow()"></span></a></div>
+                    {% else %}
+                        <div id="follow-button"><a href="#"><span id="follow-icon" class="icon-broken-heart"  onClick="unfollow()"></span></a></div>
+                    {% endif %}
+                     </div>
                     </form>
 
             {% endif %}
@@ -115,13 +136,7 @@
     });
 </script>
 
-<script type="text/javascript">
-{% if isFollowing = 0 %}
-$("#friend-button").show()
-{% else %}
-$("#unfriend-button").show()
-{% endif %}
-</script>
+
 <script type="text/javascript" src="{% static "js/friendRequest.js" %}" ></script>
 <script>
     function showCommentForm(event) {

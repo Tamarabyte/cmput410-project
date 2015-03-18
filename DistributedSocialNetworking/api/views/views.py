@@ -103,15 +103,15 @@ class FriendRequest(APIView):
             author = get_object_or_404(User, uuid=authorID)
             friend = get_object_or_404(User, uuid=friendID)
 
-            if (friend not in author.follows.all()):
-                author.follows.add(friend)
+            if (friend not in author.friends.all()):
+                author.friends.add(friend)
         except:
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
 
 class UnfriendRequest(APIView):
-    """ POST a friend query """
+    """ POST an unfriend query """
 
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
@@ -137,7 +137,87 @@ class UnfriendRequest(APIView):
         try:
             author = get_object_or_404(User, uuid=authorID)
             friend = get_object_or_404(User, uuid=friendID)
+            # If someone requsets an unfriend this is either a
+            # cancellation of a friend request, or termination
+            # of a friend relationship, so we have to remove from
+            # the author from the friends list of friends if it exists
+            # to terminate an existing friend relationship, not leave
+            # a hanging friend request from the friend immediately
+            # after termination of their relationship.
+            if (friend in author.friends.all()):
+                author.friends.remove(friend)
+            if (author in friend.friends.all()):
+                friend.friends.remove(author)
+        except:
+            return HttpResponse(status=404)
 
+        return HttpResponse(status=200)
+
+class FollowRequest(APIView):
+    """ POST a follow query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    # authentication_classes = (SessionAuthentication,BasicAuthentication,)
+    # permission_classes = (IsAuthenticated,)
+
+    def post(self, request, format=None):
+        JSONrequest = json.loads(request.body.decode('utf-8'))
+        if ('author' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['author']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['author']):
+            return HttpResponse(status=400)
+        elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['friend']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+
+        authorID = JSONrequest['author']['id']
+        friendID = JSONrequest['friend']['id']
+
+        try:
+            author = get_object_or_404(User, uuid=authorID)
+            friend = get_object_or_404(User, uuid=friendID)
+
+            if (friend not in author.follows.all()):
+                author.follows.add(friend)
+        except:
+            return HttpResponse(status=404)
+
+        return HttpResponse(status=200)
+
+class UnfollowRequest(APIView):
+    """ POST a unfollow query """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, format=None):
+        JSONrequest = json.loads(request.body.decode('utf-8'))
+        if ('author' not in JSONrequest):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['author']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['author']):
+            return HttpResponse(status=400)
+        elif ('friend' not in JSONrequest or 'id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+        elif (type(JSONrequest['friend']) is not dict):
+            return HttpResponse(status=400)
+        elif ('id' not in JSONrequest['friend']):
+            return HttpResponse(status=400)
+
+        authorID = JSONrequest['author']['id']
+        friendID = JSONrequest['friend']['id']
+
+        try:
+            author = get_object_or_404(User, uuid=authorID)
+            friend = get_object_or_404(User, uuid=friendID)
             if (friend in author.follows.all()):
                 author.follows.remove(friend)
         except:

@@ -41,6 +41,10 @@ class ProfileView(TemplateView):
             context['isFollowing'] = 1
         else:
             context['isFollowing'] = 0
+        if self.request.user in list(context["author"].friends_of.all()):
+            context['isFriends'] = 1
+        else:
+            context['isFriends'] = 0
 
         return context
 
