@@ -10,8 +10,8 @@ class PostDetails(APIView):
     """
     GET, POST, or PUT an author post
     """
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
 
     def add_categories(self, data):
         """
@@ -92,8 +92,8 @@ class AuthoredPosts(APIView):
     """
     GET posts from given author
     """
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
 
     def get(self, request, uuid, format=None):
         # Get the specified Author
@@ -113,8 +113,9 @@ class PublicPosts(APIView):
     """
     GET all public posts
     """
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+
+    # Because public
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get(self, request, format=None):
         # Filter to get public posts
@@ -131,8 +132,8 @@ class VisiblePosts(APIView):
     """
     GET all posts visbile to the current logged in user
     """
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
         # Filter to get all posts visible to the currently authenticated user
