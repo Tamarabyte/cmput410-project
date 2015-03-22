@@ -1,9 +1,23 @@
-from Hindlebook.models import Post, User, Server, Category
+from Hindlebook.models import Post, User, Server, Category, Node
 from api.serializers import PostSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status
 from django.shortcuts import get_object_or_404
+
+
+def get_user_header(request):
+    """
+    Return request's 'x-user:' header, as a bytestring.
+    Hide some test client ickyness where the header can be unicode.
+    """
+    user = request.META.get('HTTP_USERNAME', b'')
+    if isinstance(user, type('')):
+        # Work around django test client oddness
+        user = user.encode(HTTP_HEADER_ENCODING)
+
+    user_parts = get_user_header(request).decode(HTTP_HEADER_ENCODING).split(':')
+    return (user_parts[0], user_parts[1])
 
 
 class PostDetails(APIView):
@@ -92,10 +106,8 @@ class AuthoredPosts(APIView):
     """
     GET posts from given author
     """
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (permissions.AllowAny,)
-
     def get(self, request, uuid, format=None):
+
         # Get the specified Author
         pageAuthor = get_object_or_404(User, uuid=uuid)
 
@@ -136,6 +148,7 @@ class VisiblePosts(APIView):
     # permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
+
         # Filter to get all posts visible to the currently authenticated user
         posts = Post.objects_ext.get_all_visibile_posts(self.request.user)
 
