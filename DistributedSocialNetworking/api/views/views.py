@@ -2,6 +2,7 @@ from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
 from Hindlebook.models import Post
+from Hindlebook.models import Author, Post
 # from Hindlebook.serializers import PostSerializer
 from api.serializers.post_serializer import PostSerializer
 import json
@@ -13,9 +14,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
 
 class Friend2Friend(APIView):
     """ GET a friend2friend query """
@@ -25,9 +23,9 @@ class Friend2Friend(APIView):
 
     def get(self, request, authorID1, authorID2, format=None):
         try:
-            author1 = User.objects.get(uuid=authorID1)
-            author2 = User.objects.get(uuid=authorID2)
-        except User.DoesNotExist:
+            author1 = Author.objects.get(uuid=authorID1)
+            author2 = Author.objects.get(uuid=authorID2)
+        except Author.DoesNotExist:
             return HttpResponse(status=404)
 
         if (author2 in author1.getFriends() and author1 in author2.getFriends()):
@@ -48,7 +46,7 @@ class FriendQuery(APIView):
         JSONrequest = json.loads(request.body.decode('utf-8'))
 
         if ('author' not in JSONrequest):
-            return HttpResponse(status=400)
+              HttpResponse(status=400)
         elif ('authors' not in JSONrequest):
             return HttpResponse(status=400)
         elif (type(JSONrequest['authors']) is not list):
@@ -57,15 +55,15 @@ class FriendQuery(APIView):
             return HttpResponse(status=400)
 
         try:
-            author1 = User.objects.get(uuid=authorID1)
-        except User.DoesNotExist:
+            author1 = Author.objects.get(uuid=authorID1)
+        except Author.DoesNotExist:
             return HttpResponse(status=404)
 
         friends = []
 
         for authorID2 in JSONrequest['authors']:
             try:
-                author2 = User.objects.get(uuid=authorID2)
+                author2 = Author.objects.get(uuid=authorID2)
                 if (author2 in author1.getFriends() and author1 in author2.getFriends()):
                     friends.append(authorID2)
             except:
@@ -102,8 +100,8 @@ class FriendRequest(APIView):
         friendID = JSONrequest['friend']['id']
 
         try:
-            author = get_object_or_404(User, uuid=authorID)
-            friend = get_object_or_404(User, uuid=friendID)
+            author = get_object_or_404(Author, uuid=authorID)
+            friend = get_object_or_404(Author, uuid=friendID)
 
             if (friend not in author.friends.all()):
                 author.friends.add(friend)
@@ -137,8 +135,8 @@ class UnfriendRequest(APIView):
         friendID = JSONrequest['friend']['id']
 
         try:
-            author = get_object_or_404(User, uuid=authorID)
-            friend = get_object_or_404(User, uuid=friendID)
+            author = get_object_or_404(Author, uuid=authorID)
+            friend = get_object_or_404(Author, uuid=friendID)
             # If someone requsets an unfriend this is either a
             # cancellation of a friend request, or termination
             # of a friend relationship, so we have to remove from
@@ -183,8 +181,8 @@ class FollowRequest(APIView):
         friendID = JSONrequest['friend']['id']
 
         try:
-            author = get_object_or_404(User, uuid=authorID)
-            friend = get_object_or_404(User, uuid=friendID)
+            author = get_object_or_404(Author, uuid=authorID)
+            friend = get_object_or_404(Author, uuid=friendID)
 
             if (friend not in author.follows.all()):
                 author.follows.add(friend)
@@ -218,8 +216,8 @@ class UnfollowRequest(APIView):
         friendID = JSONrequest['friend']['id']
 
         try:
-            author = get_object_or_404(User, uuid=authorID)
-            friend = get_object_or_404(User, uuid=friendID)
+            author = get_object_or_404(Author, uuid=authorID)
+            friend = get_object_or_404(Author, uuid=friendID)
             if (friend in author.follows.all()):
                 author.follows.remove(friend)
         except:

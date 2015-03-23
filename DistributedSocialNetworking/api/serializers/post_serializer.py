@@ -1,10 +1,9 @@
 from django.forms import widgets
 from rest_framework import serializers
-from Hindlebook.models import Post, User, Comment, Server, ForeignUser, Node, Category
-from api.serializers import AuthorSerializer, ForeignAuthorSerializer
+from Hindlebook.models import Post, Comment, Node, Category, Author
+from api.serializers import AuthorSerializer
 from api.serializers.comment_serializer import CommentSerializer
 from django.shortcuts import get_object_or_404
-from collections import OrderedDict
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -13,7 +12,6 @@ class PostSerializer(serializers.ModelSerializer):
     """
     comments = CommentSerializer(many=True, read_only=False)
     author = AuthorSerializer(read_only=False, required=True)
-    foreign_author = ForeignAuthorSerializer(read_only=False, required=False)
 
     def to_representation(self, instance):
         """
@@ -22,14 +20,6 @@ class PostSerializer(serializers.ModelSerializer):
 
         # Get the superclass representation
         ret = super(PostSerializer, self).to_representation(instance)
-
-        # Pop foreign_author... we don't want to print that
-        foreign_author = ret.pop('foreign_author', None)
-
-        # Rename 'foreign_author' to 'author' if needed
-        author = ret.get('author', None)
-        if author is None:
-            ret['author'] = foreign_author
 
         # Rename 'content_type' to 'content-type'
         content_type = ret.pop('content_type')
@@ -49,22 +39,13 @@ class PostSerializer(serializers.ModelSerializer):
         host = author_data.get('node')
         username = author_data.get('username')
 
-        user = None
-        foreign_user = None
-        # Check whether this is a local or foreign post
-        server = Server.objects.filter(host=host).first()
-        if server is not None:
-            # It's local! Get the user, or 404 if the user doesn't exist
-            # TODO: FIX ME 400 instead??
-            user = get_object_or_404(User, uuid=uuid)
-        else:
-            # Foreign Node: Add it if we haven't seen it before
-            node = Node.objects.get_or_create(host=host)[0]
-            # Add the ForeignUser if we haven't seen them before
-            foreign_user = ForeignUser.objects.get_or_create(node=node, uuid=uuid,
-                                                             username=username)[0]
+        author = Author.object.filter(uuid=uuid).first()
 
-        return (user, foreign_user)
+        if author is None:
+            # New foreign author
+            author = Author(uuid=uuid, host=host, username=username)
+
+        return author
 
     def create_comments(self, post, comment_data):
         """
@@ -74,9 +55,8 @@ class PostSerializer(serializers.ModelSerializer):
             author = comment.pop('author', None)
             if author is None:
                 raise serializers.ValidationError('The Author field of a Comment is required.')
-            author, foreign_author = self.get_author(author)
-            Comment.objects.create(author=author, foreign_author=foreign_author,
-                                   post=post, **comment)
+            author = self.get_author(author)
+            Comment.objects.create(author=author, post=post, **comment)
 
     def create(self, validated_data):
         """
@@ -89,10 +69,10 @@ class PostSerializer(serializers.ModelSerializer):
         categories_data = validated_data.pop('categories')
 
         # Get the Author
-        author, foreign_author = self.get_author(author_data)
+        author = self.get_author(author_data)
 
         # Create the post
-        post = Post.objects.create(author=author, foreign_author=foreign_author, **validated_data)
+        post = Post.objects.create(author=author, **validated_data)
 
         # Add the categories
         for category in categories_data:
@@ -122,5 +102,4 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('title', 'source', 'origin', 'description', 'content_type', 'content',
-                  'author', 'categories', 'comments', 'pubDate', 'guid', 'visibility',
-                  'foreign_author')
+                  'author', 'categories', 'comments', 'pubDate', 'guid', 'visibility')

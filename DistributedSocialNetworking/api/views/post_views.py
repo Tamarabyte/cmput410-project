@@ -1,4 +1,4 @@
-from Hindlebook.models import Post, User, Server, Category, Node
+from Hindlebook.models import Post, Category, Node, Author
 from api.serializers import PostSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -109,9 +109,10 @@ class AuthoredPosts(APIView):
     def get(self, request, uuid, format=None):
 
         # Get the specified Author
-        pageAuthor = get_object_or_404(User, uuid=uuid)
+        pageAuthor = get_object_or_404(Author, uuid=uuid)
 
         # Get the Author's Posts
+        # TODO: FIX ME REQUEST.USER IS THE NODE. I THINK!?!?!?!
         posts = Post.objects_ext.get_profile_visibile_posts(self.request.user, pageAuthor)
 
         # Serialize all of the posts
@@ -150,6 +151,7 @@ class VisiblePosts(APIView):
     def get(self, request, format=None):
 
         # Filter to get all posts visible to the currently authenticated user
+        # TODO: FIX ME REQUEST.USER IS THE NODE. I THINK!?!?!?!
         posts = Post.objects_ext.get_all_visibile_posts(self.request.user)
 
         # Serialize all of the posts

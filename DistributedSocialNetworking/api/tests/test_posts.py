@@ -1,5 +1,5 @@
-from Hindlebook.models import User, Post
-from api.serializers import PostSerializer, AuthorSerializer, ForeignAuthorSerializer
+from Hindlebook.models import Author, Post
+from api.serializers import PostSerializer, AuthorSerializer
 from model_mommy import mommy
 from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from rest_framework import status
@@ -17,9 +17,9 @@ class PostApiTests(APITestCase):
         self.factory = APIRequestFactory()
 
         # Create Authors
-        self.author1 = mommy.make(User)
-        self.author2 = mommy.make(User)
-        self.author3 = mommy.make(User)
+        self.author1 = mommy.make(Author)
+        self.author2 = mommy.make(Author)
+        self.author3 = mommy.make(Author)
 
         # Create Private Posts
         self.post1_by_a1 = mommy.make(Post, author=self.author1)

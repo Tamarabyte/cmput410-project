@@ -1,6 +1,6 @@
 from django.forms import widgets
 from rest_framework import serializers
-from Hindlebook.models import User, ForeignUser
+from Hindlebook.models import User, Author
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -10,19 +10,19 @@ class AuthorSerializer(serializers.ModelSerializer):
     id = serializers.CharField(source='uuid')
 
     class Meta:
-        model = User;
+        model = Author
         fields = ["displayname", "host", "id"]
 
 
-class ForeignAuthorSerializer(serializers.ModelSerializer):
-    """ Used for sending/retrieving foreign author JSON data to/from other nodes """
-    displayname = serializers.CharField(source='username')
-    host = serializers.CharField(source='node')
-    id = serializers.CharField(source='uuid')
+# class ForeignAuthorSerializer(serializers.ModelSerializer):
+#     """ Used for sending/retrieving foreign author JSON data to/from other nodes """
+#     displayname = serializers.CharField(source='username')
+#     host = serializers.CharField(source='node')
+#     id = serializers.CharField(source='uuid')
 
-    class Meta:
-        model = ForeignUser;
-        fields = ["displayname", "host", "id"]
+#     class Meta:
+#         model = ForeignUser;
+#         fields = ["displayname", "host", "id"]
 
 
 class UserEditSerializer(serializers.ModelSerializer):

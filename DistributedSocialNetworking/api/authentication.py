@@ -4,7 +4,7 @@ from rest_framework import exceptions, HTTP_HEADER_ENCODING
 from rest_framework.authentication import BaseAuthentication
 from django.contrib.auth import authenticate
 import base64
-from Hindlebook.models import Server, Node, ForeignUser, User
+from Hindlebook.models import Server, Node
 
 
 def get_authorization_header(request):
@@ -85,6 +85,7 @@ class ForeignNodeAuthentication(BaseAuthentication):
 
         return self.authenticate_foreign_credentials(username, uuid, password, host)
 
+        # TODO: Cleanup this username shit FIX ME
     def authenticate_foreign_credentials(self, username, uuid, password, host):
         """
         Authenticate the host and password and return the vouched Foreign Author
@@ -94,20 +95,10 @@ class ForeignNodeAuthentication(BaseAuthentication):
         if node is None:
             raise exceptions.AuthenticationFailed(_('Node %s does not exist.') % node)
 
-        # if not node.is_active:
-        #     raise exceptions.AuthenticationFailed(_('Node %s is not active.') % node)
-
         if node.password != password:
             raise exceptions.AuthenticationFailed(_('Invalid node password.'))
 
-        # foreign_user = ForeignUser.objects.get_or_create(node=node, uuid=uuid,
-        #                                                  username=username)
-
-        User.objects.filter(username='___zzz999temp___').delete()
-
-        user = User.objects.create_user(username='___zzz999temp___', uuid=uuid)
-
-        return(user, None)
+        return(node, None)
 
     def authenticate_header(self, request):
         return 'Basic realm="%s"' % self.www_authenticate_realm

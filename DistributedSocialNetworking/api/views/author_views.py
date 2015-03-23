@@ -1,5 +1,5 @@
-from Hindlebook.models import User, ForeignUser
-from api.serializers import AuthorSerializer, ForeignAuthorSerializer, UserEditSerializer
+from Hindlebook.models import Author
+from api.serializers import AuthorSerializer, UserEditSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
