@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 from rest_framework.test import  APITestCase
-from Hindlebook.models import User, Post
+from Hindlebook.models import Author, Post
 from api.testclient import TestClient, APITestClient
 from api.serializers.post_serializer import PostSerializer
 from model_mommy import mommy
@@ -22,16 +22,12 @@ class APITests(APITestCase):
     """ Test some of the GET/POST API """
 
     def setUp(self):
-        self.author1 = mommy.make(User)
-        self.author2 = mommy.make(User)
-        self.author3 = mommy.make(User)
+        self.author1 = mommy.make(Author)
+        self.author2 = mommy.make(Author)
+        self.author3 = mommy.make(Author)
 
-        self.post1 = mommy.make(Post)
-        self.post2 = mommy.make(Post)
-
-    def tearDown(self):
-        Post.objects.all().delete()
-        User.objects.all().delete()
+        self.post1 = mommy.make(Post, author=author1)
+        self.post2 = mommy.make(Post, author=author2)
 
     # def testFriend2FriendGetQuerySuccess(self):
     #     """ Test a successful friend2friend query """

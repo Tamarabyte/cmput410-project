@@ -35,7 +35,7 @@ urlpatterns = patterns('',
     url(r'^search$', 'Hindlebook.views.search', name="search"),
 
     # Rest Api
-    #url(r'^api/', include('api.urls', namespace='api')),
-    #url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/', include('api.urls', namespace='api')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

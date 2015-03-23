@@ -26,15 +26,14 @@ class ProfileView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
-        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
-        profile_user = User.objects.filter(uuid=authorUUID)
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
+        profile_user = Author.objects.filter(uuid=authorUUID)
 
-
-        if (self.request.user.uuid == authorUUID):
+        if (self.request.user.author.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user)
 
-        context['author'] = get_object_or_404(User, uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user, page_user=profile_user )
+        context['author'] = get_object_or_404(Author, uuid=authorUUID)
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user.author, page_user=profile_user )
         context['comment_form'] = CommentForm()
 
         if self.request.user in list(context["author"].followed_by.all()):
@@ -49,14 +48,14 @@ class ProfileView(TemplateView):
         return context
 
     def post(self, *args, **kwargs):
-        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
-        page_user = get_object_or_404(User, uuid=authorUUID)
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
+        page_user = get_object_or_404(Author, uuid=authorUUID)
         posts = []
         comments = []
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        all_posts = Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, page_user=page_user, reversed=False, min_time=time)
+        all_posts = Post.objects_ext.get_all_visibile_posts(active_user=self.request.user.author, page_user=page_user, reversed=False, min_time=time)
         for post in all_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
             response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
@@ -89,7 +88,7 @@ class ProfileUpdateView(View):
         form_name_in_template = "author_form"
         form_class = ProfileEditForm
 
-        form = form_class(request.POST, request.FILES, instance=self.request.user)
+        form = form_class(request.POST, request.FILES, instance=self.request.user.author)
 
         if not form.is_valid():
             response_data = {'form': render_to_string(template_name, {form_name_in_template : form})}
@@ -108,8 +107,8 @@ class ProfileStreamView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProfileStreamView, self).get_context_data(**kwargs)
-        authorUUID = self.kwargs.get('authorUUID', self.request.user.uuid)
-        profile_user = User.objects.filter(uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user, page_user=profile_user )
+        authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
+        profile_user = Author.objects.filter(uuid=authorUUID)
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user.author, page_user=profile_user)
         context['comment_form'] = CommentForm()
         return context
