@@ -4,8 +4,8 @@ from Hindlebook.models.post_models import Post, Comment
 
 
 class PostForm(forms.ModelForm):
-    
-    def __init__(self,  *args, **kwargs):
+
+    def __init__(self, *args, **kwargs):
         self.guid = uuid.uuid4
         super(PostForm, self).__init__(*args, **kwargs)
 
@@ -20,16 +20,17 @@ class PostForm(forms.ModelForm):
 
         if commit:
             post.save()
-    
+
         return post
 
     class Meta:
         model = Post
         fields = ['content', 'visibility']
 
+
 class CommentForm(forms.ModelForm):
 
-    def __init__(self,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.guid = uuid.uuid4
         super(CommentForm, self).__init__(*args, **kwargs)
 
@@ -47,7 +48,6 @@ class CommentForm(forms.ModelForm):
             comment.save()
 
         return comment
-
 
     class Meta:
         model = Comment

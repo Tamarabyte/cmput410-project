@@ -29,7 +29,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_author(self, author_data):
         """
-        gets the local/foreign authors and adds the foreign user/node if necessry
+        gets the authors and adds the user/node if necessry
         """
         if author_data is None:
             return None

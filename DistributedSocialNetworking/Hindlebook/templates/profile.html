@@ -3,7 +3,7 @@
 
 {% block page %}
 
-{% if user.uuid == author.uuid %}
+{% if user.author.uuid == author.uuid %}
 <!-- Author Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -18,16 +18,16 @@
 
     <div class="profile-banner">
             <!-- User Buttons -->
-            {% if user.uuid == author.uuid %}
+            {% if user.author.uuid == author.uuid %}
                 <div class="profile-icon profile-edit-icon text-right">
                     <a data-toggle="modal" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
                 </div>
             {% else %}
                     <form id="friendrequestform" action=".">
                         {% csrf_token %}
-                     <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
-                     <input type="hidden"  id="author-host" value={{ user.node.host }}/>
-                     <input type="hidden" id="author-dn" value={{ user.username }}/>
+                     <input type="hidden" id="author-uuid" value={{ user.author.uuid }}/>
+                     <input type="hidden"  id="author-host" value={{ user.author.node.host }}/>
+                     <input type="hidden" id="author-dn" value={{ user.author.username }}/>
                      <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
                      <input type="hidden" id="friend-host" value={{ author.node.host }}/>
                      <input type="hidden" id="friend-dn" value={{ author.username }}/>
@@ -43,9 +43,9 @@
 
                     <form id="followform" action=".">
                         {% csrf_token %}
-                     <input type="hidden" id="author-uuid" value={{ user.uuid }}/>
-                     <input type="hidden"  id="author-host" value={{ user.node.host }}/>
-                     <input type="hidden" id="author-dn" value={{ user.username }}/>
+                     <input type="hidden" id="author-uuid" value={{ user.author.uuid }}/>
+                     <input type="hidden"  id="author-host" value={{ user.author.node.host }}/>
+                     <input type="hidden" id="author-dn" value={{ user.author.username }}/>
                      <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
                      <input type="hidden" id="friend-host" value={{ author.node.host }}/>
                      <input type="hidden" id="friend-dn" value={{ author.username }}/>
@@ -63,7 +63,7 @@
 
 
 
-        
+
             <!-- End User Buttons -->
 
                 <!-- User Text and Avatar -->
@@ -112,7 +112,7 @@
 <script>
 
     var form_options = {
-        url : '{% url 'edit_profile' user.uuid %}',
+        url : '{% url 'edit_profile' user.author.uuid %}',
         type : 'post',
         dataType: "json",
         success : profileSuccess,

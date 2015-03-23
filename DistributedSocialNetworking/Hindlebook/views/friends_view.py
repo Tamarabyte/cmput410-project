@@ -21,5 +21,3 @@ class FriendsListView(ListView):
         context['follows'] = self.author.getFollowing()
         context['friends'] = self.author.getFriends()
         return context
-
-
