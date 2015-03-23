@@ -7,11 +7,12 @@ from Hindlebook.models import Node, UuidValidator
 class Author(models.Model):
     """Model for represting a Foreign Users"""
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, related_name="author")
     about = models.CharField(max_length=250, blank=True, default="")
     uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, validators=[UuidValidator()], primary_key=True)
     username = models.CharField('username', max_length=30, blank=False)
     
+    friends = models.ManyToManyField('self', blank=True, related_name='friends_of', symmetrical=False, db_index=True)
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False, db_index=True)
     github_id = models.CharField(max_length=30, blank=True, default='')
     avatar = models.ImageField(null=False, blank=True, default="default_avatar.jpg")

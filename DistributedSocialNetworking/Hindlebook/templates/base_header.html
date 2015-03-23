@@ -16,9 +16,9 @@
         </div> <!-- /navbar-header -->
   
         <ul class="nav navbar-nav">
-          <li><a href="{% url "profile" authorUUID=user.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
+          <li><a href="{% url "profile" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
           <li><a href="#"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
-          <li><a href="#"><span class="badge">{{ user.getFriendRequestCount }}</span></a></li>
+          <li><a href="#"><span class="badge">{{ user.author.getFriendRequestCount }}</span></a></li>
         </ul>
         
           <ul id="search-nav" class="nav navbar-nav navbar-right">
@@ -35,17 +35,7 @@
     {% endblock %}
 
     <!-- bottom navbar -->
-    <a class="logout-tab" href="{% url "logout" %}"><span class="bot-text"><i class="icon-sign-out navbar-img"></i></span></a></li>
-    <!--
-    <nav class="navbar navbar-default navbar-fixed-bottom">
-        <div class="navbar-right">
-          <ul class="nav navbar-nav">
-            <li><a href="{% url "logout" %}"><span class="bot-text">logout&nbsp;&nbsp;<i class="icon-sign-out navbar-img"></i></span></a></li>
-          </ul>
-        </div>
-    </nav> -->
-    <!-- bottom navbar -->
-    
+    <a class="logout-tab" href="{% url "logout" %}"><span class="bot-text"><i class="icon-sign-out navbar-img"></i></span></a></li> 
 {% endblock %}
 
 
