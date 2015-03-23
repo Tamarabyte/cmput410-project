@@ -55,7 +55,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'widget_tweaks',
     'Hindlebook',
-    'api'
+    #'api'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -92,8 +92,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'
     ]
 }
-
-AUTH_USER_MODEL = 'Hindlebook.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

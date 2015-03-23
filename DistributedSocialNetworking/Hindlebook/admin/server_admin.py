@@ -12,7 +12,7 @@ class NodeAdmin(ModelAdmin):
     ordering = ('host_name', )
 
 
-class ServerAdmin(ModelAdmin):
+class SettingsAdmin(ModelAdmin):
 
     # List View Attributes
     list_filter = []
@@ -20,4 +20,4 @@ class ServerAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('id', 'host_name', 'host')
+    list_display = ('connection_limit',)

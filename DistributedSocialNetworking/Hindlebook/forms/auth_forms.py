@@ -2,6 +2,7 @@ from django.contrib.auth.forms import AuthenticationForm as BaseAuthenticationFo
 from django.contrib.auth import get_user_model
 from django.forms import ModelForm, CharField, ValidationError, PasswordInput
 from Hindlebook.forms.template_mixin import TemplateMixin
+from django.forms import ValidationError
 User = get_user_model()
 
 class LoginForm(BaseAuthenticationForm, TemplateMixin):
@@ -14,6 +15,15 @@ class LoginForm(BaseAuthenticationForm, TemplateMixin):
         'invalid_login': "Invalid %(username)s or password.",
         'inactive': "This account is waiting for admin activation.",
     }
+    
+    def confirm_login_allowed(self, user):
+        super(LoginForm, self).confirm_login_allowed(user)
+
+        if not hasattr(user, 'author'):
+            raise ValidationError(
+                self.error_messages['inactive'],
+                code='inactive',
+            )
     
 class RegistrationForm(ModelForm, TemplateMixin):
     """
@@ -76,7 +86,7 @@ class RegistrationForm(ModelForm, TemplateMixin):
         # Save the provided password in hashed format
         user = super(RegistrationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
-        user.is_active = False
+        user.is_active = True
         
         if commit:
             user.save()

@@ -9,7 +9,7 @@ def load_fixture(apps, schema_editor):
     fixture_file = os.path.join(fixture_dir, fixture_filename)
 
     fixture = open(fixture_file, 'rb')
-    objects = serializers.deserialize('json', fixture, ignorenonexistent=True)
+    objects = serializers.deserialize('json', fixture, ignorenonexistent=False)
     for obj in objects:
         obj.save()
     fixture.close()
@@ -17,13 +17,13 @@ def load_fixture(apps, schema_editor):
 def unload_fixture(apps, schema_editor):
     "Brutally deleting all entries for this model..."
 
-    Server = apps.get_model("Hindlebook", "Server")
-    Server.objects.all().delete()
+    Node = apps.get_model("Hindlebook", "Node")
+    Node.objects.filter(pk="localhost").delete()
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Hindlebook', '0006_auto_20150310_0452'),
+        ('Hindlebook', '0001_initial'),
     ]
 
     operations = [

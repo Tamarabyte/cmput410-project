@@ -1,4 +1,4 @@
-from Hindlebook.models.user_models import ForeignUser
+from Hindlebook.models.user_models import Author
 from Hindlebook.models import UuidValidator
 
 from django.db import models
@@ -91,8 +91,7 @@ class Post(models.Model):
     content = models.TextField(blank=False)
 
     # only author or foreign author should be set
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="posts")
-    foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="posts")
+    author = models.ForeignKey(Author, null=True, blank=True, related_name="posts")
 
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
@@ -117,8 +116,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, related_name="comments")
 
     # only author or foreign author should be set
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name="comments")
-    foreign_author = models.ForeignKey(ForeignUser, null=True, blank=True, related_name="comments")
+    author = models.ForeignKey(Author, null=True, blank=True, related_name="comments")
 
     comment = models.CharField(max_length=2048)
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)

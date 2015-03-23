@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import User, Post
+from Hindlebook.models import Post
 # from Hindlebook.serializers import PostSerializer
 from api.serializers.post_serializer import PostSerializer
 import json
@@ -13,6 +13,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class Friend2Friend(APIView):

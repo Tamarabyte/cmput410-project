@@ -22,22 +22,13 @@ class Node(models.Model):
         return self.host
 
 
-class Server(models.Model):
+class Settings(models.Model):
     """Model for our server."""
 
-    # address of the sever
-    host = models.CharField(max_length=100, blank=False, unique=True)
-
-    # short name for identifying the server
-    host_name = models.CharField(max_length=50, blank=True, default='', unique=True)
-
     connection_limit = models.IntegerField(blank=True, default=10)
-
-    # password to access this server
-    password = models.CharField(max_length=128, blank=True, default="")
 
     def __str__(self):
         return self.host
 
     class Meta:
-        verbose_name_plural = "Server"
+        verbose_name_plural = "Settings"

@@ -4,7 +4,10 @@ from django.template import RequestContext
 from django.db.models import Q
 from django.shortcuts import render_to_response
 from django.core import serializers
-from Hindlebook.models import User
+from Hindlebook.models import Author
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 
 
 def get_query(query_string, search_fields):

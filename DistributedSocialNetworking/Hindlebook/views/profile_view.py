@@ -11,7 +11,7 @@ from django.contrib.auth import get_user_model
 import dateutil
 import datetime
 
-from Hindlebook.models import Post, User, Comment
+from Hindlebook.models import Post, Author, Comment
 from Hindlebook.forms import ProfileEditForm, CommentForm
 
 User = get_user_model()

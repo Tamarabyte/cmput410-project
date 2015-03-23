@@ -1,7 +1,6 @@
 from django import forms
-from Hindlebook.models import User
 from Hindlebook.forms.template_mixin import TemplateMixin
-
+from Hindlebook.models import Author
 
 class ProfileEditForm(forms.ModelForm, TemplateMixin):
     """Form for editing user profile"""
@@ -10,7 +9,7 @@ class ProfileEditForm(forms.ModelForm, TemplateMixin):
 
 
     class Meta:
-        model = User
+        model = Author
         fields = ['about', 'github_id', 'avatar']
 
 class FriendRequestForm(forms.ModelForm):
@@ -18,6 +17,6 @@ class FriendRequestForm(forms.ModelForm):
         super(FriendRequestForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = User
+        model = Author
         fields = ['follows', 'uuid']
         # exclude = ('username', 'password', 'uuid')

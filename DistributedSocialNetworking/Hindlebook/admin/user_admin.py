@@ -1,7 +1,9 @@
 from django.contrib.auth.admin import UserAdmin as BaseAdmin
 from django.contrib.auth.forms import UserCreationForm as AdminUserCreationForm
+from django.contrib.admin import ModelAdmin, StackedInline
 from django.contrib.auth import get_user_model
 
+from Hindlebook.models import Author, Node
 
 class UserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
@@ -21,8 +23,14 @@ class UserCreationForm(AdminUserCreationForm):
         )
 
 def approve_users(modeladmin, request, queryset):
-        queryset.update(is_active=True)
-approve_users.short_description = "Approve user registrations"
+    local_node = Node.objects.get(pk="localhost")
+    for obj in queryset:
+        if not Author.objects.filter(user=obj).exists():
+            author = Author(user=obj, username=obj.username, node=local_node)
+            author.save()
+        
+approve_users.short_description = "Approve user"
+
 
 class UserAdmin(BaseAdmin):
     
@@ -30,18 +38,40 @@ class UserAdmin(BaseAdmin):
     list_filter = []
     search_fields = []
     exclude = []
-    inlines = []
     actions = [approve_users]
     
     ordering = ('username',)
-    list_display = ('username', 'uuid', 'date_joined', 'is_active')
+    list_display = ('username', 'date_joined', 'is_approved')
     add_form = UserCreationForm
 
 
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'node')}),
-        ('Permissions', {'fields': ('is_active', 'is_superuser')}),
-        ('Personal', {'fields': ('avatar',)}),
+        (None, {'fields': ('username', 'password')}),
+        ('Permissions', {'fields': ('is_superuser',)}),
     )
+    
+    def is_approved(self, obj):
+        if Author.objects.filter(user=obj).exists():
+            return True
+        return False
+    is_approved.short_description = 'Approved'
+    is_approved.boolean = True
 
+
+    
+class AuthorAdmin(ModelAdmin):
+    
+    # List View Attributes
+    list_filter = []
+    search_fields = []
+    exclude = []
+    inlines = []
+    
+    ordering = ('username',)
+    list_display = ('username', 'uuid', 'date_added')
+
+    fieldsets = (
+        (None, {'fields': ('username', 'node')}),
+        ('Personal', {'fields': ('about' ,'avatar', 'github_id')}),
+    )
 
