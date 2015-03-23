@@ -36,7 +36,7 @@ class StreamView(TemplateView):
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
 
-        for post in Post.objects_ext.get_all_visibile_posts(active_user=self.request.user, reversed=False, min_time=time):
+        for post in Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time):
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
             response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
@@ -70,7 +70,7 @@ class CreatePost(View):
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": form})}
             return JsonResponse(response_data, status=400)
 
-        post = form.save(request.user, postGUID, commit=False)
+        post = form.save(request.user.author, postGUID, commit=False)
 
         # Validate all remaining fields not included in the post form, based on model constraints
         try:
@@ -105,7 +105,7 @@ class CreateComment(View):
             return JsonResponse(response_data, status=400)
 
         post = get_object_or_404(Post, guid=postGUID)
-        comment = form.save(request.user, post, commentGUID, commit=False)
+        comment = form.save(request.user.author, post, commentGUID, commit=False)
 
         # Validate all remaining fields not included in the comment form, based on model constraints
         try:
