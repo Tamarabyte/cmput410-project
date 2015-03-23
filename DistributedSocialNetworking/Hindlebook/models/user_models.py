@@ -5,7 +5,7 @@ import uuid as uuid_import
 from Hindlebook.models import Node, UuidValidator
 
 class Author(models.Model):
-    """Model for represting a Foreign Users"""
+    """Model for represting a Authors"""
 
     user = models.OneToOneField(User, related_name="author")
     about = models.CharField(max_length=250, blank=True, default="")
