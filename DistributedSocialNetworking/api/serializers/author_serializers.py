@@ -20,7 +20,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ["displayname", "host", "id",'about','github_id','node']    
+        fields = ["displayname", "host", "id",'about','github_id','node']
 
 class UserEditSerializer(serializers.ModelSerializer):
     """ Used locally to allow users to edit their user profile"""

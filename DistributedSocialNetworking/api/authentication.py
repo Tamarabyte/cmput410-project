@@ -68,25 +68,22 @@ class ForeignNodeAuthentication(BaseAuthentication):
         host, password = auth_parts[0], auth_parts[1]
 
         # Process the 'X-user' header
-        user_parts = get_user_header(request).decode(HTTP_HEADER_ENCODING).split(':')
+        user_parts = get_user_header(request).decode(HTTP_HEADER_ENCODING).split()
 
         if not user_parts:
             msg = _('Invalid `user` header. No `user` header provided.')
             raise exceptions.AuthenticationFailed(msg)
 
-        if len(user_parts) == 1:
-            msg = _('Invalid `user` header format. Expect username:uuid')
-            raise exceptions.AuthenticationFailed(msg)
-        elif len(user_parts) > 2:
-            msg = _('Invalid `user` header. User string should not contain spaces.')
+        if len(user_parts) != 1:
+            msg = _('Invalid `user` header format. Expect `uuid`')
             raise exceptions.AuthenticationFailed(msg)
 
-        username, uuid = user_parts[0], user_parts[1]
+        uuid = user_parts[0]
 
-        return self.authenticate_foreign_credentials(username, uuid, password, host)
+        return self.authenticate_foreign_credentials(host, password, uuid)
 
         # TODO: Cleanup this username shit FIX ME
-    def authenticate_foreign_credentials(self, username, uuid, password, host):
+    def authenticate_foreign_credentials(self, host, password, uuid):
         """
         Authenticate the host and password and return the vouched Foreign Author
         """
@@ -98,7 +95,12 @@ class ForeignNodeAuthentication(BaseAuthentication):
         if node.password != password:
             raise exceptions.AuthenticationFailed(_('Invalid node password.'))
 
-        return(node, None)
+        data = {}
+        data['authenticated'] = True
+        data['node'] = node
+        data['uuid'] = uuid
+
+        return(data, None)
 
     def authenticate_header(self, request):
         return 'Basic realm="%s"' % self.www_authenticate_realm
