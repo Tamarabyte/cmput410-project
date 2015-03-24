@@ -73,13 +73,10 @@ class FriendQuery(APIView):
 
 
 class FriendRequest(APIView):
-    """ POST a friend query """
+    """ POST a friend request """
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
-    # authentication_classes = (SessionAuthentication,BasicAuthentication,)
-    # permission_classes = (IsAuthenticated,)
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         JSONrequest = json.loads(request.body.decode('utf-8'))
@@ -98,6 +95,9 @@ class FriendRequest(APIView):
 
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
+
+        if (request.user['uuid'] != authorID):
+            return HttpResponse(status=403)
 
         try:
             author = get_object_or_404(Author, uuid=authorID)
@@ -137,6 +137,9 @@ class UnfriendRequest(APIView):
 
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
+
+        if (request.user['uuid'] != authorID):
+            return HttpResponse(status=403)
 
         try:
             author = get_object_or_404(Author, uuid=authorID)
@@ -185,6 +188,9 @@ class FollowRequest(APIView):
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
 
+        if (request.user['uuid'] != authorID):
+            return HttpResponse(status=403)
+
         try:
             author = get_object_or_404(Author, uuid=authorID)
             friend = get_object_or_404(Author, uuid=friendID)
@@ -220,6 +226,9 @@ class UnfollowRequest(APIView):
 
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
+
+        if (request.user['uuid'] != authorID):
+            return HttpResponse(status=403)
 
         try:
             author = get_object_or_404(Author, uuid=authorID)
