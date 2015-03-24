@@ -36,19 +36,19 @@ class AuthorTestCases(TestCase):
     # Test Friends
     def test_friends(self):
         # Test one way friendship
-        self.author2.follows.add(self.author1)
+        self.author2.friends.add(self.author1)
         self.assertQuerysetEqual(self.author1.getFriends(), [])
         self.assertQuerysetEqual(self.author1.getFriends(), self.author2.getFriends())
 
         # Test reflexive friendship
-        self.author1.follows.add(self.author2)
+        self.author1.friends.add(self.author2)
         self.assertQuerysetEqual(self.author1.getFriends(), ["<Author: %s>" % self.author2.username])
         self.assertQuerysetEqual(self.author2.getFriends(), ["<Author: %s>" % self.author1.username])
 
     # Test Friend Requests
     def test_friend_requests(self):
         self.assertQuerysetEqual(self.author1.getFriendRequests(), [])
-        self.author2.follows.add(self.author1)
+        self.author2.friends.add(self.author1)
         self.assertQuerysetEqual(self.author1.getFriendRequests(), ["<Author: %s>" % self.author2.username])
 
 
