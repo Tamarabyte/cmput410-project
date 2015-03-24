@@ -56,7 +56,7 @@ function follow() {
     }
     
     function requestSuccess(response, status, xhr, form) {
-        console.log("friend request sent!");
+        console.log("follow request sent!");
         isFollowing = 1;
         // On request success we succesfully followed this person...
         // Time to change icon look and functionality.
@@ -152,7 +152,7 @@ function friend() {
             "friend": friend
         };
 
-    console.log("trying to follow lol")
+    console.log("trying to friend request lol")
 
     // THIS NEEDS TO BE RESOLVED, just a quick hack
     // to at least get it working... basically
@@ -197,7 +197,20 @@ function friend() {
         }
         $("#friend-icon").toggleClass("icon-favourite-3 icon-broken-heart");
         $("#friend-icon").attr("onclick","unfriend()");
-  
+        if (authorHost != "localhost") {
+            console.log("wtf")
+            $.ajax({
+                clearForm : false,
+                contentType: "application/json; charset=utf-8",
+                //error: ajaxError,
+                type : "POST",
+                url : authorHost + "/api/friendrequest",
+                data : myEscapedJSONString,
+                success : function(returnHtml) {
+                    console.log("Succesfully sent friend reuqest to host: " + authorHost)
+                }
+            })
+        }
     };
 }
 
@@ -257,7 +270,7 @@ function unfriend() {
 
     }
     function requestSuccess(response, status, xhr, form) {
-        console.log("in unfollow")
+        console.log("Succesfully Unfriended")
         $("#friend-icon").toggleClass("icon-favourite-3 icon-broken-heart");
         $("#friend-icon").attr("onclick","friend()");
   

@@ -1,7 +1,6 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import Post
 from Hindlebook.models import Author, Post
 from api.serializers.post_serializer import PostSerializer
 import json
@@ -13,6 +12,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+
+from api.json_derulo import getForeignAuthor
 
 
 class Friend2Friend(APIView):
@@ -96,15 +97,38 @@ class FriendRequest(APIView):
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
 
+        author = None
+        friend = None
+        local = True
+
         try:
-            author = get_object_or_404(Author, uuid=authorID)
+            author = Author.objects.get(uuid=authorID)
+            if Author.objects.get(uuid=authorID).node.host != "localhost":
+                local = False
+        except Author.DoesNotExist:
+            author = getForeignAuthor(authorID)
+            local = False
+        except:
+            print("yeah okay")
+        if not local:
+            author = getForeignAuthor(authorID)
+        try:
+            # Can just call get_object_or_404 as in order to
+            # friend request someone they have to have viewed their
+            # profile, meaning json_derulo added them already.
             friend = get_object_or_404(Author, uuid=friendID)
+            if author and friend:
+                if friend.node.host != "localhost" and author.node.host !="localhost":
+                    # Don't handle friend requests between two foreign users
+                    return HttpResponse(status=404)
+                if (friend not in author.friends.all()):
+                    author.friends.add(friend)
 
-            if (friend not in author.friends.all()):
-                author.friends.add(friend)
-
-            if (friend not in author.follows.all()):
-                author.follows.add(friend)
+                if (friend not in author.follows.all()):
+                    author.follows.add(friend)
+            else:
+                print("404 because couldn't find friend+author")
+                return HttpResponse(status=404)
         except:
             return HttpResponse(status=404)
 

@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 
-def get_uuid_from_header(request):
+def get_user_header(request):
     """
     Return request's 'x-uuid:' header, as a bytestring.
     Hide some test client ickyness where the header can be unicode.

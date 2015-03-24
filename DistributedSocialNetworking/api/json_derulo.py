@@ -1,17 +1,16 @@
 from urllib.request import urlopen
 from urllib.error import HTTPError
 import json
-from Hindlebook.models import Node
+from Hindlebook.models import Node, Author
 
 # Module to hold outgoing API calls to get various info from other services.
 
 def getForeignAuthor(uuid):
     # Function to get a foreign author with the given uuid.
-    # Returns None if the object isn't found, otherwise returns a JSON String
-    # of the given author. IMHO it should return None or the python object,
-    # and we should do our stuff in DJANGO NOT AJAX but whatever. See the foreign
-    # profile loading for an example of doing it in python...
-    AuthorJSON = None
+    # Returns None if the author isn't found, otherwise creates/updates that
+    # users info in our DB with the infor returned from the foreign hosts and 
+    # returns the author object.
+    author = None
     for node in Node.objects.all():
         #Right now i'm just using our url schema for API...
         # like sigh I don't know how we'll do this since its
@@ -30,17 +29,29 @@ def getForeignAuthor(uuid):
                 # outputted json is author.id so yeah...
                 # same with username/displayname
                 obj['uuid'] = obj['id']
-                obj['username'] = obj['displayname']
                 #This should probably get grabbed from like a global var,
                 # not be hardcoded but whatever.
                 obj['avatar'] = 'default_avatar.jpg'
                 obj['host'] = node.host
-                AuthorJSON = json.dumps(obj)
+                try:
+                    author = Author.objects.get(uuid=uuid)
+                    author.github_id = obj['github_id']
+                    author.about = obj['about']
+                    author.node = node
+                    author.username = obj['displayname']
+                    author.avatar = obj['avatar']
+                    author.save()
+                except Author.DoesNotExist:
+                    author= Author.objects.create(uuid=uuid,username=obj['displayname'],
+                                                    node=node,about=obj["about"],
+                                                    avatar=obj['avatar'],github_id=obj['github_id'])
+                    author.save()
                 break
         except HTTPError as e:
             # Catch any pesky errors from other sites being down
+            print("Http error getting stuff: " + type(e))
             pass 
-    return AuthorJSON
+    return author
 
 def getForeignAuthorPosts(uuid):
     # Function to get a foreign authors posts visible to the currently logged in user

@@ -39,6 +39,8 @@ class ProfileView(TemplateView):
         local = True
         try:
             context['author'] = Author.objects.get(uuid=authorUUID)
+            if Author.objects.get(uuid=authorUUID).node.host != "localhost":
+                local = False
         except Author.DoesNotExist:
             #have to catch this error otherwise we error out
             local = False
@@ -58,13 +60,12 @@ class ProfileView(TemplateView):
                 context['isFriends'] = 0
         else:
             # Have to change from JSON to object because Mark wants JSON and Ajax
-            authorJSON = getForeignAuthor(authorUUID)
-            if authorJSON:
+            author = getForeignAuthor(authorUUID)
+            if author:
                 # If we found the author we should set the other vars as
                 # necessary, if not we should 404
                 # Currently not setting up crap cuz i'm waiting for changes from m+t
-                authorObject = json.loads(authorJSON)
-                context['author'] = authorObject
+                context['author'] = author
                 context['isFollowing'] = 0
                 context['isFriends'] = 0
                 postsJSON = getForeignAuthorPosts(authorUUID)
