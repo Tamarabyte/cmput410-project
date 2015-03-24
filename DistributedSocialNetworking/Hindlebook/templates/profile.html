@@ -110,11 +110,9 @@
 
 {% block scripts %}
 <script>
-    {% if isFollowing = 0 %}
-    var isFollowing = 0;
-    {% else %}
-    var isFOllowing = 1;
-    {% endif %}
+
+    var authorHost = '{{ author.host|default:"localhost" }}';
+    var isFollowing = {{ isFollowing }};
     var form_options = {
         url : '{% url 'edit_profile' user.author.uuid %}',
         type : 'post',
