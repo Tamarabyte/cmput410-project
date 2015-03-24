@@ -24,7 +24,7 @@ def get_user_header(request):
     Return request's 'x-user:' header, as a bytestring.
     Hide some test client ickyness where the header can be unicode.
     """
-    user = request.META.get('HTTP_USERNAME', b'')
+    user = request.META.get('HTTP_UUID', b'')
     if isinstance(user, type('')):
         # Work around django test client oddness
         user = user.encode(HTTP_HEADER_ENCODING)
@@ -71,11 +71,11 @@ class ForeignNodeAuthentication(BaseAuthentication):
         user_parts = get_user_header(request).decode(HTTP_HEADER_ENCODING).split()
 
         if not user_parts:
-            msg = _('Invalid `user` header. No `user` header provided.')
+            msg = _('Invalid `uuid` header. No `uuid` header provided.')
             raise exceptions.AuthenticationFailed(msg)
 
         if len(user_parts) != 1:
-            msg = _('Invalid `user` header format. Expect `uuid`')
+            msg = _('Invalid `uuid` header format. Expect `uuid`')
             raise exceptions.AuthenticationFailed(msg)
 
         uuid = user_parts[0]
