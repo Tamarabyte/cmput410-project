@@ -69,8 +69,13 @@ class PostTestCases(TestCase):
 
     # Test Post privacy
     def test_post_privacy(self):
-        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author1), chain(self.post1_by_a1, self.post1_by_a2, self.post2_by_a1))
-        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author2), chain(self.post1_by_a1, self.post2_by_a1))
+        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author1),
+                                 ["<Post: %s>" % self.post1_by_a2.content,
+                                  "<Post: %s>" % self.post2_by_a1.content,
+                                  "<Post: %s>" % self.post1_by_a1.content])
+        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author2),
+                                 ["<Post: %s>" % self.post1_by_a2.content,
+                                  "<Post: %s>" % self.post1_by_a1.content])
 
     # Test fetching own Posts
     def test_getAuthoredPosts(self):
