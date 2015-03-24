@@ -49,7 +49,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        return User.objects.all()
+        return Author.objects.all()
 
     def retrieve(self, request, uuid=None):
         queryset = self.get_queryset()
