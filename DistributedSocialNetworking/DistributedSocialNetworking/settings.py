@@ -55,7 +55,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'widget_tweaks',
     'Hindlebook',
-    #'api'
+    'api'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,8 +85,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.IsAuthenticated',
-        'rest_framework.permissions.AllowAny'
+        'api.permissions.NodeAuthenticatedOrNotRequired'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'api.authentication.ForeignNodeAuthentication',

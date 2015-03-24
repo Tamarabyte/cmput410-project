@@ -1,10 +1,11 @@
-from Hindlebook.models import Author, Post
+from Hindlebook.models import Author, Post, Node
 from api.serializers import PostSerializer, AuthorSerializer
 from model_mommy import mommy
 from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from rest_framework import status
 from django.forms.models import model_to_dict
 import json
+import base64
 
 
 class PostApiTests(APITestCase):
@@ -31,6 +32,13 @@ class PostApiTests(APITestCase):
         self.private1_by_a1 = mommy.make(Post, author=self.author1, visibility='PRIVATE')
         self.private2_by_a1 = mommy.make(Post, author=self.author1, visibility='PRIVATE')
         self.private1_by_a2 = mommy.make(Post, author=self.author2, visibility='PRIVATE')
+
+        self.node1 = mommy.make(Node, host='test', password='test')
+
+        # Set credentials for Node 1
+        # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
+        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
+                                HTTP_USERNAME="%s" % self.author1.uuid)
 
     def testGETPublicPosts(self):
         """
@@ -178,41 +186,42 @@ class PostApiTests(APITestCase):
         Test GET posts from given author (visible wrt to the currently authenticated user)
         api method: service/api/author/{uuid}/posts
         """
-
+        # Author1 Queries Author1 posts (will see his own private)
         url = "/api/author/%s/posts" % self.author1.uuid
         response = self.client.get(url)
 
+        # Assert Response
         self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
 
-        # self.assertTrue('posts' in response.data, "No 'posts' in response")
-        # self.assertEquals(len(response.data['posts']), 2, "Should return exactly two posts")
+        # Assert Content
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 4, "Should return exactly four posts")
 
-        # url = server + "/api/author/%s/posts" % self.author2.uuid
-        # response = self.client.get(url)
-        # serializer = PostSerializer(different_post)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
-        # self.assertTrue('posts' in response.data, "No 'posts' in response")
-        # self.assertEquals(len(response.data['posts']), 1, "Should return exactly one post")
-        # self.assertEquals(response.data['posts'][0], serializer.data, "Didn't get correct post information")
+        # Author1 Queries Author2's posts (won't see his private)
+        url = "/api/author/%s/posts" % self.author2.uuid
+        response = self.client.get(url)
+
+        # Assert Response
+        self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
+
+        # Assert Content
+        serializer = PostSerializer(self.post1_by_a2)
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 1, "Should return exactly one post")
+        self.assertEquals(response.data['posts'][0], serializer.data, "Didn't get correct post information")
 
     def testGETVisiblePosts(self):
         """
         Test GET visible posts (visible wrt to the currently authenticated user)
         api method: service/api/author/posts
         """
-
+        # Author1 Queries visible posts (will see 4 public + 2 owned private)
         url = "/api/author/posts"
         response = self.client.get(url)
 
+        # Assert Response
         self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
 
-        # self.assertTrue('posts' in response.data, "No 'posts' in response")
-        # self.assertEquals(len(response.data['posts']), 2, "Should return exactly two posts")
-
-        # url = server + "/api/author/%s/posts" % self.author2.uuid
-        # response = self.client.get(url)
-        # serializer = PostSerializer(different_post)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK, "Response not 200")
-        # self.assertTrue('posts' in response.data, "No 'posts' in response")
-        # self.assertEquals(len(response.data['posts']), 1, "Should return exactly one post")
-        # self.assertEquals(response.data['posts'][0], serializer.data, "Didn't get correct post information")
+        # Assert Content
+        self.assertTrue('posts' in response.data, "No 'posts' in response")
+        self.assertEquals(len(response.data['posts']), 6, "Should return exactly six posts")

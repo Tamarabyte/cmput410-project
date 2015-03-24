@@ -20,6 +20,15 @@ def get_user_header(request):
     return (user_parts[0], user_parts[1])
 
 
+def get_author(uuid, node):
+    try:
+        author = Author.objects.get(uuid=uuid)
+    except Author.DoesNotExist:
+        author = Author.objects.create(uuid=uuid, username="DummyUsername", node=node)   # TODO: FIX ME: make a request for the username
+
+    return author
+
+
 class PostDetails(APIView):
     """
     GET, POST, or PUT an author post
@@ -112,8 +121,8 @@ class AuthoredPosts(APIView):
         pageAuthor = get_object_or_404(Author, uuid=uuid)
 
         # Get the Author's Posts
-        # TODO: FIX ME REQUEST.USER IS THE NODE. I THINK!?!?!?!
-        posts = Post.objects_ext.get_profile_visibile_posts(self.request.user, pageAuthor)
+        author = get_author(request.user.get('uuid', None), request.user.get('node', None))
+        posts = Post.objects_ext.get_profile_visibile_posts(author, pageAuthor)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
@@ -151,8 +160,8 @@ class VisiblePosts(APIView):
     def get(self, request, format=None):
 
         # Filter to get all posts visible to the currently authenticated user
-        # TODO: FIX ME REQUEST.USER IS THE NODE. I THINK!?!?!?!
-        posts = Post.objects_ext.get_all_visibile_posts(self.request.user)
+        author = get_author(request.user.get('uuid', None), request.user.get('node', None))
+        posts = Post.objects_ext.get_all_visibile_posts(author)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
