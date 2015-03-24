@@ -18,7 +18,6 @@ def unload_fixture(apps, schema_editor):
     "Brutally deleting all entries for this model..."
 
     Node = apps.get_model("Hindlebook", "Node")
-    Node.objects.filter(pk="localhost").delete()
 
 class Migration(migrations.Migration):
 
