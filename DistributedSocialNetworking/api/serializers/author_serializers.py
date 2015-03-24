@@ -8,10 +8,19 @@ class AuthorSerializer(serializers.ModelSerializer):
     displayname = serializers.CharField(source='username')
     host = serializers.CharField(source='node')
     id = serializers.CharField(source='uuid')
-
     class Meta:
         model = Author
         fields = ["displayname", "host", "id"]
+
+class ProfileSerializer(serializers.ModelSerializer):
+    """ Used for sending author JSON data to other nodes """
+    displayname = serializers.CharField(source='username')
+    host = serializers.CharField(source='node')
+    id = serializers.CharField(source='uuid')
+
+    class Meta:
+        model = Author
+        fields = ["displayname", "host", "id",'about','github_id','node']    
 
 class UserEditSerializer(serializers.ModelSerializer):
     """ Used locally to allow users to edit their user profile"""

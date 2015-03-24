@@ -34,9 +34,9 @@
                      <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
                      <div class="profile-icon text-right">
                     {% if isFriends = 0 %}
-                       <div id="follow-button"><a href="#"><span id="friend-icon" class="icon-favourite-3" onClick="friend()"></span></a></div>
+                       <div id="friend-button"><a href="#"><span id="friend-icon" class="icon-favourite-3" onClick="friend()"></span></a></div>
                     {% else %}
-                        <div id="follow-button"><a href="#"><span id="friend-icon" class="icon-broken-heart"  onClick="unfriend()"></span></a></div>
+                        <div id="friend-button"><a href="#"><span id="friend-icon" class="icon-broken-heart"  onClick="unfriend()"></span></a></div>
                     {% endif %}
                         </div>
                     </form>
@@ -110,7 +110,11 @@
 
 {% block scripts %}
 <script>
-
+    {% if isFollowing = 0 %}
+    var isFollowing = 0;
+    {% else %}
+    var isFOllowing = 1;
+    {% endif %}
     var form_options = {
         url : '{% url 'edit_profile' user.author.uuid %}',
         type : 'post',

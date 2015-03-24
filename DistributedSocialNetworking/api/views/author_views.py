@@ -1,5 +1,5 @@
 from Hindlebook.models import Author
-from api.serializers import AuthorSerializer, UserEditSerializer
+from api.serializers import AuthorSerializer, UserEditSerializer, ProfileSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -24,9 +24,9 @@ class AllowReadonlyOrAdminOrSelf(permissions.BasePermission):
         """ Readonly or Admin or editing self """
         if request.method in permissions.SAFE_METHODS:
             return True
-        if all(request.user, request.user.is_staff):
+        if all([request.user, request.user.is_staff]):
             return True
-        elif all(request.user, type(obj) == type(request.user), obj == request.user):
+        elif all([request.user, type(obj) == type(request.user), obj == request.user]):
             return True
 
         return True
@@ -46,6 +46,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     authentication_classes = (SessionAuthentication,)
     permission_classes = (AllowReadonlyOrAdminOrSelf,)
     serializer_class = AuthorSerializer
+    profileSerializer_class = ProfileSerializer
     lookup_field = 'uuid'
 
     def get_queryset(self):
@@ -54,7 +55,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, uuid=None):
         queryset = self.get_queryset()
         user = get_object_or_404(queryset, uuid=uuid)
-        serializer = self.serializer_class(user)
+        serializer = self.profileSerializer_class(user)
         return Response(serializer.data)
 
     def update(self, request, uuid=None, *args, **kwargs):

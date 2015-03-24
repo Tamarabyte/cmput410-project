@@ -9,9 +9,16 @@ from django.shortcuts import get_object_or_404
 
 import dateutil
 import datetime
+import json
+from urllib.request import urlopen
 
 from Hindlebook.models import Post, Author, Comment
 from Hindlebook.forms import ProfileEditForm, CommentForm
+from api.json_derulo import getForeignAuthor, getForeignAuthorPosts
+
+
+
+
 
 class ProfileView(TemplateView):
     template_name = 'profile.html'
@@ -25,21 +32,47 @@ class ProfileView(TemplateView):
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
         profile_author = Author.objects.filter(uuid=authorUUID)
 
+
         if (self.request.user.author.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user.author)
 
-        context['author'] = get_object_or_404(Author, uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
-        context['comment_form'] = CommentForm()
+        local = True
+        try:
+            context['author'] = Author.objects.get(uuid=authorUUID)
+        except Author.DoesNotExist:
+            #have to catch this error otherwise we error out
+            local = False
 
-        if self.request.user.author in list(context["author"].followed_by.all()):
-            context['isFollowing'] = 1
+        context['comment_form'] = CommentForm()        
+        
+        if local:
+            context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
+            print(self.request.user.author)
+            if self.request.user.author in list(context["author"].followed_by.all()):
+                context['isFollowing'] = 1
+            else:
+                context['isFollowing'] = 0
+            if self.request.user.author in list(context["author"].friends_of.all()):
+                context['isFriends'] = 1
+            else:
+                context['isFriends'] = 0
         else:
-            context['isFollowing'] = 0
-        if self.request.user.author in list(context["author"].friends_of.all()):
-            context['isFriends'] = 1
-        else:
-            context['isFriends'] = 0
+            # Have to change from JSON to object because Mark wants JSON and Ajax
+            authorJSON = getForeignAuthor(authorUUID)
+            if authorJSON:
+                # If we found the author we should set the other vars as
+                # necessary, if not we should 404
+                # Currently not setting up crap cuz i'm waiting for changes from m+t
+                authorObject = json.loads(authorJSON)
+                context['author'] = authorObject
+                context['isFollowing'] = 0
+                context['isFriends'] = 0
+                postsJSON = getForeignAuthorPosts(authorUUID)
+                if postsJSON:
+                    postsObj = json.loads(postsJSON)
+                    context['posts'] = postsObj
+            else:
+                raise Http404("No Author matches the given query.")
 
         return context
 
