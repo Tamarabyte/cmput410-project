@@ -73,13 +73,10 @@ class FriendQuery(APIView):
 
 
 class FriendRequest(APIView):
-    """ POST a friend query """
+    """ POST a friend request """
 
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
-
-    # authentication_classes = (SessionAuthentication,BasicAuthentication,)
-    # permission_classes = (IsAuthenticated,)
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         JSONrequest = json.loads(request.body.decode('utf-8'))
