@@ -38,7 +38,10 @@ class PostApiTests(APITestCase):
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
-                                HTTP_USERNAME="%s" % self.author1.uuid)
+                                HTTP_UUID="%s" % self.author1.uuid)
+
+    def tearDown(self):
+        self.client.credentials()
 
     def testGETPublicPosts(self):
         """

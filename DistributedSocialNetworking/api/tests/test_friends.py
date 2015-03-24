@@ -1,5 +1,3 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from Hindlebook.models import Author, Post, Node
 from rest_framework.test import APITestCase, APIRequestFactory, APIClient
@@ -23,13 +21,9 @@ class APITests(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        self.user1 = mommy.make(User)
-        self.user2 = mommy.make(User)
-        self.user3 = mommy.make(User)
-
-        self.author1 = mommy.make(Author, user=self.user1)
-        self.author2 = mommy.make(Author, user=self.user2)
-        self.author3 = mommy.make(Author, user=self.user3)
+        self.author1 = mommy.make(Author)
+        self.author2 = mommy.make(Author)
+        self.author3 = mommy.make(Author)
 
         self.post1 = mommy.make(Post, author=self.author1)
         self.post2 = mommy.make(Post, author=self.author2)
@@ -39,7 +33,10 @@ class APITests(APITestCase):
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
-                                HTTP_USERNAME="%s" % self.author1.uuid)
+                                HTTP_UUID="%s" % self.author1.uuid)
+
+    def tearDown(self):
+        self.client.credentials()
 
     def testFriend2FriendGetQuerySuccess(self):
         """ Test a successful friend2friend query """
