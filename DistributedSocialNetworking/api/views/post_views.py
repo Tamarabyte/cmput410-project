@@ -2,22 +2,32 @@ from Hindlebook.models import Post, Category, Node, Author
 from api.serializers import PostSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import authentication, permissions, status
+from rest_framework import authentication, permissions, status, exceptions, HTTP_HEADER_ENCODING
+from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
 
-def get_user_header(request):
+def get_uuid_from_header(request):
     """
-    Return request's 'x-user:' header, as a bytestring.
+    Return request's 'x-uuid:' header, as a bytestring.
     Hide some test client ickyness where the header can be unicode.
     """
-    user = request.META.get('HTTP_USERNAME', b'')
+    user = request.META.get('HTTP_UUID', b'')
     if isinstance(user, type('')):
         # Work around django test client oddness
         user = user.encode(HTTP_HEADER_ENCODING)
 
-    user_parts = get_user_header(request).decode(HTTP_HEADER_ENCODING).split(':')
-    return (user_parts[0], user_parts[1])
+    user_parts = user.decode(HTTP_HEADER_ENCODING).split(':')
+
+    if not user_parts or user_parts[0] == '':
+        msg = _('Invalid `uuid` header. No `uuid` header provided.')
+        raise exceptions.AuthenticationFailed(msg)
+
+    if len(user_parts) != 1:
+        msg = _('Invalid `uuid` header format. Expect `uuid`')
+        raise exceptions.AuthenticationFailed(msg)
+
+    return user_parts[0]
 
 
 def get_author(uuid, node):
@@ -33,8 +43,6 @@ class PostDetails(APIView):
     """
     GET, POST, or PUT an author post
     """
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (permissions.AllowAny,)
 
     def add_categories(self, data):
         """
@@ -116,12 +124,15 @@ class AuthoredPosts(APIView):
     GET posts from given author
     """
     def get(self, request, uuid, format=None):
-
         # Get the specified Author
         pageAuthor = get_object_or_404(Author, uuid=uuid)
 
+        # Get info from request
+        uuid = get_uuid_from_header(request)
+        node = request.user
+
         # Get the Author's Posts
-        author = get_author(request.user.get('uuid', None), request.user.get('node', None))
+        author = get_author(uuid, node)
         posts = Post.objects_ext.get_profile_visibile_posts(author, pageAuthor)
 
         # Serialize all of the posts
@@ -154,13 +165,14 @@ class VisiblePosts(APIView):
     """
     GET all posts visbile to the current logged in user
     """
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
+        # Get info from request
+        uuid = get_uuid_from_header(request)
+        node = request.user
 
         # Filter to get all posts visible to the currently authenticated user
-        author = get_author(request.user.get('uuid', None), request.user.get('node', None))
+        author = get_author(uuid, node)
         posts = Post.objects_ext.get_all_visibile_posts(author)
 
         # Serialize all of the posts

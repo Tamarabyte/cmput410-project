@@ -1,6 +1,7 @@
 from rest_framework import permissions
 from django.contrib.auth.models import AnonymousUser
 
+
 class NodeAuthenticatedOrNotRequired(permissions.BasePermission):
     """
     Custom Permissions Class for Nodes

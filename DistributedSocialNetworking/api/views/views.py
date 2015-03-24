@@ -96,9 +96,6 @@ class FriendRequest(APIView):
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
 
-        if (request.user['uuid'] != authorID):
-            return HttpResponse(status=403)
-
         try:
             author = get_object_or_404(Author, uuid=authorID)
             friend = get_object_or_404(Author, uuid=friendID)
@@ -137,9 +134,6 @@ class UnfriendRequest(APIView):
 
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
-
-        if (request.user['uuid'] != authorID):
-            return HttpResponse(status=403)
 
         try:
             author = get_object_or_404(Author, uuid=authorID)
@@ -188,9 +182,6 @@ class FollowRequest(APIView):
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
 
-        if (request.user['uuid'] != authorID):
-            return HttpResponse(status=403)
-
         try:
             author = get_object_or_404(Author, uuid=authorID)
             friend = get_object_or_404(Author, uuid=friendID)
@@ -226,9 +217,6 @@ class UnfollowRequest(APIView):
 
         authorID = JSONrequest['author']['id']
         friendID = JSONrequest['friend']['id']
-
-        if (request.user['uuid'] != authorID):
-            return HttpResponse(status=403)
 
         try:
             author = get_object_or_404(Author, uuid=authorID)
