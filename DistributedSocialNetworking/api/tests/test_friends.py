@@ -1,9 +1,11 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
-from Hindlebook.models import Author, Post
+from Hindlebook.models import Author, Post, Node
+from rest_framework.test import APITestCase, APIRequestFactory, APIClient
 from api.testclient import TestClient, APITestClient
 from api.serializers.post_serializer import PostSerializer
+from api.serializers.author_serializers import AuthorSerializer
 from model_mommy import mommy
 from django.utils.six import BytesIO
 from rest_framework import status
@@ -14,15 +16,13 @@ import json
 import base64
 import uuid as uuid_import
 
-c = TestClient()
-client = APITestClient()
-server = "http://localhost:8000"
-
 
 class APITests(APITestCase):
     """ Test some of the GET/POST API """
 
     def setUp(self):
+        self.client = APIClient()
+
         self.user1 = mommy.make(User)
         self.user2 = mommy.make(User)
         self.user3 = mommy.make(User)
@@ -34,13 +34,20 @@ class APITests(APITestCase):
         self.post1 = mommy.make(Post, author=self.author1)
         self.post2 = mommy.make(Post, author=self.author2)
 
+        self.node1 = mommy.make(Node, host='test', password='test')
+
+        # Set credentials for Node 1
+        # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
+        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
+                                HTTP_USERNAME="%s" % self.author1.uuid)
+
     def testFriend2FriendGetQuerySuccess(self):
         """ Test a successful friend2friend query """
 
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
 
-        response = c.get('/api/friends/%s/%s' % (self.author1.uuid, self.author2.uuid))
+        response = self.client.get('/api/friends/%s/%s' % (self.author1.uuid, self.author2.uuid))
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -65,7 +72,7 @@ class APITests(APITestCase):
 
         JSONdata = json.dumps({"query": "friends", "author": id1, "authors": [fakeUUID, id2, fakeUUID2]})
 
-        response = c.post('/api/friends/%s' % id1, user=self.author1, data=JSONdata, content_type='application/json; charset=utf')
+        response = self.client.post('/api/friends/%s' % id1, user=self.author1, data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -79,26 +86,23 @@ class APITests(APITestCase):
     def testFriendRequestSuccess(self):
         """ Test sending a successful bidirectional friend request """
 
-        authorID1 = str(self.author1.uuid)
-        authorID2 = str(self.author2.uuid)
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
 
-        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
-                               "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
-                                          "url": server + "/author/" + authorID2}})
-        c.login_user(self.author1.user)
+        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
 
-        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         self.assertQuerysetEqual(self.author1.getUnacceptedFriends(), ["<Author: %s>" % self.author2.username])
         self.assertQuerysetEqual(self.author2.getUnacceptedFriends(), [])
 
-        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID2, "host": server, "displayname": self.author2.username},
-                               "friend": {"id": authorID1, "host": server, "displayname": self.author1.username,
-                                          "url": server + "/author/" + authorID1}})
-        c.login_user(self.author2.user)
-        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": author2.data, "friend": author1.data})
+
+        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0', HTTP_USERNAME="%s" % self.author2.uuid)
+
+        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -108,16 +112,13 @@ class APITests(APITestCase):
     def testFriendRequestRepeated(self):
         """ Test sending a friend request multiple times """
 
-        authorID1 = str(self.author1.uuid)
-        authorID2 = str(self.author2.uuid)
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
 
         for i in range(0, 3):
-            JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
-                                   "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
-                                              "url": server + "/author/" + authorID2}})
-            c.login_user(self.author1.user)
+            JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
 
-            response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+            response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
             self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -128,15 +129,12 @@ class APITests(APITestCase):
     def testFriendRequestFollows(self):
         """ Test sending a friend request will follow that person """
 
-        authorID1 = str(self.author1.uuid)
-        authorID2 = str(self.author2.uuid)
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
 
-        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
-                               "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
-                                          "url": server + "/author/" + authorID2}})
-        c.login_user(self.author1.user)
+        JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
 
-        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -145,13 +143,15 @@ class APITests(APITestCase):
 
     def testIllegalFriendRequest(self):
         """ Test sending a friend request from the not currently logged in user """
-        authorID1 = str(self.author1.uuid)
-        authorID2 = str(self.author2.uuid)
-        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
-                               "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
-                                          "url": server + "/author/" + authorID2}})
-        c.login_user(self.author2.user)
-        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
+
+        JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
+
+        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0', HTTP_USERNAME="%s" % self.author2.uuid)
+
+        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
         # This should probably be a 403 - Forbidden? If logged in as wrong user?
         self.assertNotEquals(response.status_code, 200, "Response should not be 200 Ok")
