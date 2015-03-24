@@ -387,7 +387,8 @@ float: right!important;
 
 .profile-banner {
     width: 100%;
-    background-color: #1b1b1b;
+    background-color: #444;
+    background-border: #444;
     color: #fff;
     padding: 15px 50px 50px;
     border-radius: 40px;

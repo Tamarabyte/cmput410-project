@@ -39,7 +39,7 @@ class PostSerializer(serializers.ModelSerializer):
         host = author_data.get('node')
         username = author_data.get('username')
 
-        author = Author.object.filter(uuid=uuid).first()
+        author = Author.objects.filter(uuid=uuid).first()
 
         if author is None:
             # New foreign author

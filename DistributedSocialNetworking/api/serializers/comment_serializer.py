@@ -1,6 +1,6 @@
 from django.forms import widgets
 from rest_framework import serializers
-from Hindlebook.models import User, Comment
+from Hindlebook.models import Comment
 from api.serializers import AuthorSerializer
 
 

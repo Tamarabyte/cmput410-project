@@ -6,16 +6,12 @@ from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 
 import dateutil
 import datetime
 
 from Hindlebook.models import Post, Author, Comment
 from Hindlebook.forms import ProfileEditForm, CommentForm
-
-User = get_user_model()
-
 
 class ProfileView(TemplateView):
     template_name = 'profile.html'
@@ -27,20 +23,20 @@ class ProfileView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
-        profile_user = Author.objects.filter(uuid=authorUUID)
+        profile_author = Author.objects.filter(uuid=authorUUID)
 
         if (self.request.user.author.uuid == authorUUID):
-            context['author_form'] = ProfileEditForm(instance=self.request.user)
+            context['author_form'] = ProfileEditForm(instance=self.request.user.author)
 
         context['author'] = get_object_or_404(Author, uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user.author, page_user=profile_user )
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
         context['comment_form'] = CommentForm()
 
-        if self.request.user in list(context["author"].followed_by.all()):
+        if self.request.user.author in list(context["author"].followed_by.all()):
             context['isFollowing'] = 1
         else:
             context['isFollowing'] = 0
-        if self.request.user in list(context["author"].friends_of.all()):
+        if self.request.user.author in list(context["author"].friends_of.all()):
             context['isFriends'] = 1
         else:
             context['isFriends'] = 0
@@ -49,13 +45,13 @@ class ProfileView(TemplateView):
 
     def post(self, *args, **kwargs):
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
-        page_user = get_object_or_404(Author, uuid=authorUUID)
+        page_author = get_object_or_404(Author, uuid=authorUUID)
         posts = []
         comments = []
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        all_posts = Post.objects_ext.get_all_visibile_posts(active_user=self.request.user.author, page_user=page_user, reversed=False, min_time=time)
+        all_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, page_author=page_author, reversed=False, min_time=time)
         for post in all_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
             response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
@@ -108,7 +104,7 @@ class ProfileStreamView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProfileStreamView, self).get_context_data(**kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
-        profile_user = Author.objects.filter(uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_user=self.request.user.author, page_user=profile_user)
+        profile_author = Author.objects.filter(uuid=authorUUID)
+        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author)
         context['comment_form'] = CommentForm()
         return context

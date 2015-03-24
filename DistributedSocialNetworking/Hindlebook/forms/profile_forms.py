@@ -20,4 +20,3 @@ class FriendRequestForm(forms.ModelForm):
     class Meta:
         model = Author
         fields = ['follows', 'uuid']
-        # exclude = ('username', 'password', 'uuid')

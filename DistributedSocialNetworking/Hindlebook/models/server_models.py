@@ -27,8 +27,5 @@ class Settings(models.Model):
 
     connection_limit = models.IntegerField(blank=True, default=10)
 
-    def __str__(self):
-        return self.host
-
     class Meta:
         verbose_name_plural = "Settings"
