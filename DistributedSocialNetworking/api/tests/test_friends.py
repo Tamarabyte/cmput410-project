@@ -25,10 +25,13 @@ class APITests(APITestCase):
 
         self.node1 = mommy.make(Node, host='test', password='test')
 
+        self.login(self.author1)
+
+    def login(self, author):
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
-                                HTTP_UUID="%s" % self.author1.uuid)
+                                HTTP_UUID="%s" % author.uuid)
 
     def testFriend2FriendGetQuerySuccess(self):
         """
@@ -95,7 +98,7 @@ class APITests(APITestCase):
 
         JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": author2.data, "friend": author1.data})
 
-        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0', HTTP_USERNAME="%s" % self.author2.uuid)
+        self.login(self.author2)
 
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
@@ -150,7 +153,7 @@ class APITests(APITestCase):
 
         JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
 
-        self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0', HTTP_USERNAME="%s" % self.author2.uuid)
+        self.login(self.author2)
 
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
