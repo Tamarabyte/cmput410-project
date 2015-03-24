@@ -1,10 +1,8 @@
 from Hindlebook.models import Author, Post, Node
-from api.serializers import PostSerializer, AuthorSerializer
+from api.serializers import PostSerializer
 from model_mommy import mommy
-from rest_framework.test import APITestCase, APIRequestFactory, APIClient
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
-from django.forms.models import model_to_dict
-import json
 import base64
 
 
@@ -15,7 +13,6 @@ class PostApiTests(APITestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.factory = APIRequestFactory()
 
         # Create Authors
         self.author1 = mommy.make(Author)
@@ -39,9 +36,6 @@ class PostApiTests(APITestCase):
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
                                 HTTP_UUID="%s" % self.author1.uuid)
-
-    def tearDown(self):
-        self.client.credentials()
 
     def testGETPublicPosts(self):
         """

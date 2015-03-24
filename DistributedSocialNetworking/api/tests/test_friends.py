@@ -1,22 +1,17 @@
-from rest_framework.test import APITestCase
 from Hindlebook.models import Author, Post, Node
-from rest_framework.test import APITestCase, APIRequestFactory, APIClient
-from api.testclient import TestClient, APITestClient
-from api.serializers.post_serializer import PostSerializer
-from api.serializers.author_serializers import AuthorSerializer
+from rest_framework.test import APITestCase, APIClient
+from api.serializers import AuthorSerializer
 from model_mommy import mommy
-from django.utils.six import BytesIO
 from rest_framework import status
-from django.conf import settings
-from django.contrib.auth import login
-from django.http import HttpRequest
 import json
 import base64
 import uuid as uuid_import
 
 
 class APITests(APITestCase):
-    """ Test some of the GET/POST API """
+    """
+    Test some of the Friends API
+    """
 
     def setUp(self):
         self.client = APIClient()
@@ -35,11 +30,10 @@ class APITests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
                                 HTTP_UUID="%s" % self.author1.uuid)
 
-    def tearDown(self):
-        self.client.credentials()
-
     def testFriend2FriendGetQuerySuccess(self):
-        """ Test a successful friend2friend query """
+        """
+        Test a successful friend2friend query
+        """
 
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
@@ -56,7 +50,9 @@ class APITests(APITestCase):
         self.assertEquals(decoded['friends'], "YES", "Authors are not friends but should be")
 
     def testFriendQueryPostSuccessOneFriend(self):
-        """ Test a successful friend query with one friend in list """
+        """
+        Test a successful friend query with one friend in list
+        """
 
         id1 = str(self.author1.uuid)
         id2 = str(self.author2.uuid)
@@ -81,7 +77,9 @@ class APITests(APITestCase):
         self.assertEquals(decoded['friends'][0], id2, "Authors are not friends but they should be")
 
     def testFriendRequestSuccess(self):
-        """ Test sending a successful bidirectional friend request """
+        """
+        Test sending a successful bidirectional friend request
+        """
 
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
@@ -107,7 +105,9 @@ class APITests(APITestCase):
         self.assertQuerysetEqual(self.author2.getFriends(), ["<Author: %s>" % self.author1.username])
 
     def testFriendRequestRepeated(self):
-        """ Test sending a friend request multiple times """
+        """
+        Test sending a friend request multiple times
+        """
 
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
@@ -124,7 +124,9 @@ class APITests(APITestCase):
             self.assertQuerysetEqual(self.author2.getUnacceptedFriends(), [])
 
     def testFriendRequestFollows(self):
-        """ Test sending a friend request will follow that person """
+        """
+        Test sending a friend request will follow that person
+        """
 
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
@@ -139,7 +141,9 @@ class APITests(APITestCase):
         self.assertQuerysetEqual(self.author2.follows.all(), [])
 
     def testIllegalFriendRequest(self):
-        """ Test sending a friend request from the not currently logged in user """
+        """
+        Test sending a friend request from the not currently logged in user
+        """
 
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
