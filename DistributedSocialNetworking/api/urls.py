@@ -6,8 +6,8 @@ from api.routers import CustomSimpleRouter
 
 urlpatterns = [
     # GET, POST, PUT for posts by ID
-    # url(r'^post/(?P<postID>[-\w]+)$', views.PostDetail.as_view(), name='postByID'),
     url(r'^post/(?P<guid>[-\w]+)$', PostDetails.as_view(), name='postByID'),
+    url(r'^posts/(?P<guid>[-\w]+)$', PostDetails.as_view(), name='postByID'),
 
     # GET for friend2friend querying
     url(r'^friends/(?P<authorID1>[-\w]+)/(?P<authorID2>[-\w]+)$', views.Friend2Friend.as_view(), name='friend2friend'),
