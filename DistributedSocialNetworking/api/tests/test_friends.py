@@ -105,6 +105,44 @@ class APITests(APITestCase):
         self.assertQuerysetEqual(self.author1.getFriends(), ["<Author: %s>" % self.author2.username])
         self.assertQuerysetEqual(self.author2.getFriends(), ["<Author: %s>" % self.author1.username])
 
+    def testFriendRequestRepeated(self):
+        """ Test sending a friend request multiple times """
+
+        authorID1 = str(self.author1.uuid)
+        authorID2 = str(self.author2.uuid)
+
+        for i in range(0, 3):
+            JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
+                                   "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
+                                              "url": server + "/author/" + authorID2}})
+            c.login_user(self.author1.user)
+
+            response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+
+            self.assertEquals(response.status_code, 200, "Response not 200")
+
+            self.assertEqual(len(self.author1.friends.all()), 1)
+            self.assertQuerysetEqual(self.author1.getUnacceptedFriends(), ["<Author: %s>" % self.author2.username])
+            self.assertQuerysetEqual(self.author2.getUnacceptedFriends(), [])
+
+    def testFriendRequestFollows(self):
+        """ Test sending a friend request will follow that person """
+
+        authorID1 = str(self.author1.uuid)
+        authorID2 = str(self.author2.uuid)
+
+        JSONdata = json.dumps({"query": "friendrequest", "author": {"id": authorID1, "host": server, "displayname": self.author1.username},
+                               "friend": {"id": authorID2, "host": server, "displayname": self.author2.username,
+                                          "url": server + "/author/" + authorID2}})
+        c.login_user(self.author1.user)
+
+        response = c.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+
+        self.assertEquals(response.status_code, 200, "Response not 200")
+
+        self.assertQuerysetEqual(self.author1.follows.all(), ["<Author: %s>" % self.author2.username])
+        self.assertQuerysetEqual(self.author2.follows.all(), [])
+
     def testIllegalFriendRequest(self):
         """ Test sending a friend request from the not currently logged in user """
         authorID1 = str(self.author1.uuid)

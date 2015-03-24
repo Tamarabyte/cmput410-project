@@ -3,7 +3,6 @@ from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
 from Hindlebook.models import Post
 from Hindlebook.models import Author, Post
-# from Hindlebook.serializers import PostSerializer
 from api.serializers.post_serializer import PostSerializer
 import json
 
@@ -14,6 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
+
 
 class Friend2Friend(APIView):
     """ GET a friend2friend query """
@@ -46,7 +46,7 @@ class FriendQuery(APIView):
         JSONrequest = json.loads(request.body.decode('utf-8'))
 
         if ('author' not in JSONrequest):
-              HttpResponse(status=400)
+            return HttpResponse(status=400)
         elif ('authors' not in JSONrequest):
             return HttpResponse(status=400)
         elif (type(JSONrequest['authors']) is not list):
@@ -105,10 +105,14 @@ class FriendRequest(APIView):
 
             if (friend not in author.friends.all()):
                 author.friends.add(friend)
+
+            if (friend not in author.follows.all()):
+                author.follows.add(friend)
         except:
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
+
 
 class UnfriendRequest(APIView):
     """ POST an unfriend query """
@@ -153,6 +157,7 @@ class UnfriendRequest(APIView):
 
         return HttpResponse(status=200)
 
+
 class FollowRequest(APIView):
     """ POST a follow query """
 
@@ -190,6 +195,7 @@ class FollowRequest(APIView):
             return HttpResponse(status=404)
 
         return HttpResponse(status=200)
+
 
 class UnfollowRequest(APIView):
     """ POST a unfollow query """
