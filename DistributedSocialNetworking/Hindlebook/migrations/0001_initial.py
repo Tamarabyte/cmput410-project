@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import uuid
 import Hindlebook.models.validators
+import uuid
 from django.conf import settings
 
 
@@ -17,13 +17,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Author',
             fields=[
-                ('about', models.CharField(max_length=250, blank=True, default='')),
-                ('uuid', models.CharField(serialize=False, validators=[Hindlebook.models.validators.UuidValidator()], blank=True, primary_key=True, max_length=40, default=uuid.uuid4)),
+                ('about', models.CharField(default='', max_length=250, blank=True)),
+                ('uuid', models.CharField(validators=[Hindlebook.models.validators.UuidValidator()], primary_key=True, default=uuid.uuid4, max_length=40, serialize=False, blank=True)),
                 ('username', models.CharField(verbose_name='username', max_length=30)),
-                ('github_id', models.CharField(max_length=30, blank=True, default='')),
-                ('avatar', models.ImageField(blank=True, default='default_avatar.jpg', upload_to='')),
-                ('is_foreign', models.BooleanField(default=False)),
-                ('follows', models.ManyToManyField(to='Hindlebook.Author', blank=True, db_index=True, related_name='followed_by')),
+                ('github_id', models.CharField(default='', max_length=30, blank=True)),
+                ('avatar', models.ImageField(default='default_avatar.jpg', upload_to='', blank=True)),
+                ('date_added', models.DateTimeField(auto_now_add=True)),
+                ('follows', models.ManyToManyField(db_index=True, related_name='followed_by', blank=True, to='Hindlebook.Author')),
+                ('friends', models.ManyToManyField(db_index=True, related_name='friends_of', blank=True, to='Hindlebook.Author')),
             ],
             options={
             },
@@ -32,7 +33,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Category',
             fields=[
-                ('tag', models.CharField(serialize=False, max_length=25, primary_key=True)),
+                ('tag', models.CharField(max_length=25, serialize=False, primary_key=True)),
             ],
             options={
                 'verbose_name': 'Tags',
@@ -43,10 +44,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Comment',
             fields=[
-                ('guid', models.CharField(serialize=False, validators=[Hindlebook.models.validators.UuidValidator()], blank=True, primary_key=True, max_length=40, default=uuid.uuid4)),
+                ('guid', models.CharField(validators=[Hindlebook.models.validators.UuidValidator()], primary_key=True, default=uuid.uuid4, max_length=40, serialize=False, blank=True)),
                 ('comment', models.CharField(max_length=2048)),
-                ('pubDate', models.DateTimeField(verbose_name='date published', auto_now_add=True, db_index=True)),
-                ('author', models.ForeignKey(blank=True, related_name='comments', to='Hindlebook.Author', null=True)),
+                ('pubDate', models.DateTimeField(verbose_name='date published', db_index=True, auto_now_add=True)),
+                ('author', models.ForeignKey(related_name='comments', to='Hindlebook.Author')),
             ],
             options={
             },
@@ -55,7 +56,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Image',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
                 ('image', models.ImageField(upload_to='')),
                 ('date_added', models.DateTimeField(auto_now_add=True)),
             ],
@@ -66,12 +67,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Node',
             fields=[
-                ('host', models.CharField(serialize=False, max_length=100, unique=True, primary_key=True)),
-                ('host_name', models.CharField(max_length=50, blank=True, default='')),
+                ('host', models.CharField(max_length=100, unique=True, serialize=False, primary_key=True)),
+                ('host_name', models.CharField(default='', max_length=50, blank=True)),
                 ('share_posts', models.BooleanField(default=True)),
                 ('share_images', models.BooleanField(default=True)),
                 ('require_auth', models.BooleanField(default=True)),
-                ('password', models.CharField(max_length=128, blank=True, default='')),
+                ('password', models.CharField(default='', max_length=128, blank=True)),
             ],
             options={
             },
@@ -80,17 +81,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Post',
             fields=[
-                ('guid', models.CharField(serialize=False, validators=[Hindlebook.models.validators.UuidValidator()], blank=True, primary_key=True, max_length=40, default=uuid.uuid4)),
-                ('source', models.CharField(max_length=100, blank=True, default='Unknown source')),
-                ('origin', models.CharField(max_length=100, blank=True, default='Unknown origin')),
-                ('title', models.CharField(max_length=40, blank=True, default='No title')),
-                ('description', models.CharField(max_length=40, blank=True, default='No description')),
+                ('guid', models.CharField(validators=[Hindlebook.models.validators.UuidValidator()], primary_key=True, default=uuid.uuid4, max_length=40, serialize=False, blank=True)),
+                ('source', models.CharField(default='Unknown source', max_length=100, blank=True)),
+                ('origin', models.CharField(default='Unknown origin', max_length=100, blank=True)),
+                ('title', models.CharField(default='No title', max_length=40, blank=True)),
+                ('description', models.CharField(default='No description', max_length=40, blank=True)),
                 ('content', models.TextField()),
-                ('pubDate', models.DateTimeField(verbose_name='date published', auto_now_add=True, db_index=True)),
-                ('content_type', models.CharField(max_length=15, choices=[('text/plain', 'text/plain'), ('text/x-markdown', 'text/x-markdown'), ('text/html', 'text/html')], blank=True, default='text/html')),
-                ('visibility', models.CharField(max_length=10, choices=[('PUBLIC', 'PUBLIC'), ('FOAF', 'FOAF'), ('FRIENDS', 'FRIENDS'), ('PRIVATE', 'PRIVATE'), ('SERVERONLY', 'SERVERONLY')], default='PUBLIC', db_index=True)),
-                ('author', models.ForeignKey(blank=True, related_name='posts', to='Hindlebook.Author', null=True)),
-                ('categories', models.ManyToManyField(to='Hindlebook.Category', blank=True, related_name='tagged_posts')),
+                ('pubDate', models.DateTimeField(verbose_name='date published', db_index=True, auto_now_add=True)),
+                ('content_type', models.CharField(default='text/html', max_length=15, choices=[('text/plain', 'text/plain'), ('text/x-markdown', 'text/x-markdown'), ('text/html', 'text/html')], blank=True)),
+                ('visibility', models.CharField(default='PUBLIC', max_length=10, choices=[('PUBLIC', 'PUBLIC'), ('FOAF', 'FOAF'), ('FRIENDS', 'FRIENDS'), ('PRIVATE', 'PRIVATE'), ('SERVERONLY', 'SERVERONLY')], db_index=True)),
+                ('author', models.ForeignKey(related_name='posts', to='Hindlebook.Author')),
+                ('categories', models.ManyToManyField(related_name='tagged_posts', blank=True, to='Hindlebook.Category')),
             ],
             options={
             },
@@ -99,8 +100,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Settings',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('connection_limit', models.IntegerField(blank=True, default=10)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
+                ('connection_limit', models.IntegerField(default=10, blank=True)),
             ],
             options={
                 'verbose_name_plural': 'Settings',
@@ -116,19 +117,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='post',
-            field=models.ForeignKey(to='Hindlebook.Post', related_name='comments'),
+            field=models.ForeignKey(related_name='comments', to='Hindlebook.Post'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='author',
             name='node',
-            field=models.ForeignKey(to='Hindlebook.Node', related_name='users'),
+            field=models.ForeignKey(related_name='authors', to='Hindlebook.Node'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='author',
             name='user',
-            field=models.OneToOneField(blank=True, to=settings.AUTH_USER_MODEL, null=True),
+            field=models.OneToOneField(null=True, related_name='author', blank=True, to=settings.AUTH_USER_MODEL),
             preserve_default=True,
         ),
     ]

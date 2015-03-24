@@ -31,9 +31,6 @@ urlpatterns = patterns('',
     # Friends URLs
     url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsListView.as_view(), name='friends_view'),
 
-    # Search URLs
-    url(r'^search$', 'Hindlebook.views.search', name="search"),
-
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

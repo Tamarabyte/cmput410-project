@@ -4,7 +4,7 @@ from rest_framework import exceptions, HTTP_HEADER_ENCODING
 from rest_framework.authentication import BaseAuthentication
 from django.contrib.auth import authenticate
 import base64
-from Hindlebook.models import Server, Node
+from Hindlebook.models import Node
 
 
 def get_authorization_header(request):

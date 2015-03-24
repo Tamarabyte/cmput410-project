@@ -6,5 +6,11 @@
       "host_name": "Hindlebook",
       "password" : ""
     }
+  },
+  {
+    "model": "Hindlebook.settings",
+    "fields": {
+      "connection_limit": "10"
+    }
   }
 ]
