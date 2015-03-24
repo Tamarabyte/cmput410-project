@@ -50,7 +50,7 @@ class ExtendedPostManager(models.Manager):
 
         #  Is the active user the user they are looking at
         if active_author == page_author:
-            return Post.objects.filter(author=page_author).ordered_by(-pubDate)
+            return Post.objects.filter(author=page_author).order_by('-pubDate')
 
         #  Get list of friends
         friends = active_author.getFriends()
