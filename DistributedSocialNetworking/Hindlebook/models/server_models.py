@@ -17,6 +17,10 @@ class Node(models.Model):
 
     # password to access this node
     password = models.CharField(max_length=128, blank=True, default="")
+    
+    our_username = models.CharField(max_length=128, blank=True, default="")
+    our_password = models.CharField(max_length=128, blank=True, default="")
+    
 
     def __str__(self):
         return self.host
