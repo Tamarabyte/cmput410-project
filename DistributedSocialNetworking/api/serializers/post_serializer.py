@@ -1,8 +1,7 @@
 from django.forms import widgets
 from rest_framework import serializers
 from Hindlebook.models import Post, Comment, Node, Category, Author
-from api.serializers import AuthorSerializer
-from api.serializers.comment_serializer import CommentSerializer
+from api.serializers import AuthorSerializer, CommentSerializer, NonSavingCommentSerializer
 from django.shortcuts import get_object_or_404
 
 
@@ -38,12 +37,16 @@ class PostSerializer(serializers.ModelSerializer):
         uuid = author_data.get('uuid')
         host = author_data.get('node')
         username = author_data.get('username')
-        #TODO FIX ME BUG THIS DOESNT SAVE IT WHAT THE FUCK MARK
-        author = Author.objects.filter(uuid=uuid).first()
 
+        node = Node.objects.filter(node=host).first()
+        if node is None:
+            raise serializers.ValidationError('Unknownlol Host: %s' host)
+
+
+        author = Author.objects.filter(uuid=uuid).first()
         if author is None:
             # New foreign author
-            author = Author(uuid=uuid, host=host, username=username)
+            author = Author.objects.create(uuid=uuid, node=node, username=username)
 
         return author
 
@@ -127,8 +130,8 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         author = Author.objects.filter(uuid=uuid).first()
 
         if author is None:
-            # New foreign author BUG THIS DOESNT SAVE IT WHAT THE FUCK MARK
-            author = Author(uuid=uuid, host=host, username=username)
+            # New foreign author
+            author = Author(uuid=uuid, node=host, username=username)
 
         return author
 
@@ -136,12 +139,9 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         """
         Creates the comments for `post` stored in `comment_data`
         """
-        for comment in comment_data:
-            author = comment.pop('author', None)
-            if author is None:
-                raise serializers.ValidationError('The Author field of a Comment is required.')
-            author = self.get_author(author)
-            Comment.objects.create(author=author, post=post, **comment)
+        serializer = NonSavingCommentSerializer(data=comment_data, many=True)
+        serializer.is_valid(raise_exceptions=True)
+        post.comments_set.add(serializer.save())
 
     def create(self, validated_data):
         """
@@ -164,7 +164,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
             post.categories.add(category)
 
         # Create the comments
-        # self.create_comments(post, comment_data)
+        self.create_comments(post, comment_data)
 
         return post
 
