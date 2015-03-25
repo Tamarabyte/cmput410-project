@@ -1,12 +1,13 @@
 import json
-
-
-from Hindlebook.models import Node, Author, Settings, Post
-from api.requests.authored_posts_factory import AuthoredPostsRequestFactory
-from api.requests.visible_posts_factory import VisiblePostsRequestFactory
-from api.serializers import NonSavingPostSerializer
+import requests
 import datetime
 import dateutil.parser
+
+from Hindlebook.models import Node, Author, Settings, Post
+from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
+from api.serializers import NonSavingPostSerializer
+
+
 # Key for the Request Factories
 #
 # Appending .json() to the end of these gets the json
@@ -32,44 +33,20 @@ import dateutil.parser
 # Module to hold outgoing API calls to get various info from other services.
 
 
-def author_update_or_create(uuid,host):
+def author_update_or_create(targetUUID,node):
     author = None
+
+    obj = ProfileRequestFactory.create(node.host).get(targetUUID).json()
     try:
-        url = host + "/api/author/" +uuid
-        print(url)
-        response = urlopen(url)
-        str_response = response.readall().decode('utf-8')
-        obj = json.loads(str_response)
-        node = None
-        try:
-            node = Node.objects.get(host = host)
-        except:
-            raise Exception("Failure finding node: %s" % host)
-        if obj != None:
-            # for some reason model has author.uuid but
-            # outputted json is author.id so yeah...
-            # same with username/displayname
-            obj['uuid'] = obj['id']
-            #This should probably get grabbed from like a global var,
-            # not be hardcoded but whatever.
-            obj['avatar'] = 'default_avatar.jpg'
-            obj['host'] = node.host
-            try:
-                author = Author.objects.get(uuid=uuid,node = node)
-                author.github_id = obj['github_id']
-                author.about = obj['about']
-                author.username = obj['displayname']
-                author.avatar = obj['avatar']
-                author.save()
-            except Author.DoesNotExist:
-                author= Author.objects.create(uuid=uuid,username=obj['displayname'],
-                                                node=node,about=obj["about"],
-                                                avatar=obj['avatar'],github_id=obj['github_id'])
-                author.save()
-    except HTTPError as e:
-        # Catch any pesky errors from other sites being down
-        print("Http error getting stuff: " + type(e))
-        pass
+        author = Author.objects.get(uuid=targetUUID,node = node)
+        author.github_id = obj['github_id']
+        author.about = obj['about']
+        author.username = obj['displayname']
+        author.save()
+    except Author.DoesNotExist:
+        author= Author.objects.create(uuid=targetUUID,username=obj['displayname'],
+                                        node=node,about=obj["about"],github_id=obj['github_id'])
+        author.save()
     return author
 
 
@@ -104,8 +81,7 @@ def getForeignStreamPosts(uuid,min_time):
                 else:
                     posts.append(post)
             except Exception as e:
-                print(str(e))
-                
+                print(str(e))    
     return posts
 
 
@@ -113,11 +89,7 @@ def getForeignStreamPosts(uuid,min_time):
 def getForeignAuthor(uuid,host="http://dev.tamarabyte.com"):
     author = None
     try:
-        url = host + "/api/author/" +uuid
-        print(url)
-        response = urlopen(url)
-        str_response = response.readall().decode('utf-8')
-        obj = json.loads(str_response)
+       
         node = None
         try:
             node = Node.objects.get(host = host)
