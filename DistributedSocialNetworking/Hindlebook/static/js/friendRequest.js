@@ -197,7 +197,7 @@ function friend() {
         }
         $("#friend-icon").toggleClass("icon-favourite-3 icon-broken-heart");
         $("#friend-icon").attr("onclick","unfriend()");
-        if (authorHost != "localhost") {
+        if (isForeign) {
             console.log("wtf")
             $.ajax({
                 clearForm : false,

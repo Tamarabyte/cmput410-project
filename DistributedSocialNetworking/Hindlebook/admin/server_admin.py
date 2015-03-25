@@ -8,9 +8,13 @@ class NodeAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('host_name', 'host')
+    list_display = ('host_name', 'host', 'get_primarykey')
     ordering = ('host_name', )
 
+
+    def get_primarykey(self, obj):
+        return obj.pk
+    get_primarykey.short_description = 'Primary Key'
 
 class SettingsAdmin(ModelAdmin):
 
@@ -20,4 +24,4 @@ class SettingsAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('connection_limit',)
+    list_display = ('node', 'connection_limit',)

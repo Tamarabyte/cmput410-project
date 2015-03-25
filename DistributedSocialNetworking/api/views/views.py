@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import Author, Post
+from Hindlebook.models import Author, Post, Settings
 from api.serializers import PostSerializer, FriendQuerySerializer
 import json
 
@@ -32,8 +32,6 @@ class Friend2Friend(APIView):
             friends = "NO"
 
         return JsonResponse({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
-
-
 
 class UnfriendRequest(APIView):
     """ POST an unfriend query """
