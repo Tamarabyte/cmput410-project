@@ -80,7 +80,7 @@ class APITests(APITestCase):
 
         decoded = json.loads(response.content.decode('utf-8'))
 
-        # Ensure the response only includes the real friend     
+        # Ensure the response only includes the real friend
         self.assertEquals(decoded['query'], "friends", "JSON response needs \"query\":\"friends\"")
         self.assertEquals(decoded['author'], id1, "Author has incorrect ID")
         self.assertEquals(len(decoded['friends']), 1, "Author should have exactly one friend")
@@ -160,24 +160,6 @@ class APITests(APITestCase):
         # Make sure sending a friend request will also follow that author
         self.assertQuerysetEqual(self.author1.follows.all(), ["<Author: %s>" % self.author2.username])
         self.assertQuerysetEqual(self.author2.follows.all(), [])
-
-    def testFriendRequestUnathenticated(self):
-        """
-        Test sending a friend request not authenticated
-        """
-
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
-        JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
-
-        # No longer have valid authentication
-        self.client.credentials()
-
-        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
-
-        # The server should not let unauthenticated users post friend requests
-        self.assertEquals(response.status_code, 401, "Response should be 401")
 
     def testFriendRequestFriendNotFound(self):
         """
