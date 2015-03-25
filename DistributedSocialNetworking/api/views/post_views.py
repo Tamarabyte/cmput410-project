@@ -148,7 +148,7 @@ class PublicPosts(APIView):
     """
 
     # Because public
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, format=None):
         # Filter to get public posts

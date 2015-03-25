@@ -94,25 +94,3 @@ class FriendRequestSerializer(serializers.Serializer):
 
     def validate_friend(self, value):
         return self.author_validator(value)
-
-    def save(self):
-        """
-        Complete the friend request and issue to foreign node if necessary
-        """
-        author = self.validated_data['author']
-        friend = self.validated_data['friend']
-
-        # Test if both authors are foreign
-        if author.user is None and friend.user is None:
-            return False
-
-        # If Target is foreign, echo the friend request
-        # TODO: FIX ME: Insert call to foreign Node
-
-        if (friend not in author.friends.all()):
-            author.friends.add(friend)
-
-        if (friend not in author.follows.all()):
-            author.follows.add(friend)
-
-        return True

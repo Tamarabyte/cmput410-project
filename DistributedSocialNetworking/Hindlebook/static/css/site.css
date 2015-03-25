@@ -44,6 +44,13 @@ a {
     border-color: #444;
 }
 
+.post-block {
+    padding-top: 20px;
+    padding-bottom: 15px;
+    padding-right: 5px;
+    padding-left: 0;
+}
+
 .auth-forms .control-label {
     font-size: 22px;
     color: #333;
@@ -335,6 +342,7 @@ float: right!important;
     top: -20px;
     right: -20px;
     font-size: 16px;
+    color: #FFF;
 }
 
 .post-content {
@@ -356,8 +364,7 @@ float: right!important;
 .comment-block {
     border-radius: 20px;
     border: 2px solid #bbb;
-    padding-left: 40px;
-    padding-right: 30px;
+    padding: 15px;
 }
 
 .comment-author {
@@ -367,7 +374,8 @@ float: right!important;
 
 .comment-date {
     padding-bottom: 5px;
-    padding-left: 5px;
+    padding-left: 20px;
+    color: #3197B5;
 }
 
 .comment-block a:hover, .comment-block a:focus {

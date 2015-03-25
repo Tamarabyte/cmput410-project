@@ -97,7 +97,7 @@ class Post(models.Model):
     content_type_choices = (("text/plain", "text/plain"), ("text/x-markdown", "text/x-markdown"), ("text/html", "text/html"))
     content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/html")
 
-    visibility_choices = (("PUBLIC", "PUBLIC"), ("FOAF", "FOAF"), ("FRIENDS", "FRIENDS"), ("PRIVATE", "PRIVATE"), ("SERVERONLY", "SERVERONLY"))
+    visibility_choices = (("PUBLIC", "Public"), ("FOAF", "Friends of Friends Only"), ("FRIENDS", "Friends Only"), ("PRIVATE", "Private"), ("SERVERONLY", "Server Only"))
     visibility = models.CharField(default="PUBLIC", max_length=10, blank=False, choices=visibility_choices, db_index=True)
 
     def __str__(self):

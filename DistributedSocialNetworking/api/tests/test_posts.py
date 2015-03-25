@@ -19,7 +19,7 @@ class PostApiTests(APITestCase):
         self.author2 = mommy.make(Author)
         self.author3 = mommy.make(Author)
 
-        # Create Private Posts
+        # Create Public Posts
         self.post1_by_a1 = mommy.make(Post, author=self.author1)
         self.post2_by_a1 = mommy.make(Post, author=self.author1)
         self.post1_by_a2 = mommy.make(Post, author=self.author2)
