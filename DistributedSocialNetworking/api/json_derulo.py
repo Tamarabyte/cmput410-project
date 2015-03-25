@@ -34,6 +34,8 @@ from api.serializers import NonSavingPostSerializer
 
 
 def author_update_or_create(targetUUID,node):
+    ''' Takes in a uuid and a node and update or creates that author in our
+        DB after requesting the info from that node '''
     author = None
 
     obj = ProfileRequestFactory.create(node.host).get(targetUUID).json()
@@ -50,13 +52,18 @@ def author_update_or_create(targetUUID,node):
     return author
 
 
-def getForeignAuthorPosts(uuid, host):
-    raise Exception("getForeignAuthorPosts not implemented")
-    postsJSON = AuthoredPostsRequestFactory.create(host).get(self.request.user.author, uuid).json()
-    
-    return postsJSON
+def getForeignAuthorPosts(requesterUuid,targetUuid, node):
+    ''' Gets all posts created by targetUuid a user on host node that
+        are visible by logged in user requestUuid and returns them '''
+    postsJSON = AuthoredPostsRequestFactory.create(node.host).get(requesterUuid,
+                                                                    targetUuid).json()
+    serializer = NonSavingPostSerializer(data=postsJSON["posts"],many=True)
+    posts = None
+    if serializer.is_valid(raise_exception=True):
+        posts = serializer.save()
+    return posts
 
-def getForeignStreamPosts(uuid,min_time):
+def getForeignStreamPosts(userUuid,min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
         by uuid's stream. Should be called to create the stream for user uuid 
         returns a list of post objects.'''
@@ -65,7 +72,7 @@ def getForeignStreamPosts(uuid,min_time):
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
             continue
-        postsJSON = VisiblePostsRequestFactory.create(node.host,uuid).get(uuid).json()
+        postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
         try:
             serializer = NonSavingPostSerializer(data=postsJSON["posts"],many=True)
             if serializer.is_valid(raise_exception=True):
@@ -73,52 +80,31 @@ def getForeignStreamPosts(uuid,min_time):
         except Exception as e:
             print("exception raised!")
             print(str(e))
-        for post in newposts:
-            try:
-                if min_time != None:
-                    if post.pubDate > min_time:
-                        posts.append(post)
-                else:
-                    posts.append(post)
-            except Exception as e:
-                print(str(e))    
+        if min_time != None:
+            posts += filter(lambda p: p.pubDate > min_time,newposts)
+        else:
+            posts += newposts
     return posts
 
 
 
-def getForeignAuthor(uuid,host="http://dev.tamarabyte.com"):
+def getForeignAuthor(uuid):
     author = None
-    try:
-       
-        node = None
+    for node in Node.objects.all():
+        if node == Settings.objects.all().first().node:
+            continue
+        obj = ProfileRequestFactory.create(node.host).get(uuid).json()
         try:
-            node = Node.objects.get(host = host)
-        except:
-            raise Exception("Failure finding node: %s" % host)
-        if obj != None:
-            # for some reason model has author.uuid but
-            # outputted json is author.id so yeah...
-            # same with username/displayname
-            obj['uuid'] = obj['id']
-            #This should probably get grabbed from like a global var,
-            # not be hardcoded but whatever.
-            obj['avatar'] = 'default_avatar.jpg'
-            obj['host'] = node.host
-            try:
-                author = Author.objects.get(uuid=uuid,node = node)
-                author.github_id = obj['github_id']
-                author.about = obj['about']
-                author.username = obj['displayname']
-                author.avatar = obj['avatar']
-                author.save()
-            except Author.DoesNotExist:
-                author= Author.objects.create(uuid=uuid,username=obj['displayname'],
-                                                node=node,about=obj["about"],
-                                                avatar=obj['avatar'],github_id=obj['github_id'])
-                author.save()
-    except HTTPError as e:
-        # Catch any pesky errors from other sites being down
-        print("Http error getting stuff: " + type(e))
-        pass
+            author = Author.objects.get(uuid=uuid,node = node)
+            author.github_id = obj['github_id']
+            author.about = obj['about']
+            author.username = obj['displayname']
+            author.save()
+            break
+        except Author.DoesNotExist:
+            author= Author.objects.create(uuid=uuid,username=obj['displayname'],
+                                            node=node,about=obj["about"],github_id=obj['github_id'])
+            author.save()
+            break
     return author
 

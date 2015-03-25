@@ -56,19 +56,16 @@ class ProfileView(TemplateView):
             else:
                 context['isFriends'] = 0
         else:
-            # Have to change from JSON to object because Mark wants JSON and Ajax
-            author = getForeignAuthor(authorUUID)
-            if author:
-                # If we found the author we should set the other vars as
-                # necessary, if not we should 404
-                # Currently not setting up crap cuz i'm waiting for changes from m+t
-                context['author'] = author
-                context['isFollowing'] = 0
+            targetAuthor = getForeignAuthor(authorUUID)
+            if targetAuthor:
+                context['author'] = targetAuthor
+                #TODO query host server to check if they are friends for isfriends
                 context['isFriends'] = 0
-                postsJSON = getForeignAuthorPosts(authorUUID)
-                if postsJSON:
-                    postsObj = json.loads(postsJSON)
-                    context['posts'] = postsObj
+                if targetAuthor in self.request.user.author.follows.all():
+                    context['isFollowing'] = 1
+                else:
+                    context['isFollowing'] = 0
+                context['posts'] = getForeignAuthorPosts(self.request.user.author,authorUUID, targetAuthor.node)
             else:
                 raise Http404("No Author matches the given query.")
 
