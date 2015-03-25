@@ -11,11 +11,11 @@ class VisiblePostsRequestFactory():
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
-    def create(host, uuid):
+    def create(host):
         if host == HINDLEBOOK['host']:
-            return HindlebookVisiblePostsRequest(host, uuid)
+            return HindlebookVisiblePostsRequest(host)
         elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookVisiblePostsRequest(host, uuid)
+            return DevHindlebookVisiblePostsRequest(host)
         else:
             raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
 
