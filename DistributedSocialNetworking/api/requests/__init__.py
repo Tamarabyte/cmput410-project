@@ -1,4 +1,7 @@
-from public_posts_factory import PublicPostsRequestFactory
+from api.requests.public_posts_factory import PublicPostsRequestFactory
+from api.requests.visible_posts_factory import VisiblePostsRequestFactory
+from api.requests.authored_posts_factory import AuthoredPostsRequestFactory
+from api.requests.post_factory import PostRequestFactory
 
 # Settings for Nodes
 
@@ -14,11 +17,4 @@ DEV_HINDLEBOOK = {
     'username': "dev.hindlebook.tamarabyte.com",
     'password': "test",
     'port': ''
-}
-
-TEST = {
-    'host': "localhost",
-    'username': "test",
-    'password': "test",
-    'port': "8000"
 }

@@ -17,46 +17,48 @@ DEV_HINDLEBOOK = {
 }
 
 
-class PublicPostsRequestFactory():
+class VisiblePostsRequestFactory():
     """
-    An Encapsulation for building Public Post requests
+    An Encapsulation for building Visible Post requests
     """
     def get(self):
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
-    def create(host):
+    def create(host, uuid):
         if host == HINDLEBOOK['host']:
-            return HindlebookPublicPostsRequest(host)
+            return HindlebookVisiblePostsRequest(host, uuid)
         elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookPublicPostsRequest(host)
+            return DevHindlebookVisiblePostsRequest(host, uuid)
         else:
             raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
 
     create = staticmethod(create)
 
 
-class HindlebookPublicPostsRequest(PublicPostsRequestFactory):
+class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     """
-    Hindlebook specific Public Post Request
+    Hindlebook specific Visible Post Request
     """
-    def __init__(self, host):
+    def __init__(self, host, uuid):
         self.host = host
-        self.url = "http://%s/api/posts" % host
+        self.url = "http://%s/api/author/posts" % host
+        self.headers = {'uuid': uuid}
         self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
 
     def get(self):
-        return requests.get(url=self.url, auth=self.auth)
+        return requests.get(url=self.url, headers=self.headers, auth=self.auth)
 
 
-class DevHindlebookPublicPostsRequest(PublicPostsRequestFactory):
+class DevHindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     """
-    Dev_Hindlebook specific Public Post Request
+    Dev_Hindlebook specific Visible Post Request
     """
-    def __init__(self, host):
+    def __init__(self, host, uuid):
         self.host = host
-        self.url = "http://%s/api/posts" % host
+        self.url = "http://%s/api/author/posts" % host
         self.auth = HTTPBasicAuth(DEV_HINDLEBOOK['username'], DEV_HINDLEBOOK['password'])
 
-    def get(self):
-        return requests.get(url=self.url, auth=self.auth)
+    def get(self, uuid):
+        self.headers = {'uuid': uuid}
+        return requests.get(url=self.url, headers=self.headers, auth=self.auth)
