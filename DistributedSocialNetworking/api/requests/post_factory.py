@@ -31,11 +31,11 @@ class PostRequestFactory():
         raise NotImplementedError('`put()` must be implemented.')
 
     # Static Factory
-    def create(host, post_id):
+    def create(host):
         if host == HINDLEBOOK['host']:
-            return HindlebookAuthoredPostsRequest(host, post_id)
+            return HindlebookAuthoredPostsRequest(host)
         elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookAuthoredPostsRequest(host, post_id)
+            return DevHindlebookAuthoredPostsRequest(host)
         else:
             raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
 

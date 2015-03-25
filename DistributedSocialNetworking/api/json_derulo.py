@@ -21,7 +21,9 @@ from Hindlebook.models import Node, Author, Settings
 # AuthoredPostsRequestFactory(node.host).get(requester_uuid, author_uuid)   # Author's posts visible to Requester
 # FriendQueryRequestFactory(node.host).get(author1_uuid, author2_uuid)     # get verison, friends/uuid/uuid
 # FriendQueryRequestFactory(node.host).post(uuid, uuids)                  # bulk version, uuids must be a list
-
+# PostRequestFactory(node.host).get(post_id)                       # Get Post
+# PostRequestFactory(node.host).post(post_id, Post)                # Post Post
+# PostRequestFactory(node.host).put(post_id, Post)                # Put Post
 
 
 # Module to hold outgoing API calls to get various info from other services.
