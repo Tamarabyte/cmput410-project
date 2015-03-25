@@ -20,4 +20,4 @@ class SettingsAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('connection_limit',)
+    list_display = ('local_node', 'connection_limit', )
