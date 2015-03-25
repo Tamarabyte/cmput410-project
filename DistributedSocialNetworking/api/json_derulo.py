@@ -71,6 +71,7 @@ def getForeignStreamPosts(userUuid,min_time):
     postsJSON = None
     for node in Node.objects.all():
         # Skip our node, don't want to ask ourselves unecessarily.
+        newposts = None
         if node == Settings.objects.all().first().node:
             continue
         try:
@@ -85,10 +86,11 @@ def getForeignStreamPosts(userUuid,min_time):
         except Exception as e:
             print("exception raised!")
             print(str(e))
-        if min_time != None:
-            posts += filter(lambda p: p.pubDate > min_time,newposts)
-        else:
-            posts += newposts
+        if (newposts != None):
+            if min_time != None:
+                posts += filter(lambda p: p.pubDate > min_time,newposts)
+            else:
+                posts += newposts
     return posts
 
 
