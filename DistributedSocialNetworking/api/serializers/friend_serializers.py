@@ -90,10 +90,10 @@ class FriendRequestSerializer(serializers.Serializer):
         return author
 
     def validate_author(self, value):
-        return author_validator(value)
+        return self.author_validator(value)
 
     def validate_friend(self, value):
-        return author_validator(value)
+        return self.author_validator(value)
 
     def save(self):
         """
