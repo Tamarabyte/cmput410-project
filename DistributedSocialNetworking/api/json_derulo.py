@@ -65,7 +65,7 @@ def getForeignAuthorPosts(requesterUuid,targetUuid, node):
 
 def getForeignStreamPosts(userUuid,min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
-        by uuid's stream. Should be called to create the stream for user uuid 
+        by uuid's stream. Should be called to create the stream for user uuid
         returns a list of post objects.'''
     posts = []
     postsJSON = None
@@ -74,7 +74,7 @@ def getForeignStreamPosts(userUuid,min_time):
         if node == Settings.objects.all().first().node:
             continue
         try:
-            postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
+            postsJSON = VisiblePostsRequestFactory.create(node.host).get(userUuid).json()
         except Exception as e:
             print(node)
             print(str(e))
