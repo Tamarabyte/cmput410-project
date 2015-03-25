@@ -66,7 +66,10 @@ class FriendRequestSerializer(serializers.Serializer):
             raise serializers.ValidationError("Missing or invalid 'query: friendrequest'")
         return value
 
-    def validate_author(self, value):
+    def author_validator(self, value):
+        """
+        A Validator for the Author/Friend fields of a friend request
+        """
         username = value.get('username')
         uuid = value.get('uuid')
         node = value.get('node')
@@ -85,28 +88,17 @@ class FriendRequestSerializer(serializers.Serializer):
             # TODO: FIX ME: Insert Foreign Author Profile Update
 
         return author
+
+    def validate_author(self, value):
+        return self.author_validator(value)
 
     def validate_friend(self, value):
-        username = value.get('username')
-        uuid = value.get('uuid')
-        node = value.get('node')
-
-        # Reject unknown hosts
-        node = Node.objects.filter(host=node).first()
-        if node is None:
-            raise serializers.ValidationError("Invalid or unknown Host: %s" % node)
-
-        # Get or create Author
-        author = Author.objects.filter(uuid=uuid).first()
-        if author is None:
-            # TODO FIX ME: Insert Foreign Author Profile Grab
-            author = Author.objects.create(username=username, uuid=uuid, node=node)
-        # elif author.user is None:
-            # TODO: FIX ME: Insert Foreign Author Profile Update
-
-        return author
+        return self.author_validator(value)
 
     def save(self):
+        """
+        Complete the friend request and issue to foreign node if necessary
+        """
         author = self.validated_data['author']
         friend = self.validated_data['friend']
 
