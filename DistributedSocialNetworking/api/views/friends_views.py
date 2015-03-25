@@ -38,6 +38,27 @@ class FriendQuery(APIView):
         return Response({"query": "friends", "author": authorID1, "friends": friends})
 
 
+class Friend2Friend(APIView):
+    """
+    GET a friend2friend query
+    """
+    def get(self, request, authorID1, authorID2, format=None):
+        try:
+            author1 = Author.objects.get(uuid=authorID1)
+            author2 = Author.objects.get(uuid=authorID2)
+
+            if (author2 in author1.getFriends() and author1 in author2.getFriends()):
+                friends = "YES"
+            else:
+                friends = "NO"
+
+        except Author.DoesNotExist:
+            # TODO: FIX ME: Add logic to create foreign user from Robby
+            friends = "NO"
+
+        return Response({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
+
+
 class FriendRequest(APIView):
     """
     POST a friend request
@@ -47,9 +68,94 @@ class FriendRequest(APIView):
         serializer = FriendRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Form the Friendship
-        if not serializer.save():
+        author = serializer.validated_data['author']
+        friend = serializer.validated_data['friend']
+
+        if author.isForeign() and friend.isForeign():
             return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=200)
+        # If Target is foreign, echo the friend request
+        # TODO: FIX ME: Insert call to foreign Node
+
+        if friend not in author.friends.all():
+            author.friends.add(friend)
+
+        return Response()
+
+
+class FollowRequest(APIView):
+    """
+    POST a follow query
+    """
+    def post(self, request, format=None):
+        # Validate the request body
+        serializer = FriendRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        author = serializer.validated_data['author']
+        friend = serializer.validated_data['friend']
+
+        if author.isForeign() and friend.isForeign():
+            return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Form the followship
+        if (friend not in author.follows.all()):
+            author.follows.add(friend)
+
+        return Response()
+
+
+class UnfollowRequest(APIView):
+    """
+    POST a unfollow query
+    """
+    def post(self, request, format=None):
+        # Validate the request body
+        serializer = FriendRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        author = serializer.validated_data['author']
+        friend = serializer.validated_data['friend']
+
+        if author.isForeign() and friend.isForeign():
+            return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if (friend in author.follows.all()):
+            author.follows.remove(friend)
+
+        return Response()
+
+
+class UnfriendRequest(APIView):
+    """
+    POST an unfriend query
+    """
+
+    def post(self, request, format=None):
+        # Validate the request body
+        serializer = FriendRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        author = serializer.validated_data['author']
+        friend = serializer.validated_data['friend']
+
+        if author.isForeign() and friend.isForeign():
+            return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # If someone requsets an unfriend this is either a
+        # cancellation of a friend request, or termination
+        # of a friend relationship, so we have to remove from
+        # the author from the friends list of friends if it exists
+        # to terminate an existing friend relationship, not leave
+        # a hanging friend request from the friend immediately
+        # after termination of their relationship.
+        if (friend in author.friends.all()):
+            author.friends.remove(friend)
+        if (author in friend.friends.all()):
+            friend.friends.remove(author)
+
+        return Response()
