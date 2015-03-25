@@ -82,7 +82,6 @@ def getForeignStreamPosts(userUuid,min_time):
             if serializer.is_valid(raise_exception=True):
                 newposts = serializer.save()
         except Exception as e:
-            print(postsJSON)
             print("exception raised!")
             print(str(e))
         if min_time != None:
