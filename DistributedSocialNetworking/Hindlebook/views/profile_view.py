@@ -31,23 +31,22 @@ class ProfileView(TemplateView):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
         profile_author = Author.objects.filter(uuid=authorUUID)
+        context['comment_form'] = CommentForm()
 
-
+        # get the profile edit form if our requesting user is viewing their own profile
         if (self.request.user.author.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user.author)
 
-        local = True
-        try:
-            context['author'] = Author.objects.get(uuid=authorUUID)
-        except Author.DoesNotExist:
-            #have to catch this error otherwise we error out
+        # get the author from the authorUUID in the URL
+        context['author'] = Author.objects.filter(uuid=authorUUID).first()
+        if context['author'] is None:
             local = False
+        else:
+            local = not context['author'].isForeign()
 
-        context['comment_form'] = CommentForm()        
-        
         if local:
             context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
-            print(self.request.user.author)
+
             if self.request.user.author in list(context["author"].followed_by.all()):
                 context['isFollowing'] = 1
             else:
@@ -58,13 +57,12 @@ class ProfileView(TemplateView):
                 context['isFriends'] = 0
         else:
             # Have to change from JSON to object because Mark wants JSON and Ajax
-            authorJSON = getForeignAuthor(authorUUID)
-            if authorJSON:
+            author = getForeignAuthor(authorUUID)
+            if author:
                 # If we found the author we should set the other vars as
                 # necessary, if not we should 404
                 # Currently not setting up crap cuz i'm waiting for changes from m+t
-                authorObject = json.loads(authorJSON)
-                context['author'] = authorObject
+                context['author'] = author
                 context['isFollowing'] = 0
                 context['isFriends'] = 0
                 postsJSON = getForeignAuthorPosts(authorUUID)

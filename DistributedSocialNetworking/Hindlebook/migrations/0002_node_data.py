@@ -3,7 +3,7 @@ import os
 from django.db import models, migrations
 
 fixture_dir = os.path.abspath(os.path.dirname(__file__))
-fixture_filename = 'server_data.json'
+fixture_filename = 'node_data.json'
 
 def load_fixture(apps, schema_editor):
     fixture_file = os.path.join(fixture_dir, fixture_filename)
@@ -18,7 +18,9 @@ def unload_fixture(apps, schema_editor):
     "Brutally deleting all entries for this model..."
 
     Node = apps.get_model("Hindlebook", "Node")
-    Node.objects.filter(pk="localhost").delete()
+    Node.objects.filter(pk=1).delete()
+    Settings = apps.get_model("Hindlebook", "Settings")
+    Settings.objects.filter(pk=1).delete()
 
 class Migration(migrations.Migration):
 

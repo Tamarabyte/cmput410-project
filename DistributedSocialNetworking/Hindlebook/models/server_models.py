@@ -6,7 +6,7 @@ class Node(models.Model):
     """Model for representing different servers"""
 
     # address of the nodes host
-    host = models.CharField(max_length=100, blank=False, unique=True, primary_key=True)
+    host = models.CharField(max_length=100, blank=False, unique=True)
     # short name for identifying the nodes host
     host_name = models.CharField(max_length=50, blank=True, default='')
 
@@ -21,11 +21,11 @@ class Node(models.Model):
     def __str__(self):
         return self.host
 
-
 class Settings(models.Model):
     """Model for our server."""
 
     connection_limit = models.IntegerField(blank=True, default=10)
+    node = models.ForeignKey(Node, null=True, blank=False, default=1)
 
     class Meta:
         verbose_name_plural = "Settings"

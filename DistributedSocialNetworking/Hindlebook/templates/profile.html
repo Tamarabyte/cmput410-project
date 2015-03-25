@@ -111,8 +111,10 @@
 {% block scripts %}
 <script>
 
-    var authorHost = '{{ author.host|default:"localhost" }}';
+
+    var authorHost = '{{ author.node|escapejs }}';
     var isFollowing = {{ isFollowing }};
+    var isForeign = {% if author.isForeign %}1{% else %}0{% endif %};
     var form_options = {
         url : '{% url 'edit_profile' user.author.uuid %}',
         type : 'post',
