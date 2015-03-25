@@ -25,6 +25,9 @@ class FriendQueryRequestFactory():
     def get(self):
         raise NotImplementedError('`get()` must be implemented.')
 
+    def post(self):
+        raise NotImplementedError('`post()` must be implemented.')
+
     # Static Factory
     def create(host):
         if host == HINDLEBOOK['host']:
@@ -50,6 +53,13 @@ class HindlebookFriendQueryRequest(FriendQueryRequestFactory):
         self.url = self.url + "/%s/%s" % (uuid1, uuid2)
         return requests.get(url=self.url, auth=self.auth)
 
+    def post(self, uuid, uuids=[]):
+        self.url = self.url + "/%s" % uuid
+        data = {"query": "friends",
+                "author": uuid,
+                "authors": uuids}
+        return requests.get(url=self.url, data=data auth=self.auth)
+
 
 class DevHindlebookFriendQueryRequest(FriendQueryRequestFactory):
     """
@@ -63,3 +73,10 @@ class DevHindlebookFriendQueryRequest(FriendQueryRequestFactory):
     def get(self, uuid1, uuid2):
         self.url = self.url + "/%s/%s" % (uuid1, uuid2)
         return requests.get(url=self.url, auth=self.auth)
+
+    def post(self, uuid, uuids=[]):
+        self.url = self.url + "/%s" % uuid
+        data = {"query": "friends",
+                "author": uuid,
+                "authors": uuids}
+        return requests.get(url=self.url, data=data auth=self.auth)

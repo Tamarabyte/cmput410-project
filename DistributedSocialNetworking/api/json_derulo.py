@@ -18,9 +18,9 @@ from Hindlebook.models import Node, Author, Settings
 # FriendRequestFactory(node.host).post(author, friend)  # Pass in the author objects, not the UUID
 # VisiblePostsRequestFactory(node.host).get(uuid)   # All posts visible to UUID
 # PublicPostsRequestFactory(node.host).get()        # All public posts
-# AuthoredPostsRequestFactory(node.host).get(requester_uuid, author_uuid) # Author's posts visible to Requester
-# FriendQueryRequestFactory(node.host).get(author1_uuid, author2_uuid)
-#
+# AuthoredPostsRequestFactory(node.host).get(requester_uuid, author_uuid)   # Author's posts visible to Requester
+# FriendQueryRequestFactory(node.host).get(author1_uuid, author2_uuid)     # get verison, friends/uuid/uuid
+# FriendQueryRequestFactory(node.host).post(uuid, uuids)                  # bulk version, uuids must be a list
 
 
 
