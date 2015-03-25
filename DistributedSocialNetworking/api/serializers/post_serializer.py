@@ -5,6 +5,9 @@ from api.serializers import AuthorSerializer
 from api.serializers.comment_serializer import CommentSerializer, NonSavingCommentSerializer
 from django.shortcuts import get_object_or_404
 
+import datetime
+import dateutil.parser
+
 
 class PostSerializer(serializers.ModelSerializer):
     """
@@ -115,6 +118,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
     """
     comments = CommentSerializer(many=True, read_only=False)
     author = AuthorSerializer(read_only=False, required=True)
+    pubDate = serializers.DateTimeField()
 
     def get_author(self, author_data):
         """
@@ -125,7 +129,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
 
         # Get Author/Host info
         uuid = author_data.get('uuid')
-        host = author_data.get('node')
+        host = Node.objects.get(host=str(author_data.get('node')))
         username = author_data.get('username')
 
         author = Author.objects.filter(uuid=uuid).first()
@@ -140,9 +144,11 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         """
         Creates the comments for `post` stored in `comment_data`
         """
-        serializer = NonSavingCommentSerializer(data=comment_data, many=True)
-        serializer.is_valid(raise_exceptions=True)
-        post.comments_set.add(serializer.save())
+        if len(comment_data) > 0:
+            serializer = NonSavingCommentSerializer(data=comment_data, many=True)
+            serializer.is_valid()
+            comment = serializer.save()
+            post.comments.add(comment)
 
     def create(self, validated_data):
         """
@@ -153,7 +159,6 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         author_data = validated_data.pop('author')
         comment_data = validated_data.pop('comments')
         categories_data = validated_data.pop('categories')
-
         # Get the Author
         author = self.get_author(author_data)
 
@@ -165,7 +170,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
             post.categories.add(category)
 
         # Create the comments
-        self.create_comments(post, comment_data)
+        #self.create_comments(post, comment_data)
 
         return post
 
