@@ -6,6 +6,9 @@ from rest_framework import status
 import json
 import base64
 import uuid as uuid_import
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class APITests(APITestCase):
@@ -16,17 +19,23 @@ class APITests(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
+        # A dummy node to test authentication
+        self.node1 = mommy.make(Node, host='test', password='test')
+        self.node2 = mommy.make(Node, host='node2', password='node2')
+
+        # Create Users
+        self.user1 = mommy.make(User)
+        self.user2 = mommy.make(User)
+        self.user3 = mommy.make(User)
+
         # Create authors
-        self.author1 = mommy.make(Author)
-        self.author2 = mommy.make(Author)
-        self.author3 = mommy.make(Author)
+        self.author1 = mommy.make(Author, node=self.node1, user=self.user1)
+        self.author2 = mommy.make(Author, node=self.node1, user=self.user2)
+        self.author3 = mommy.make(Author, node=self.node1, user=self.user3)
 
         # Create posts
         self.post1 = mommy.make(Post, author=self.author1)
         self.post2 = mommy.make(Post, author=self.author2)
-
-        # A dummy node to test authentication
-        self.node1 = mommy.make(Node, host='test', password='test')
 
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
@@ -165,48 +174,65 @@ class APITests(APITestCase):
         """
         Test sending a friend request from local author to unknown author
         """
-
         # Friend request from local author
         author1 = AuthorSerializer(self.author1)
 
         # A fake UUID that doesn't exist in our db
         fakeUUID = str(uuid_import.uuid4())
+        self.author2.uuid = fakeUUID
+        author2 = AuthorSerializer(self.author2)
 
         # The JSON with valid author, unknown friend
-        JSONdata = json.dumps({"query": "friendrequest", "author": author1.data,
-                               "friend": {"id" : fakeUUID, "host" : "http://www.fake.com", "displayname": "Fake"}})
-
-        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
         # The server should return 200
         self.assertEquals(response.status_code, 200, "Response should be 200")
 
         # Server should have created a foreign author from unknown UUID
         foreignAuthor = Author.objects.get(uuid=fakeUUID)
-        self.assertEquals(foreignAuthor.username, "Fake", "Created foreign author has wrong name")
+        self.assertEquals(foreignAuthor.username, self.author2.username, "Created foreign author has wrong name")
         self.assertQuerysetEqual(self.author1.getUnacceptedFriends(), ["<Author: %s>" % foreignAuthor.username])
 
     def testFriendRequestAuthorNotFound(self):
         """
         Test sending a friend request from an unknown author to a local author
         """
-
         # Friend request to local author
         author1 = AuthorSerializer(self.author1)
 
-        # A fake UUID that doesn't exist in our db
+        # Form a user with a UUID that doesn't exist in our db
         fakeUUID = str(uuid_import.uuid4())
+        self.author2.uuid = fakeUUID
+        author2 = AuthorSerializer(self.author2)
 
         # The JSON with unknown author, valid friend
-        JSONdata = json.dumps({"query": "friendrequest", "author": {"id" : fakeUUID, "host" : "http://www.fake.com", "displayname": "Fake"},
-                               "friend": author1.data})
-
-        response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
+        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
         # The server should return 200
         self.assertEquals(response.status_code, 200, "Response should be 200")
 
         # Server should have created a foreign author from unknown UUID
         foreignAuthor = Author.objects.get(uuid=fakeUUID)
-        self.assertEquals(foreignAuthor.username, "Fake", "Created foreign author has wrong name")
+        self.assertEquals(foreignAuthor.username, self.author2.username, "Created foreign author has wrong name")
         self.assertQuerysetEqual(foreignAuthor.getUnacceptedFriends(), ["<Author: %s>" % self.author1.username])
+
+    def testFriendRequestFromUnknownNode(self):
+        """
+        Unkown Hosts should be rejected
+        """
+        # Friend request to local author
+        author1 = AuthorSerializer(self.author1)
+
+        # Form a user with a Node that doesn't exist in our db
+        self.author2.node = self.node2
+        author2 = AuthorSerializer(self.author2)
+        Node.objects.filter(host=self.author2.node).delete()
+
+        # The JSON with unknown author, valid friend
+        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        response = self.client.post('/api/friendrequest', JSONdata, format='json')
+
+        # The server should return 400
+        self.assertEquals(response.status_code, 400, "Response should be 400")

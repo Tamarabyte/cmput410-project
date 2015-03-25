@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from api.serializers import FriendQuerySerializer
+from api.serializers import FriendQuerySerializer, FriendRequestSerializer
 from Hindlebook.models import Author
 
 
@@ -31,11 +31,25 @@ class FriendQuery(APIView):
 
         # Compare each friend in the request
         for authorID2 in data.get('authors'):
-            try:
                 author2 = Author.objects.get(uuid=authorID2)
                 if author2 in friends_set:
                     friends.append(authorID2)
-            except:
-                pass
 
         return Response({"query": "friends", "author": authorID1, "friends": friends})
+
+
+class FriendRequest(APIView):
+    """
+    POST a friend request
+    """
+    def post(self, request, format=None):
+        # Validate the request body
+        serializer = FriendRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Form the Friendship
+        if not serializer.save():
+            return Response({"error" : "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(status=200)
