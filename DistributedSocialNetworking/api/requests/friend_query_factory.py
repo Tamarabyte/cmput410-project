@@ -58,7 +58,7 @@ class HindlebookFriendQueryRequest(FriendQueryRequestFactory):
         data = {"query": "friends",
                 "author": uuid,
                 "authors": uuids}
-        return requests.get(url=self.url, data=data auth=self.auth)
+        return requests.get(url=self.url, data=data, auth=self.auth)
 
 
 class DevHindlebookFriendQueryRequest(FriendQueryRequestFactory):
@@ -79,4 +79,4 @@ class DevHindlebookFriendQueryRequest(FriendQueryRequestFactory):
         data = {"query": "friends",
                 "author": uuid,
                 "authors": uuids}
-        return requests.get(url=self.url, data=data auth=self.auth)
+        return requests.get(url=self.url, data=data, auth=self.auth)
