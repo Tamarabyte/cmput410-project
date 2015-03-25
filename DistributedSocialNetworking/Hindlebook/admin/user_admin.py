@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm as AdminUserCreationForm
 from django.contrib.admin import ModelAdmin, StackedInline
 from django.contrib.auth import get_user_model
 
-from Hindlebook.models import Author, Node
+from Hindlebook.models import Author, Node, Settings
 
 class UserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
@@ -23,7 +23,7 @@ class UserCreationForm(AdminUserCreationForm):
         )
 
 def approve_users(modeladmin, request, queryset):
-    local_node = Node.objects.get(pk="localhost")
+    local_node = Settings.objects.all().first().node
     for obj in queryset:
         if not Author.objects.filter(user=obj).exists():
             author = Author(user=obj, username=obj.username, node=local_node)

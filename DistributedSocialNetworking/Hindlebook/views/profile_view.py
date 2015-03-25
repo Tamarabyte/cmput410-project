@@ -31,25 +31,22 @@ class ProfileView(TemplateView):
         context = super(ProfileView, self).get_context_data(*args, **kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
         profile_author = Author.objects.filter(uuid=authorUUID)
+        context['comment_form'] = CommentForm()
 
-
+        # get the profile edit form if our requesting user is viewing their own profile
         if (self.request.user.author.uuid == authorUUID):
             context['author_form'] = ProfileEditForm(instance=self.request.user.author)
 
-        local = True
-        try:
-            context['author'] = Author.objects.get(uuid=authorUUID)
-            if Author.objects.get(uuid=authorUUID).node.host != "localhost":
-                local = False
-        except Author.DoesNotExist:
-            #have to catch this error otherwise we error out
+        # get the author from the authorUUID in the URL
+        context['author'] = Author.objects.filter(uuid=authorUUID).first()
+        if context['author'] is None:
             local = False
+        else:
+            local = not context['author'].isForeign()
 
-        context['comment_form'] = CommentForm()        
-        
         if local:
             context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
-            print(self.request.user.author)
+
             if self.request.user.author in list(context["author"].followed_by.all()):
                 context['isFollowing'] = 1
             else:
