@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response, get_object_or_404
 from django.template import Template
 from django.http import HttpResponse, JsonResponse, HttpRequest, Http404
-from Hindlebook.models import Author, Post
+from Hindlebook.models import Author, Post, Settings
 from api.serializers import PostSerializer, FriendQuerySerializer
 import json
 
@@ -61,7 +61,7 @@ class FriendRequest(APIView):
 
         try:
             author = Author.objects.get(uuid=authorID)
-            if Author.objects.get(uuid=authorID).node.host != "localhost":
+            if Author.objects.get(uuid=authorID).node != Settings.objects.all().first():
                 local = False
         except Author.DoesNotExist:
             author = getForeignAuthor(authorID)
@@ -76,7 +76,7 @@ class FriendRequest(APIView):
             # profile, meaning json_derulo added them already.
             friend = get_object_or_404(Author, uuid=friendID)
             if author and friend:
-                if friend.node.host != "localhost" and author.node.host !="localhost":
+                if friend.node != Settings.objects.all().first() and author.node != Settings.objects.all().first():
                     # Don't handle friend requests between two foreign users
                     return HttpResponse(status=404)
                 if (friend not in author.friends.all()):

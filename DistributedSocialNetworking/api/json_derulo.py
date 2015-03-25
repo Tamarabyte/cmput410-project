@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 from urllib.error import HTTPError
 import json
-from Hindlebook.models import Node, Author
+from Hindlebook.models import Node, Author, Settings
 
 # Module to hold outgoing API calls to get various info from other services.
 
@@ -16,7 +16,7 @@ def getForeignAuthor(uuid):
         # like sigh I don't know how we'll do this since its
         # obviously not going to be generic.
         # guess it'll be a buncha if elses.
-        if node.host == "localhost":
+        if node == Settings.objects.all().first():
             continue
         try:
             url = node.host + "/api/author/" +uuid

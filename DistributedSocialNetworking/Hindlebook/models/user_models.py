@@ -22,6 +22,11 @@ class Author(models.Model):
     def __str__(self):
         return self.username
 
+    def isForeign(self):
+        if self.user is None:
+            return True
+        return False
+
     # Two way friends implies "real" friendship
     def getFriends(self):
         return self.friends.all() & self.friends_of.all()
