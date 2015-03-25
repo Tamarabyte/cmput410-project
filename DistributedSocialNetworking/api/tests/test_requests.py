@@ -1,7 +1,7 @@
 # from django.test import TestCase
 # from model_mommy import mommy
 # from Hindlebook.models import Author, Post, Node
-# from api.requests import PublicPostsRequestFactory
+from api.requests import PublicPostsRequestFactory
 # import requests
 
 

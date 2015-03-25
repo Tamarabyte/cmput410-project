@@ -1,20 +1,6 @@
-# from api.requests import HINDLEBOOK, DEV_HINDLEBOOK, TEST
+from api.requests import HINDLEBOOK, DEV_HINDLEBOOK
 from requests.auth import HTTPBasicAuth
 import requests
-
-HINDLEBOOK = {
-    'host': "hindlebook.tamarabyte.com",
-    'username': "hindlebook.tamarabyte.com",
-    'password': "test",
-    'port': ''
-}
-
-DEV_HINDLEBOOK = {
-    'host': "dev.hindlebook.tamarabyte.com",
-    'username': "hindlebook.tamarabyte.com",
-    'password': "test",
-    'port': ''
-}
 
 
 class PostRequestFactory():
