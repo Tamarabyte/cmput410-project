@@ -72,12 +72,17 @@ def getForeignStreamPosts(userUuid,min_time):
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
             continue
-        postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
+        try:
+            postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
+        except Exception as e:
+            print(node)
+            print(str(e))
         try:
             serializer = NonSavingPostSerializer(data=postsJSON["posts"],many=True)
             if serializer.is_valid(raise_exception=True):
                 newposts = serializer.save()
         except Exception as e:
+            print(postsJSON)
             print("exception raised!")
             print(str(e))
         if min_time != None:

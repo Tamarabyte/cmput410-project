@@ -26,7 +26,7 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     """
     Hindlebook specific Visible Post Request
     """
-    def __init__(self, host):
+    def __init__(self, host, uuid):
         self.host = host
         self.url = "http://%s/api/author/posts" % host
         self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
