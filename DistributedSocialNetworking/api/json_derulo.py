@@ -68,6 +68,7 @@ def getForeignStreamPosts(userUuid,min_time):
         by uuid's stream. Should be called to create the stream for user uuid 
         returns a list of post objects.'''
     posts = []
+    postsJSON = None
     for node in Node.objects.all():
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
