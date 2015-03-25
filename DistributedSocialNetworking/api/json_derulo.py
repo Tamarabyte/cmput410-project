@@ -9,21 +9,21 @@ from Hindlebook.models import Node, Author, Settings
 # Appending .json() to the end of these gets the json
 # or you can store it and get the status_code
 #
-# eg/ request = FriendRequestFactory(node.host)
+# eg/ request = FriendRequestFactory(node.host).create()
 #     response = request.post(author, friend)
 #     if response.status_code != 200:
 #          explode()
 #     data = response.json()
 #
-# FriendRequestFactory(node.host).post(author, friend)  # Pass in the author objects, not the UUID
-# VisiblePostsRequestFactory(node.host).get(uuid)   # All posts visible to UUID
-# PublicPostsRequestFactory(node.host).get()        # All public posts
-# AuthoredPostsRequestFactory(node.host).get(requester_uuid, author_uuid)   # Author's posts visible to Requester
-# FriendQueryRequestFactory(node.host).get(author1_uuid, author2_uuid)     # get verison, friends/uuid/uuid
-# FriendQueryRequestFactory(node.host).post(uuid, uuids)                  # bulk version, uuids must be a list
-# PostRequestFactory(node.host).get(post_id)                       # Get Post
-# PostRequestFactory(node.host).post(post_id, Post)                # Post Post
-# PostRequestFactory(node.host).put(post_id, Post)                # Put Post
+# FriendRequestFactory(node.host).create().post(author, friend)  # Pass in the author objects, not the UUID
+# VisiblePostsRequestFactory(node.host).create().get(uuid)   # All posts visible to UUID
+# PublicPostsRequestFactory(node.host).create().get()        # All public posts
+# AuthoredPostsRequestFactory(node.host).create().get(requester_uuid, author_uuid)   # Author's posts visible to Requester
+# FriendQueryRequestFactory(node.host).create().get(author1_uuid, author2_uuid)     # get verison, friends/uuid/uuid
+# FriendQueryRequestFactory(node.host).create().post(uuid, uuids)                  # bulk version, uuids must be a list
+# PostRequestFactory(node.host).create().get(post_id)                       # Get Post
+# PostRequestFactory(node.host).create().post(post_id, Post)                # Post Post
+# PostRequestFactory(node.host).create().put(post_id, Post)                # Put Post
 
 
 # Module to hold outgoing API calls to get various info from other services.
