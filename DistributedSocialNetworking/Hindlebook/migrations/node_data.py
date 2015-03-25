@@ -25,7 +25,7 @@ def unload_fixture(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Hindlebook', '0001_initial'),
+        ('Hindlebook', '0003_auto_20150325_1632'),
     ]
 
     operations = [

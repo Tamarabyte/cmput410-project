@@ -5,13 +5,16 @@
     "fields": {
       "host": "localhost",
       "host_name": "Hindlebook",
-      "password" : ""
+      "password" : "",
+      "our_username" : "",
+      "our_password" : ""
     }
   },
-    {
+  {
     "model": "Hindlebook.Settings",
     "pk" : 1,
     "fields": {
+      "node" : 1,
       "connection_limit": "10"
     }
   }
