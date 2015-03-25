@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 from urllib.error import HTTPError
 import json
+import requests
 from Hindlebook.models import Node, Author, Settings
 
 # Key for the Request Factories
