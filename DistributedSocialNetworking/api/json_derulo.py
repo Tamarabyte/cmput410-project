@@ -63,7 +63,7 @@ def getForeignAuthorPosts(requesterUuid,targetUuid, node):
         posts = serializer.save()
     return posts
 
-def getForeignStreamPosts(userUuid,targetUuid,min_time):
+def getForeignStreamPosts(userUuid,min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
         by uuid's stream. Should be called to create the stream for user uuid 
         returns a list of post objects.'''
@@ -72,7 +72,7 @@ def getForeignStreamPosts(userUuid,targetUuid,min_time):
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
             continue
-        postsJSON = VisiblePostsRequestFactory.create(node.host,uuid).get(uuid).json()
+        postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
         try:
             serializer = NonSavingPostSerializer(data=postsJSON["posts"],many=True)
             if serializer.is_valid(raise_exception=True):
