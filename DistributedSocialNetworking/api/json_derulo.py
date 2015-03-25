@@ -68,6 +68,7 @@ def getForeignStreamPosts(userUuid,min_time):
         by uuid's stream. Should be called to create the stream for user uuid 
         returns a list of post objects.'''
     posts = []
+    postsJSON = None
     for node in Node.objects.all():
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
@@ -82,7 +83,6 @@ def getForeignStreamPosts(userUuid,min_time):
             if serializer.is_valid(raise_exception=True):
                 newposts = serializer.save()
         except Exception as e:
-            print(postsJSON)
             print("exception raised!")
             print(str(e))
         if min_time != None:
