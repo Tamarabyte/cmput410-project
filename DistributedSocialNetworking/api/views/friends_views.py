@@ -49,7 +49,7 @@ class FriendRequest(APIView):
 
         # Form the Friendship
         if not serializer.save():
-            return Response({"error" : "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
+            return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         return Response(status=200)
