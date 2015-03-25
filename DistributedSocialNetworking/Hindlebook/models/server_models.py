@@ -21,6 +21,8 @@ class Node(models.Model):
     our_username = models.CharField(max_length=128, blank=True, default="")
     our_password = models.CharField(max_length=128, blank=True, default="")
     
+    team_number = models.IntegerField(blank=False, default=9)
+    
 
     def __str__(self):
         return self.host
