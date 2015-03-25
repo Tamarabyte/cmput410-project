@@ -111,6 +111,7 @@
 {% block scripts %}
 <script>
 
+
     var authorHost = '{{ author.node|escapejs }}';
     var isFollowing = {{ isFollowing }};
     var isForeign = {% if author.isForeign %}1{% else %}0{% endif %};
