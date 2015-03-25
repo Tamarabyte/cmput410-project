@@ -1,7 +1,8 @@
 from django.forms import widgets
 from rest_framework import serializers
 from Hindlebook.models import Post, Comment, Node, Category, Author
-from api.serializers import AuthorSerializer, CommentSerializer, NonSavingCommentSerializer
+from api.serializers import AuthorSerializer
+from api.serializers.comment_serializer import CommentSerializer, NonSavingCommentSerializer
 from django.shortcuts import get_object_or_404
 
 
@@ -38,9 +39,9 @@ class PostSerializer(serializers.ModelSerializer):
         host = author_data.get('node')
         username = author_data.get('username')
 
-        node = Node.objects.filter(node=host).first()
+        node = Node.objects.filter(host=host).first()
         if node is None:
-            raise serializers.ValidationError('Unknownlol Host: %s' host)
+            raise serializers.ValidationError('Unknownlol Host: %s' % host)
 
 
         author = Author.objects.filter(uuid=uuid).first()
