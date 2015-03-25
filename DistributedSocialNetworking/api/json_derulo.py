@@ -5,6 +5,52 @@ from Hindlebook.models import Node, Author
 
 # Module to hold outgoing API calls to get various info from other services.
 
+
+def author_update_or_create(uuid,host):
+    author = None
+    try:
+        url = host + "/api/author/" +uuid
+        print(url)
+        response = urlopen(url)
+        str_response = response.readall().decode('utf-8')
+        obj = json.loads(str_response)
+        node = None
+        try:
+            node = Node.objects.get(host = host)
+        except:
+            raise Exception("Failure finding node: %s" % host)
+        if obj != None:
+            # for some reason model has author.uuid but
+            # outputted json is author.id so yeah...
+            # same with username/displayname
+            obj['uuid'] = obj['id']
+            #This should probably get grabbed from like a global var,
+            # not be hardcoded but whatever.
+            obj['avatar'] = 'default_avatar.jpg'
+            obj['host'] = node.host
+            try:
+                author = Author.objects.get(uuid=uuid,node = node)
+                author.github_id = obj['github_id']
+                author.about = obj['about']
+                author.username = obj['displayname']
+                author.avatar = obj['avatar']
+                author.save()
+            except Author.DoesNotExist:
+                author= Author.objects.create(uuid=uuid,username=obj['displayname'],
+                                                node=node,about=obj["about"],
+                                                avatar=obj['avatar'],github_id=obj['github_id'])
+                author.save()
+    except HTTPError as e:
+        # Catch any pesky errors from other sites being down
+        print("Http error getting stuff: " + type(e))
+        pass 
+    return author
+        
+
+# Deprecated function. No longer use, references to this function should be removed.
+# and then the function itself. I have not yet done this as I don't want to fix all
+# the places I use this code before pushing the other function for mark
+# Deprecated because Mark is a big meanie.
 def getForeignAuthor(uuid):
     # Function to get a foreign author with the given uuid.
     # Returns None if the author isn't found, otherwise creates/updates that
