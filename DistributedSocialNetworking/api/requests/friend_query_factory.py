@@ -12,7 +12,7 @@ HINDLEBOOK = {
 
 DEV_HINDLEBOOK = {
     'host': "dev.hindlebook.tamarabyte.com",
-    'username': "dev.hindlebook.tamarabyte.com",
+    'username': "hindlebook.tamarabyte.com",
     'password': "test",
     'port': ''
 }
