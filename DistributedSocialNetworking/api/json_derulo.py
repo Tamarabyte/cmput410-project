@@ -3,6 +3,26 @@ from urllib.error import HTTPError
 import json
 from Hindlebook.models import Node, Author, Settings
 
+# Key for the Request Factories
+#
+# Appending .json() to the end of these gets the json
+# or you can store it and get the status_code
+#
+# eg/ request = FriendRequestFactory(node.host)
+#     response = request.post(author, friend)
+#     if response.status_code != 200:
+#          explode()
+#     data = response.json()
+#
+# FriendRequestFactory(node.host).post(author, friend)  # Pass in the author objects, not the UUID
+# VisiblePostsRequestFactory(node.host).get(uuid)   # All posts visible to UUID
+# PublicPostsRequestFactory(node.host).get()        # All public posts
+# AuthoredPostsRequestFactory(node.host).get(requester_uuid, author_uuid) # Author's posts visible to Requester
+# FriendQueryRequestFactory(node.host).get(author1_uuid, author2_uuid)
+#
+
+
+
 # Module to hold outgoing API calls to get various info from other services.
 
 
@@ -43,9 +63,9 @@ def author_update_or_create(uuid,host):
     except HTTPError as e:
         # Catch any pesky errors from other sites being down
         print("Http error getting stuff: " + type(e))
-        pass 
+        pass
     return author
-        
+
 
 # Deprecated function. No longer use, references to this function should be removed.
 # and then the function itself. I have not yet done this as I don't want to fix all
@@ -54,7 +74,7 @@ def author_update_or_create(uuid,host):
 def getForeignAuthor(uuid):
     # Function to get a foreign author with the given uuid.
     # Returns None if the author isn't found, otherwise creates/updates that
-    # users info in our DB with the infor returned from the foreign hosts and 
+    # users info in our DB with the infor returned from the foreign hosts and
     # returns the author object.
     author = None
     for node in Node.objects.all():
@@ -96,7 +116,7 @@ def getForeignAuthor(uuid):
         except HTTPError as e:
             # Catch any pesky errors from other sites being down
             print("Http error getting stuff: " + type(e))
-            pass 
+            pass
     return author
 
 def getForeignAuthorPosts(uuid):

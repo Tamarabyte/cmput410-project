@@ -1,5 +1,6 @@
 # from api.requests import HINDLEBOOK, DEV_HINDLEBOOK, TEST
 from requests.auth import HTTPBasicAuth
+from api.serializers import AuthorSerializer
 import requests
 
 HINDLEBOOK = {
@@ -17,48 +18,48 @@ DEV_HINDLEBOOK = {
 }
 
 
-class VisiblePostsRequestFactory():
+class FriendQueryRequestFactory():
     """
-    An Encapsulation for building Visible Post requests
+    An Encapsulation for building Author to Author friend querying
     """
     def get(self):
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
-    def create(host, uuid):
+    def create(host):
         if host == HINDLEBOOK['host']:
-            return HindlebookVisiblePostsRequest(host, uuid)
+            return HindlebookPublicPostsRequest(host)
         elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookVisiblePostsRequest(host, uuid)
+            return DevHindlebookPublicPostsRequest(host)
         else:
             raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
 
     create = staticmethod(create)
 
 
-class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
+class HindlebookFriendQueryRequest(FriendQueryRequestFactory):
     """
-    Hindlebook specific Visible Post Request
+    Hindlebook specific FriendRequest
     """
     def __init__(self, host):
         self.host = host
-        self.url = "http://%s/api/author/posts" % host
+        self.url = "http://%s/api/friends" % host
         self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
 
-    def get(self, uuid):
-        headers = {'uuid': uuid}
-        return requests.get(url=self.url, headers=headers, auth=self.auth)
+    def get(self, uuid1, uuid2):
+        self.url = self.url + "/%s/%s" % (uuid1, uuid2)
+        return requests.get(url=self.url, auth=self.auth)
 
 
-class DevHindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
+class DevHindlebookFriendQueryRequest(FriendQueryRequestFactory):
     """
-    Dev_Hindlebook specific Visible Post Request
+    Dev_Hindlebook specific FriendRequest
     """
-    def __init__(self, host, uuid):
+    def __init__(self, host):
         self.host = host
-        self.url = "http://%s/api/author/posts" % host
+        self.url = "http://%s/api/friends" % host
         self.auth = HTTPBasicAuth(DEV_HINDLEBOOK['username'], DEV_HINDLEBOOK['password'])
 
-    def get(self, uuid):
-        headers = {'uuid': uuid}
-        return requests.get(url=self.url, headers=headers, auth=self.auth)
+    def get(self, uuid1, uuid2):
+        self.url = self.url + "/%s/%s" % (uuid1, uuid2)
+        return requests.get(url=self.url, auth=self.auth)
