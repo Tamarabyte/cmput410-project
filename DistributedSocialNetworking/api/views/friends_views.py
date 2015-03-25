@@ -81,6 +81,9 @@ class FriendRequest(APIView):
         if friend not in author.friends.all():
             author.friends.add(friend)
 
+        if (friend not in author.follows.all()):
+            author.follows.add(friend)
+
         return Response()
 
 
