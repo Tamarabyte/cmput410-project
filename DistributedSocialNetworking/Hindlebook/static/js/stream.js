@@ -33,7 +33,7 @@ $(function() {
 '<div class="row">'+
     '<div class="well comment-block">'+
         '<span class="comment-author">'+
-            '<a href="'+ 'a place'/* author url */ +'">'+
+            '<a href="'+ comment.author_url +'">'+
             comment.author.displayname +
             '</a>'+
         '</span>'+
