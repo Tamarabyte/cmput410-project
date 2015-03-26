@@ -20,7 +20,6 @@ from api import json_derulo
 from api.serializers import CommentSerializer
 
 
-
 class StreamView(TemplateView):
 
     template_name = "stream.html"
@@ -42,13 +41,10 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
+            json_derulo.getForeignStreamPosts(self.request.user.author, time)
         local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
-        # foreign_posts = json_derulo.getForeignStreamPosts(self.request.user.author, time)
-        # new_posts = sorted(chain(local_posts, foreign_posts), key=lambda instance: instance.pubDate, reverse=reversed)
-        # new_posts.sort(key=lambda p: p.pubDate)
-        new_posts = local_posts
 
-        for post in new_posts:
+        for post in local_posts:
             response_data = {}
             response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})

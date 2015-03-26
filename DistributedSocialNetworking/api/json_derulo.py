@@ -110,7 +110,7 @@ def getForeignStreamPosts(author, min_time):
         # Turn the JSON into Post objects in the DB!
         json_to_posts(postsJSON)
 
-        return []
+    return []
 
 
 def getForeignAuthor(uuid):
