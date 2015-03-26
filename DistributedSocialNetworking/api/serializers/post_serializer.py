@@ -4,6 +4,7 @@ from rest_framework import serializers
 from Hindlebook.models import Post, Comment, Node, Category, Author
 from api.serializers import AuthorSerializer
 from api.serializers.comment_serializer import CommentSerializer
+from api.requests import ProfileRequestFactory
 from django.shortcuts import get_object_or_404
 # from api.json_derulo import getForeignProfile
 import datetime
