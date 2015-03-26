@@ -3,7 +3,8 @@ import json
 # from django.forms import widgets
 from rest_framework import serializers
 from Hindlebook.models import Post, Comment, Node, Category, Author
-from api.serializers import AuthorSerializer, CommentSerializer
+from api.serializers import AuthorSerializer
+from api.serializers.comment_serializer import CommentSerializer
 from api.requests import ProfileRequestFactory
 from django.shortcuts import get_object_or_404
 # import datetime
