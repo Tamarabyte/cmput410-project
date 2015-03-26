@@ -338,7 +338,7 @@ float: right!important;
 .post-field-img {
   height: 34px;
   font-size: 18px;
-  background-color: #34AACD;
+  background-color: #989EA0;
   float: left;
   margin-top: 30px;
   padding: 10px;
@@ -382,8 +382,7 @@ float: right!important;
 }
 
 .post-tag-select {
-  background-color: #34AACD !important;
-  border-color: #34AACD !important;
+  background-color: #7B8386 !important;
   color: #fff !important;
 }
 
