@@ -102,6 +102,9 @@ def getForeignAuthor(uuid):
         obj = ProfileRequestFactory.create(node).get(uuid).json()
         try:
             author = Author.objects.get(uuid=uuid, node = node)
+            # since there is no defined profile JSON, can't expect these to be in the request.
+            # best to use obj.get('github_id', None) which will give you None if not in the request
+            # indexing will throw an error
             author.github_id = obj['github_id']
             author.about = obj['about']
             author.username = obj['displayname']

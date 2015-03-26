@@ -65,18 +65,18 @@ class ForeignNodeAuthentication(BaseAuthentication):
             msg = _('Invalid basic header. Expect host:password')
             raise exceptions.AuthenticationFailed(msg)
 
-        host, password = auth_parts[0], auth_parts[1]
+        host_name, password = auth_parts[0], auth_parts[1]
 
         return self.authenticate_foreign_credentials(host, password)
 
-    def authenticate_foreign_credentials(self, host, password):
+    def authenticate_foreign_credentials(self, host_name, password):
         """
         Authenticate the host and password and return the vouched Foreign Author
         """
-        node = Node.objects.filter(host=host).first()
+        node = Node.objects.filter(host=host_name).first()
 
         if node is None:
-            raise exceptions.AuthenticationFailed(_('Node %s does not exist.') % node)
+            raise exceptions.AuthenticationFailed(_('Node %s does not exist.') % host_name)
 
         if node.password != password:
             raise exceptions.AuthenticationFailed(_('Invalid node password.'))

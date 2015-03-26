@@ -26,7 +26,7 @@ class HindlebookPublicPostsRequest(PublicPostsRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/posts" % node.host
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self):
         return requests.get(url=self.url, auth=self.auth)

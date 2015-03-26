@@ -26,7 +26,7 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     def __init__(self, host, uuid):
         self.node = node
         self.url = "http://%s/api/author/posts" % node.host_name
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid):
         headers = {'uuid': uuid}

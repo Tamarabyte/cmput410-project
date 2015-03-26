@@ -30,7 +30,7 @@ class HindlebookFriendQueryRequest(FriendQueryRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/friends" % node.host
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid1, uuid2):
         self.url = self.url + "/%s/%s" % (uuid1, uuid2)
