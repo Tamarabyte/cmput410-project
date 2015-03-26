@@ -2,8 +2,8 @@ import json
 import requests
 import datetime
 import dateutil.parser
-from Hindlebook.models import Node, Author, Settings, Post
-from api.serializers import NonSavingPostSerializer
+from Hindlebook.models import Node, Author, Settings, Post, Comment
+from api.serializers import PostSerializer
 from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
 
 
@@ -31,6 +31,37 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 
 # Module to hold outgoing API calls to get various info from other services.
 
+def json_to_posts(json):
+    posts = json["posts"]
+
+    out = []
+
+    for p in posts:
+        guid = p.get('guid', None)
+        if guid is None:
+            # Bad json
+            continue
+
+        post = Post.objects.filter(guid=guid).first()
+        if post is None:
+            # create post
+            serializer = PostSerializer(data=p)
+            serializer.is_valid(raise_exception=True)
+            post = serializer.save()
+            out.append(post)
+        else:
+            # update post
+            # Purge old comments, if necessary
+            if p.get('comments', None) is not None:
+                post.comments.all().delete()
+            serializer = PostSerializer(post, data=p)
+            serializer.is_valid(raise_exception=True)
+            post = serializer.save()
+            out.append(post)
+
+    return out
+
+
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     ''' Gets all posts created by targetUuid a user on host node that
         are visible by logged in user requestUuid and returns them '''
@@ -47,10 +78,9 @@ def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     postsJSON = response.json()
 
     # Turn the JSON into Post objects!
-    serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-    if serializer.is_valid(raise_exception=True):
-        posts = serializer.save()
-    return posts
+    json_to_posts(postsJSON)
+
+    return []
 
 
 def getForeignStreamPosts(author, min_time):
@@ -77,19 +107,10 @@ def getForeignStreamPosts(author, min_time):
         # Get the JSON returned
         postsJSON = response.json()
 
-        # Turn the JSON into Post objects!
-        # If the serializer throws exceptions during validation, it will throw a HTTP 400
-        # Don't catch it!
-        serializer = PostSerializer(data=postsJSON["posts"], many=True)
-        if serializer.is_valid(raise_exception=True):
-            newposts = serializer.save()
+        # Turn the JSON into Post objects in the DB!
+        json_to_posts(postsJSON)
 
-        # We only want newish posts ?
-        if min_time is not None:
-            posts += filter(lambda p: p.pubDate > min_time, newposts)
-        else:
-            posts += newposts
-    return posts
+        return []
 
 
 def getForeignAuthor(uuid):

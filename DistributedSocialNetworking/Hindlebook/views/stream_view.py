@@ -15,6 +15,7 @@ from Hindlebook.models import Post, Comment
 from Hindlebook.forms import PostForm, CommentForm
 from api.json_derulo import getForeignStreamPosts
 
+
 class StreamView(TemplateView):
     template_name = "stream.html"
 
@@ -50,6 +51,7 @@ class StreamView(TemplateView):
             all_comments = Comment.objects.all()
 
         for comment in all_comments:
+            print(comment.comment)
             response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
             response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
             response_data["postGUID"] = comment.post.guid
