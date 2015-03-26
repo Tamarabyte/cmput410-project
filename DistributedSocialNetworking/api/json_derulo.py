@@ -52,22 +52,27 @@ def author_update_or_create(targetUUID, node):
     return author
 
 
-# def getForeignAuthorPosts(requesterUuid, targetUuid, node):
-#     ''' Gets all posts created by targetUuid a user on host node that
-#         are visible by logged in user requestUuid and returns them '''
-#     postsJSON = AuthoredPostsRequestFactory.create(node).get(requesterUuid, targetUuid).json()
-#     serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-#     posts = None
-#     if serializer.is_valid(raise_exception=True):
-#         posts = serializer.save()
-#     return posts
-
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
-    return []
+    ''' Gets all posts created by targetUuid a user on host node that
+        are visible by logged in user requestUuid and returns them '''
 
-# def getForeignStreamPosts(userUuid, min_time):
-#     print(userUuid)
-#     return []
+    request = AuthoredPostsRequestFactory.create(node)
+    response = request.get(requesterUuid, targetUuid)
+
+    if(response.status_code != 200):
+        # Node not reachable
+        print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+        return []
+
+    # Get the JSON returned
+    postsJSON = response.json()
+
+    # Turn the JSON into Post objects!
+    serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
+    if serializer.is_valid(raise_exception=True):
+        posts = serializer.save()
+    return posts
+
 
 def getForeignStreamPosts(author, min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
@@ -76,8 +81,6 @@ def getForeignStreamPosts(author, min_time):
     posts = []
     postsJSON = None
     for node in Node.objects.all():
-
-        newposts = None
 
         # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
@@ -88,28 +91,25 @@ def getForeignStreamPosts(author, min_time):
         response = request.get(author.uuid)
 
         if(response.status_code != 200):
-            print(response.status_code)
-            # print(response.content)
             # Node not reachable
+            print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
             continue
 
         # Get the JSON returned
         postsJSON = response.json()
 
-        print(postsJSON)
+        # Turn the JSON into Post objects!
+        # If the serializer throws exceptions during validation, it will throw a HTTP 400
+        # Don't catch it!
+        serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
+        if serializer.is_valid(raise_exception=True):
+            newposts = serializer.save()
 
-        try:
-            serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-            if serializer.is_valid(raise_exception=True):
-                newposts = serializer.save()
-        except Exception as e:
-            print("exception raised!")
-            print(str(e))
-        if (newposts is not None):
-            if min_time is not None:
-                posts += filter(lambda p: p.pubDate > min_time,newposts)
-            else:
-                posts += newposts
+        # We only want newish posts ?
+        if min_time is not None:
+            posts += filter(lambda p: p.pubDate > min_time, newposts)
+        else:
+            posts += newposts
     return posts
 
 
