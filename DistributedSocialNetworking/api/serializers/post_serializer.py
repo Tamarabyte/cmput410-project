@@ -208,12 +208,23 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         if comment_data is None:
             return
 
+        comments = []
+
         for comment in comment_data:
             author = comment.pop('author', None)
             if author is None:
                 raise serializers.ValidationError('The Author field of a Comment is required.')
             author = self.get_author(author)
-            post.comments.add(Comment(author=author, post=post, **comment))
+            comments.append(Comment(author=author, post=post, **comment))
+
+            guid = comment.get('guid')
+            print(guid)
+
+            c = Comment.objects.filter(guid=guid).first()
+            if c is not None:
+                c.delete()
+
+        post.comments = comments
 
     def create(self, validated_data):
         """
@@ -235,7 +246,9 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
             post.categories.add(category)
 
         # Create the comments
-        self.create_comments(post, comment_data)
+        # self.create_comments(post, comment_data)
+
+        # Comment.objects.all().delete()
 
         return post
 
@@ -253,7 +266,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         return value
 
     def validate_comments(self, value):
-        pass
+        return value
 
     class Meta:
         model = Post
