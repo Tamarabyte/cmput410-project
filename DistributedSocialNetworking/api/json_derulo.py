@@ -117,10 +117,11 @@ def getForeignAuthor(uuid):
 
 
 def sendForeignComment(comment):
+    print("hi3")
     for node in Node.objects.all():
         if node == Settings.objects.all().first().node:
             continue
-        obj = PostRequestFactory.create(node)
+        request = PostRequestFactory.create(node)
         try:
             response = obj.get(comment.uuid)
             if response.status_code != 200:
@@ -133,7 +134,7 @@ def sendForeignComment(comment):
             post = NonSavingPostSerializer(data=postsJSON["posts"], many=False)
             post.comments.add(comment)
 
-            response = obj.put(post.guid, post)
+            response = request.put(post.guid, post)
 
             if response != 200:
                 # Something went wrong with the post

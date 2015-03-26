@@ -41,7 +41,7 @@ class StreamView(TemplateView):
             time = dateutil.parser.parse(self.request.POST['last_time'])
         local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
         foreign_posts = json_derulo.getForeignStreamPosts(self.request.user.author, time)
-        new_posts = sorted(chain(local_posts, foreign_posts), key=lambda instance: instance.pubDate, reverse=reversed)
+        new_posts = sorted(chain(local_posts, foreign_posts), key=lambda instance: instance.pubDate, reverse=False)
         new_posts.sort(key=lambda p: p.pubDate)
         for post in new_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}

@@ -12,12 +12,12 @@ class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.guid = uuid.uuid4
         super(PostForm, self).__init__(*args, **kwargs)
-        
+
         self.category_choices = [category.tag for category in Category.objects.all()];
-        
+
         # add fields here so we can dynamically set choices on form creations
         self.fields['categories'] = MultipleChoiceFieldNoValidation(choices=zip(self.category_choices, self.category_choices))
-    
+
     def clean_categories(self):
         """
         Validate that the supplied email address is unique for the site.
@@ -39,7 +39,7 @@ class PostForm(forms.ModelForm):
         post.source = Settings.objects.all().first().node.host
         post.origin = Settings.objects.all().first().node.host
         post.description = post.title
-        
+
         tags = Category.objects.filter(pk__in=self.cleaned_data.get("categories"))
         post.categories.add(*tags)
         if commit:
@@ -47,7 +47,7 @@ class PostForm(forms.ModelForm):
             self.save_m2m()
 
         return post
-    
+
     class Meta:
         model = Post
         fields = ['title', 'content', 'visibility', 'content_type']
@@ -68,7 +68,6 @@ class CommentForm(forms.ModelForm):
         comment.guid = commentGUID
         comment.post = post
         comment.author = author
-
         if commit:
             comment.save()
 
