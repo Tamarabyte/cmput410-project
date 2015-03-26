@@ -481,7 +481,7 @@ float: right!important;
     position: relative;
     top: -10px;
     left: -10px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     font-size: 16px;
     font-weight: bold;
 }
@@ -514,7 +514,7 @@ float: right!important;
 
 
 #comment_form_html {
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 /* Posts  ------------------------------------------ */
