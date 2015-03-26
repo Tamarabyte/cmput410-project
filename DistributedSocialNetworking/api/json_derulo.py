@@ -2,10 +2,9 @@ import json
 import requests
 import datetime
 import dateutil.parser
-
 from Hindlebook.models import Node, Author, Settings, Post
-from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
 from api.serializers import NonSavingPostSerializer
+from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
 
 
 # Key for the Request Factories
@@ -32,65 +31,64 @@ from api.serializers import NonSavingPostSerializer
 
 # Module to hold outgoing API calls to get various info from other services.
 
-
-def author_update_or_create(targetUUID, node):
-    ''' Takes in a uuid and a node and update or creates that author in our
-        DB after requesting the info from that node '''
-    author = None
-
-    obj = ProfileRequestFactory.create(node).get(targetUUID).json()
-    try:
-        author = Author.objects.get(uuid=targetUUID, node = node)
-        author.github_id = obj['github_id']
-        author.about = obj['about']
-        author.username = obj['displayname']
-        author.save()
-    except Author.DoesNotExist:
-        author = Author.objects.create(uuid=targetUUID, username=obj['displayname'],
-                                       node=node, about=obj["about"], github_id=obj['github_id'])
-        author.save()
-    return author
-
-
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     ''' Gets all posts created by targetUuid a user on host node that
         are visible by logged in user requestUuid and returns them '''
-    postsJSON = AuthoredPostsRequestFactory.create(node).get(requesterUuid, targetUuid).json()
+
+    request = AuthoredPostsRequestFactory.create(node)
+    response = request.get(requesterUuid, targetUuid)
+
+    if(response.status_code != 200):
+        # Node not reachable
+        print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+        return []
+
+    # Get the JSON returned
+    postsJSON = response.json()
+
+    # Turn the JSON into Post objects!
     serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-    posts = None
     if serializer.is_valid(raise_exception=True):
         posts = serializer.save()
     return posts
 
 
-def getForeignStreamPosts(userUuid, min_time):
+def getForeignStreamPosts(author, min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
         by uuid's stream. Should be called to create the stream for user uuid
         returns a list of post objects.'''
     posts = []
     postsJSON = None
     for node in Node.objects.all():
+
         # Skip our node, don't want to ask ourselves unecessarily.
-        newposts = None
         if node == Settings.objects.all().first().node:
             continue
-        try:
-            postsJSON = VisiblePostsRequestFactory.create(node).get(userUuid).json()
-        except Exception as e:
-            print(node)
-            print(str(e))
-        try:
-            serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-            if serializer.is_valid(raise_exception=True):
-                newposts = serializer.save()
-        except Exception as e:
-            print("exception raised!")
-            print(str(e))
-        if (newposts is not None):
-            if min_time is not None:
-                posts += filter(lambda p: p.pubDate > min_time,newposts)
-            else:
-                posts += newposts
+
+        # Make a request for this nodes visible posts
+        request = VisiblePostsRequestFactory.create(node)
+        response = request.get(author.uuid)
+
+        if(response.status_code != 200):
+            # Node not reachable
+            print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+            continue
+
+        # Get the JSON returned
+        postsJSON = response.json()
+
+        # Turn the JSON into Post objects!
+        # If the serializer throws exceptions during validation, it will throw a HTTP 400
+        # Don't catch it!
+        serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
+        if serializer.is_valid(raise_exception=True):
+            newposts = serializer.save()
+
+        # We only want newish posts ?
+        if min_time is not None:
+            posts += filter(lambda p: p.pubDate > min_time, newposts)
+        else:
+            posts += newposts
     return posts
 
 
@@ -102,6 +100,9 @@ def getForeignAuthor(uuid):
         obj = ProfileRequestFactory.create(node).get(uuid).json()
         try:
             author = Author.objects.get(uuid=uuid, node = node)
+            # since there is no defined profile JSON, can't expect these to be in the request.
+            # best to use obj.get('github_id', None) which will give you None if not in the request
+            # indexing will throw an error
             author.github_id = obj['github_id']
             author.about = obj['about']
             author.username = obj['displayname']
@@ -113,4 +114,3 @@ def getForeignAuthor(uuid):
             author.save()
             break
     return author
-

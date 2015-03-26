@@ -35,7 +35,7 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        new_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time) + getForeignStreamPosts(self.request.user.author,time)
+        new_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time) + getForeignStreamPosts(self.request.user.author, time)
         new_posts.sort(key=lambda p: p.pubDate)
         for post in new_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}

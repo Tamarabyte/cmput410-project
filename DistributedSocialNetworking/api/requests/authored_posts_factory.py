@@ -26,7 +26,7 @@ class HindlebookAuthoredPostsRequest(AuthoredPostsRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/author" % node.host
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, requester_uuid, author_uuid):
         self.url = self.url + "/%s/posts" % author_uuid

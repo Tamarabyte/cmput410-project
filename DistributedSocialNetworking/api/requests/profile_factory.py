@@ -12,7 +12,7 @@ class ProfileRequestFactory():
     # Static Factory
     def create(node):
         if node.team_number == 9:
-            return HindlebookAuthoredPostsRequest(node)
+            return HindlebookProfileRequest(node)
         else:
             raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 
@@ -26,7 +26,7 @@ class HindlebookProfileRequest(ProfileRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/author" % node.host
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, author_uuid):
         self.url = self.url + "/%s" % author_uuid

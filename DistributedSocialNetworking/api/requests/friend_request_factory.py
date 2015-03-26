@@ -13,7 +13,7 @@ class FriendRequestFactory():
     # Static Factory
     def create(node):
         if node.team_number == 9:
-            return HindlebookAuthoredPostsRequest(node)
+            return HindlebookFriendRequest(node)
         else:
             raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 
@@ -27,7 +27,7 @@ class HindlebookFriendRequest(FriendRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/friendrequest" % node.host
-        self.auth = HTTPBasicAuth(node.host_name, node.password)
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
         data = {"query": "friendrequest",
