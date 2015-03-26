@@ -1,4 +1,3 @@
-from api.requests import HINDLEBOOK, DEV_HINDLEBOOK
 from requests.auth import HTTPBasicAuth
 import requests
 
@@ -11,13 +10,11 @@ class AuthoredPostsRequestFactory():
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
-    def create(host):
-        if host == HINDLEBOOK['host']:
-            return HindlebookAuthoredPostsRequest(host)
-        elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookAuthoredPostsRequest(host)
+    def create(node):
+        if node.team_number == 9:
+            return HindlebookAuthoredPostsRequest(node)
         else:
-            raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
+            raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 
     create = staticmethod(create)
 
@@ -26,25 +23,10 @@ class HindlebookAuthoredPostsRequest(AuthoredPostsRequestFactory):
     """
     Hindlebook specific Authored Post Request
     """
-    def __init__(self, host):
-        self.host = host
-        self.url = "http://%s/api/author" % host
-        self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
-
-    def get(self, requester_uuid, author_uuid):
-        self.url = self.url + "/%s/posts" % author_uuid
-        self.headers = {'uuid': requester_uuid}
-        return requests.get(url=self.url, headers=self.headers, auth=self.auth)
-
-
-class DevHindlebookAuthoredPostsRequest(AuthoredPostsRequestFactory):
-    """
-    Dev_Hindlebook specific Authored Post Request
-    """
-    def __init__(self, host):
-        self.host = host
-        self.url = "http://%s/api/author" % host
-        self.auth = HTTPBasicAuth(DEV_HINDLEBOOK['username'], DEV_HINDLEBOOK['password'])
+    def __init__(self, node):
+        self.node = node
+        self.url = "http://%s/api/author" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, requester_uuid, author_uuid):
         self.url = self.url + "/%s/posts" % author_uuid

@@ -35,7 +35,7 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        new_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time) + getForeignStreamPosts(self.request.user.author,time)
+        new_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time) + getForeignStreamPosts(self.request.user.author, time)
         new_posts.sort(key=lambda p: p.pubDate)
         for post in new_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
@@ -85,6 +85,8 @@ class CreatePost(View):
             return JsonResponse(response_data, status=400)
 
         post.save()
+        # When we don't pass form.save(commit=True) we have to explicitly save m2m fields later
+        form.save_m2m()
         response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
         response_data["time"] = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
         response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})

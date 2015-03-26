@@ -6,9 +6,19 @@
             <div class="pull-left"><img class="post-img" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="100"></img></div>
             <div class="post-row">
                 <div class="post-author pull-left"><a href="{% url "profile" post.author.uuid %}">{{ post.author.username }}</a></div>
+                {% for category in post.categories.all %}
+                    <span class="label label-info post-tag">{{ category }}</span>
+                {% endfor %}
                 <div class="post-date">{{ post.pubDate }}</div>
-                <br>
+ 
+                 <div class="post-title">{{ post.title }}</div>
                 <div class="post-content">{{ post.content }}</div>
+                
+
+
+
+
+                <br>
             </div>
         </div> <!-- /row -->
     </div>   <!-- /well -->

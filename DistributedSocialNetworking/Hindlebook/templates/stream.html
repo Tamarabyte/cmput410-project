@@ -37,6 +37,7 @@
 
 <script>
 var time = "";
+var category_choices;
 
 function showCommentForm(event) {
     $("#comment-errors").text("");
@@ -51,7 +52,40 @@ function showCommentForm(event) {
     $("#comment-form").data("postGUID", data);
     console.log($("#comment-form").data("postGUID"));
 };
+
+function magicSuggest() {
+	category_choices = [];
+    $("#id_categories option").each(function() {
+      category_choices.push({ "id": $(this).val() + "", "name": $(this).text() + "" });
+    });
+    ms = $('#cat-suggest').magicSuggest({
+      placeholder: ' Add tags...',
+      allowFreeEntries: true,
+      highlight: false,
+      data: category_choices,
+      value: $("#id_categories").val(),
+	  selectionCls: 'post-tag-select',
+	  maxEntryLength: 15,
+	  maxSelection: 3,
+	  maxEntryRenderer: function(v) {return 'too long';}
+    });
+	
+    $(ms).on('selectionchange', function(){
+	  var values = this.getValue();
+	  for (var i = 0; i < values.length; i++) {
+		if (!$('#id_categories option[value="' + values[i] + '"]').length) {
+			$("#id_categories").append('<option value="' + values[i] + '">' + values[i] + '</option>');
+			category_choices.push({ "id": values[i] + "", "name": values[i] + "" });
+		}
+	  }
+	  $("#id_categories").val(values);
+	  console.log($("#id_categories").val());
+    });
+}
+	magicSuggest();
+
 </script>
+
 <script type="text/javascript" src="{% static "js/post.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/comment.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/stream.js" %}"></script>

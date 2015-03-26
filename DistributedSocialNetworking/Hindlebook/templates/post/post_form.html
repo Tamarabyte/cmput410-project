@@ -5,21 +5,30 @@
         {% csrf_token %}
         <fieldset>
             <div class="col-lg-12">
-                {% render_field post_form.content rows="3" placeholder="Enter a new post..." class+="form-control input-lg" autocomplete="off" %}
-                {% if post_form.content.errors %}
-                    <div class="error-container error">{{ post_form.content.errors.0|escape }}</div>
+                {% render_field post_form.title placeholder="Title..." class+="form-control input-lg post-title-inp" autocomplete="off" %}
+                {% if post_form.title.errors %}
+                    <div class="error-container error">{{ post_form.title.errors.0|escape }}</div>
                 {% endif %}
                 {% if alert %}
                     <div class="error-container error">{{ alert | safe }}{{ post_form.content.errors.0|escape }}</div>
                 {% endif %}
+                {% render_field post_form.content rows="3" placeholder="Enter a new post..." class+="post-content-inp form-control input-lg" autocomplete="off" %}
+                {% if post_form.content.errors %}
+                    <div class="error-container error">{{ post_form.content.errors.0|escape }}</div>
+                {% endif %}
                 <input id="guid" type="hidden" value="{{ post_form.guid }}" />
-                {% render_field post_form.visibility default="PUBLIC" class+="pull-left form-control input-sm post-vis" %}
+                <div class="icon-kub-tag post-field-img"></div>
+                <div id="cat-suggest"></div>
+                <div class="pull-right">{% render_field post_form.visibility default="PUBLIC" class+="pull-right form-control input-sm post-vis-inp" %}<div class="icon-kub-locked post-field-img"></div></div>
+                {% render_field post_form.categories class+="pull-left form-control input-sm post-cat hidden" %}
+                <div class="pull-right">{% render_field post_form.content_type default="text/plain" class+="pull-right form-control input-sm post-type-inp" %}<div class="icon-kub-document post-field-img"></div></div>
+
             </div>
         </fieldset>
 
         <!-- Submit Button -->
         <div class="form-buttons col-lg-12">
-          <button type="submit" class="btn btn-ex-lg btn-success" value="submit">
+          <button type="submit" class="btn btn-ex-lg btn-success post-form-button" value="submit">
             <i class="icon-kub-speech-02"></i> Post
           </button>
        </div> <!-- buttons -->

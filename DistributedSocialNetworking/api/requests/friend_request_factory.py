@@ -1,4 +1,3 @@
-from api.requests import HINDLEBOOK, DEV_HINDLEBOOK
 from requests.auth import HTTPBasicAuth
 from api.serializers import AuthorSerializer
 import requests
@@ -12,13 +11,11 @@ class FriendRequestFactory():
         raise NotImplementedError('`post()` must be implemented.')
 
     # Static Factory
-    def create(host):
-        if host == HINDLEBOOK['host']:
-            return HindlebookPublicPostsRequest(host)
-        elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookPublicPostsRequest(host)
+    def create(node):
+        if node.team_number == 9:
+            return HindlebookFriendRequest(node)
         else:
-            raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
+            raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 
     create = staticmethod(create)
 
@@ -27,26 +24,10 @@ class HindlebookFriendRequest(FriendRequestFactory):
     """
     Hindlebook specific FriendRequest
     """
-    def __init__(self, host):
-        self.host = host
-        self.url = "http://%s/api/friendrequest" % host
-        self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
-
-    def post(self, author, friend):
-        data = {"query": "friendrequest",
-                "author": AuthorSerializer(author).data,
-                "friend": AuthorSerializer(friend).data}
-        return requests.post(url=self.url, data=data, auth=self.auth)
-
-
-class DevHindlebookFriendRequest(FriendRequestFactory):
-    """
-    Dev_Hindlebook specific FriendRequest
-    """
-    def __init__(self, host):
-        self.host = host
-        self.url = "http://%s/api/friendrequest" % host
-        self.auth = HTTPBasicAuth(DEV_HINDLEBOOK['username'], DEV_HINDLEBOOK['password'])
+    def __init__(self, node):
+        self.node = node
+        self.url = "http://%s/api/friendrequest" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
         data = {"query": "friendrequest",
