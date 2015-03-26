@@ -1,8 +1,9 @@
+import json
 from django.forms import widgets
 from rest_framework import serializers
 from Hindlebook.models import Post, Comment, Node, Category, Author
 from api.serializers import AuthorSerializer
-from api.serializers.comment_serializer import CommentSerializer, NonSavingCommentSerializer
+from api.serializers.comment_serializer import CommentSerializer
 from django.shortcuts import get_object_or_404
 # from api.json_derulo import getForeignProfile
 import datetime
@@ -192,10 +193,17 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         """
         Creates the comments for `post` stored in `comment_data`
         """
-        serializer = NonSavingCommentSerializer(data=comment_data, many=True)
-        serializer.is_valid()
-        comment = serializer.save()
-        post.comments.add(comment)
+
+        # [OrderedDict([('author', OrderedDict([('username', 'mark2'), ('node', 'localhost:8080'), ('uuid', '1611693a-6167-4b89-8916-0ab40b8820cc')])), ('comment', "Mark2's commetn!"), ('guid', 'ad73cd02-5c2f-4a79-9675-65aa5a2c8c23')])]
+
+        # [{"author": {"username": "mark2", "node": "localhost:8080", "uuid": "1611693a-6167-4b89-8916-0ab40b8820cc"}, "comment": "Mark2's commetn!", "guid": "ad73cd02-5c2f-4a79-9675-65aa5a2c8c23"}]
+
+        for comment in comment_data:
+            author = comment.pop('author', None)
+            if author is None:
+                raise serializers.ValidationError('The Author field of a Comment is required.')
+            author = self.get_author(author)
+            post.comments.add(Comment(author=author, post=post, **comment))
 
     def create(self, validated_data):
         """
@@ -217,8 +225,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
             post.categories.add(category)
 
         # Create the comments
-        if(len(comment_data) > 0):
-            self.create_comments(post, comment_data)
+        # self.create_comments(post, comment_data)
 
         return post
 
