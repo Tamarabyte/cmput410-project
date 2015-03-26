@@ -24,9 +24,11 @@ $(function() {
         $('#post-form').html(response["form"]);
         $('#post-form').clearForm();
         $("#id_visibility").val("PUBLIC")
+        $("#id_visibility").val("text/plain")
         $('#stream').prepend(response["post"]);
         $('.add_comment_button[data-postGUID="' + response["created_guid"] +'"]').click(showCommentForm);
         time = response['time'];
+        magicSuggest();
     }
 
     function ajaxError(xhr, errmsg, err) {
@@ -34,6 +36,7 @@ $(function() {
         console.log(xhr.status + ": " + xhr.responseText);
         response = JSON.parse(xhr.responseText);
         $('#post-form').html(response["form"]);
+        magicSuggest();
     }
     
 });

@@ -12,11 +12,15 @@ import operator
 
 
 class Category(models.Model):
-    tag = models.CharField(max_length=25, null=False, blank=False, primary_key=True)
+    tag = models.CharField(max_length=15, null=False, blank=False, primary_key=True)
 
+    def __str__(self):
+        return self.tag
+    
     class Meta():
         verbose_name = "Tags"
         verbose_name_plural = "Tags"
+        ordering = ['tag']
 
 
 class ExtendedPostManager(models.Manager):
@@ -82,11 +86,11 @@ class Post(models.Model):
     objects_ext = ExtendedPostManager()
 
     guid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
-    source = models.CharField(max_length=100, blank=True, default='Unknown source')
-    origin = models.CharField(max_length=100, blank=True, default='Unknown origin')
+    source = models.CharField(max_length=100, blank=True, default='')
+    origin = models.CharField(max_length=100, blank=True, default='')
 
-    title = models.CharField(max_length=40, blank=True, default='No title')
-    description = models.CharField(max_length=40, blank=True, default='No description')
+    title = models.CharField(max_length=40, blank=False, default='')
+    description = models.CharField(max_length=40, blank=True, default='')
     categories = models.ManyToManyField(Category, blank=True, related_name='tagged_posts')
     content = models.TextField(blank=False)
 
@@ -94,8 +98,8 @@ class Post(models.Model):
 
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
-    content_type_choices = (("text/plain", "text/plain"), ("text/x-markdown", "text/x-markdown"), ("text/html", "text/html"))
-    content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/html")
+    content_type_choices = (("text/plain", "Text"), ("text/x-markdown", "Markdown"), ("text/html", "HTML"))
+    content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/plain")
 
     visibility_choices = (("PUBLIC", "Public"), ("FOAF", "Friends of Friends Only"), ("FRIENDS", "Friends Only"), ("PRIVATE", "Private"), ("SERVERONLY", "Server Only"))
     visibility = models.CharField(default="PUBLIC", max_length=10, blank=False, choices=visibility_choices, db_index=True)
