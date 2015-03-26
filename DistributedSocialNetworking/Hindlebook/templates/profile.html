@@ -67,29 +67,39 @@
             <!-- End User Buttons -->
 
                 <!-- User Text and Avatar -->
-            <div class="profile">
-                    <div class="pull-left profile-img">
+            <div class="profile row">
+                    <div class="pull-left profile-img img-col col-lg-4 col-md-4 col-sm-5">
                         <img class="avatar picture-shadow" src="{{ MEDIA_URL }}{{ author.avatar }}" height="200"></img>
                     </div>
-                    <div class="profile-text">
+                    <div class="profile-text col-lg-8 col-md-8 col-sm-7">
                         <div class="profile-name">{{ author.username }}</b></div>
-                        <div class="row">
+                        <div>
                             <br>
-                            <div class="profile-about-title pull-left">About Me: </div>
-                            <div class="profile-about">
-                                {% if author.about %}
-                                    {{ author.about }}
-                            {% else %}
-                                This user has not entered any information about themselves yet.
-                            {% endif %}
+                                
+                            <div class="profile-field">
+                                <div class="profile-about-title pull-left">Node: </div>
+                                <div class="profile-host">
+                                    {{ author.node.host_name }}
+                                </div>
                             </div>
-                            <br>
+                            <div class="profile-field">
+                                <div class="profile-about-title pull-left">About Me: </div>
+                                <div class="profile-about">
+                                    {% if author.about %}
+                                        {{ author.about }}
+                                    {% else %}
+                                        This user has not entered any information about themselves yet.
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="profile-field">
                             <div class="profile-about-title pull-left">Github ID: </div>
-                            {% if author.github_id %}
-                                    {{ author.github_id }}
-                            {% else %}
-                                Not Available
-                            {% endif %}
+                                {% if author.github_id %}
+                                        {{ author.github_id }}
+                                {% else %}
+                                    Not Available
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
             </div>
@@ -110,8 +120,6 @@
 
 {% block scripts %}
 <script>
-
-
     var authorHost = '{{ author.node|escapejs }}';
     var isFollowing = {{ isFollowing }};
     var isForeign = {% if author.isForeign %}1{% else %}0{% endif %};
@@ -137,6 +145,10 @@
     //setUpAjaxForm($('#profile_update_form'), formOptions);
     $(document).ready(function (){
         $('#profile_update_form').ajaxForm(form_options);
+        var h = $('.profile-text').height();
+        console.log(h);
+        console.log((h-200));
+        $('.avatar').css("top", (h-200)/2);
     });
 </script>
 

@@ -1,6 +1,7 @@
 from requests.auth import HTTPBasicAuth
 from api.serializers import AuthorSerializer
 import requests
+import json
 
 
 class FriendRequestFactory():
@@ -33,4 +34,4 @@ class HindlebookFriendRequest(FriendRequestFactory):
         data = {"query": "friendrequest",
                 "author": AuthorSerializer(author).data,
                 "friend": AuthorSerializer(friend).data}
-        return requests.post(url=self.url, data=data, auth=self.auth)
+        return requests.post(url=self.url,headers={"content-type":"application/json"}, data=json.dumps(data), auth=self.auth)
