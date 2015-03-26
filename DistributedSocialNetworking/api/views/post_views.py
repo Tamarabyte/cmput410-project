@@ -35,9 +35,11 @@ def get_author(uuid, node):
     if author is None:
         # New foreign author
         profileJSON = getForeignProfile(uuid, node)
+        if profileJSON is None:
+            return None
 
-        github_id = profileJSON.get('github_id', None)
-        about = profileJSON.get('about', None)
+        github_id = profileJSON.get('github_id', "unknown")
+        about = profileJSON.get('about', "Unknown")
         username = profileJSON.get('username', "Unknown Username")
 
         author = Author.objects.create(uuid=uuid, node=node, username=username,
@@ -49,7 +51,7 @@ def get_author(uuid, node):
 
         github_id = profileJSON.get('github_id', author.github_id)
         about = profileJSON.get('about', author.about)
-        username = profileJSON.get('username', username)
+        username = profileJSON.get('username', author.username)
 
         author.username = username
         author.github_id = github_id
@@ -153,7 +155,10 @@ class AuthoredPosts(APIView):
 
         # Get the Author's Posts
         author = get_author(uuid, node)
-        posts = Post.objects_ext.get_profile_visibile_posts(author, pageAuthor)
+        if author is None:
+            posts = Post.objects.filter(visibility='PUBLIC')
+        else:
+            posts = Post.objects_ext.get_profile_visibile_posts(author, pageAuthor)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
@@ -193,7 +198,10 @@ class VisiblePosts(APIView):
 
         # Filter to get all posts visible to the currently authenticated user
         author = get_author(uuid, node)
-        posts = Post.objects_ext.get_all_visibile_posts(author)
+        if author is None:
+            posts = Post.objects.filter(visibility='PUBLIC')
+        else:
+            posts = Post.objects_ext.get_all_visibile_posts(author)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
