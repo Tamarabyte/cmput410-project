@@ -163,6 +163,7 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=False)
     author = AuthorSerializer(read_only=False, required=True)
     pubDate = serializers.DateTimeField()
+    categories = serializers.ListField(child=serializers.CharField(max_length=15))
 
     def get_author(self, author_data):
         """
@@ -204,6 +205,9 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
 
         # [{"author": {"username": "mark2", "node": "localhost:8080", "uuid": "1611693a-6167-4b89-8916-0ab40b8820cc"}, "comment": "Mark2's commetn!", "guid": "ad73cd02-5c2f-4a79-9675-65aa5a2c8c23"}]
 
+        if comment_data is None:
+            return
+
         for comment in comment_data:
             author = comment.pop('author', None)
             if author is None:
@@ -226,18 +230,12 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         # Create the post
         post = Post(author=author, **validated_data)
 
-        # Create categories if necessary
-        if categories_data is not None:
-            for category in categories_data:
-                if not Category.objects.filter(tag=category).exists():
-                    Category.objects.create(tag=category)
-
         # Add the categories
         for category in categories_data:
             post.categories.add(category)
 
         # Create the comments
-        # self.create_comments(post, comment_data)
+        self.create_comments(post, comment_data)
 
         return post
 
@@ -246,6 +244,16 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         Not Supported
         """
         return None
+
+    def validate_categories(self, value):
+        categories = value
+
+        for cat in categories:
+            Category.objects.get_or_create(tag=cat)
+        return value
+
+    def validate_comments(self, value):
+        pass
 
     class Meta:
         model = Post
