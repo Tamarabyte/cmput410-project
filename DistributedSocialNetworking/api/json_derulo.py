@@ -76,16 +76,28 @@ def getForeignStreamPosts(author, min_time):
     posts = []
     postsJSON = None
     for node in Node.objects.all():
-        # Skip our node, don't want to ask ourselves unecessarily.
+
         newposts = None
+
+        # Skip our node, don't want to ask ourselves unecessarily.
         if node == Settings.objects.all().first().node:
             continue
-        try:
-            postsJSON = VisiblePostsRequestFactory.create(node).get(author.uuid).json()
-        except Exception as e:
-            print('hi')
-            print(node)
-            print(str(e))
+
+        # Make a request for this nodes visible posts
+        request = VisiblePostsRequestFactory.create(node)
+        response = request.get(author.uuid)
+
+        if(response.status_code != 200):
+            print(response.status_code)
+            # print(response.content)
+            # Node not reachable
+            continue
+
+        # Get the JSON returned
+        postsJSON = response.json()
+
+        print(postsJSON)
+
         try:
             serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
             if serializer.is_valid(raise_exception=True):

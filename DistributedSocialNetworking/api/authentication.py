@@ -67,7 +67,7 @@ class ForeignNodeAuthentication(BaseAuthentication):
 
         host_name, password = auth_parts[0], auth_parts[1]
 
-        return self.authenticate_foreign_credentials(host, password)
+        return self.authenticate_foreign_credentials(host_name, password)
 
     def authenticate_foreign_credentials(self, host_name, password):
         """
