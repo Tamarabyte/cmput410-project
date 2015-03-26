@@ -1,6 +1,6 @@
 import uuid
 from django import forms
-from Hindlebook.models.post_models import Post, Comment
+from Hindlebook.models import Post, Comment, Settings
 
 
 class PostForm(forms.ModelForm):
@@ -17,7 +17,9 @@ class PostForm(forms.ModelForm):
         post = super(PostForm, self).save(commit=False)
         post.author = author
         post.guid = postGUID
-
+        post.source = Settings.objects.all().first().node.host
+        post.origin = Settings.objects.all().first().node.host
+        
         if commit:
             post.save()
 
