@@ -44,7 +44,7 @@ class PostSerializer(serializers.ModelSerializer):
 
         node = Node.objects.filter(host=host).first()
         if node is None:
-            raise serializers.ValidationError('Unknownlol Host: %s' % host)
+            raise serializers.ValidationError('Unknown Host: %s' % host)
 
 
         author = Author.objects.filter(uuid=uuid).first()

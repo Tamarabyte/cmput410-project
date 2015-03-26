@@ -65,7 +65,7 @@ class ProfileView(TemplateView):
                     context['isFollowing'] = 1
                 else:
                     context['isFollowing'] = 0
-                context['posts'] = getForeignAuthorPosts(self.request.user.author,authorUUID, targetAuthor.node)
+                context['posts'] = getForeignAuthorPosts(self.request.user.author.uuid, authorUUID, targetAuthor.node)
             else:
                 raise Http404("No Author matches the given query.")
 
@@ -80,7 +80,7 @@ class ProfileView(TemplateView):
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
         all_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, page_author=page_author, reversed=False, min_time=time)
-        
+
         for post in all_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
             response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
