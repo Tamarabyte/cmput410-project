@@ -1,13 +1,14 @@
 [
   {
-    "model": "Hindlebook.node",
+    "model": "Hindlebook.Node",
     "pk" : 1, 
     "fields": {
       "host": "localhost",
       "host_name": "Hindlebook",
       "password" : "",
       "our_username" : "",
-      "our_password" : ""
+      "our_password" : "",
+      "team_number" : 9
     }
   },
   {
