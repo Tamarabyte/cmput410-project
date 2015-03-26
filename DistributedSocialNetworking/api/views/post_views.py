@@ -40,7 +40,7 @@ def get_author(uuid, node):
 
         github_id = profileJSON.get('github_id', "unknown")
         about = profileJSON.get('about', "Unknown")
-        username = profileJSON.get('username', "Unknown Username")
+        username = profileJSON.get('displayname', "Unknown Username")
 
         author = Author.objects.create(uuid=uuid, node=node, username=username,
                                        github_id=github_id, about=about)
