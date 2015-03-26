@@ -13,7 +13,6 @@ $(function() {
     }
 
     function getSuccess(response, status, xhr, form) {
-        console.log(response);
         $.each(response['posts'], function(count, post){
             $('#stream').prepend(post["post"]);
             $('.add_comment_button[data-postGUID="' + post["created_guid"] +'"]').click(showCommentForm);

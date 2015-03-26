@@ -157,6 +157,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 
 class NonSavingPostSerializer(serializers.ModelSerializer):
+
     """
     A Serializer for the Post Model that doesn't save
     """

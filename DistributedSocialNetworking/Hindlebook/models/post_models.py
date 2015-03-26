@@ -2,8 +2,6 @@ from Hindlebook.models.user_models import Author
 from Hindlebook.models import UuidValidator
 
 from django.db import models
-from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 from itertools import chain
 import uuid as uuid_import
@@ -16,7 +14,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.tag
-    
+
     class Meta():
         verbose_name = "Tags"
         verbose_name_plural = "Tags"
@@ -80,6 +78,7 @@ class ExtendedPostManager(models.Manager):
 
 
 class Post(models.Model):
+
     """Model for representing a Post made by an Author"""
 
     objects = models.Manager()
@@ -113,6 +112,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+
     """Model for representing a Comment on a Post made by an Author"""
 
     guid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
@@ -123,11 +123,18 @@ class Comment(models.Model):
     comment = models.CharField(max_length=2048)
     pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
 
+    def save(self, *argv, **kwargs):
+        if Post.objects.filter(guid=self.post) is not None:
+            super(Comment, self).save(*argv, **kwargs)
+            return True
+        return False
+
     def __str__(self):
         return str(self.guid)
 
 
 class Image(models.Model):
+
     """Model for representing an Image attached to Posts"""
     attached_to = models.ForeignKey(Post, null=False)
     image = models.ImageField(null=False)
@@ -135,4 +142,3 @@ class Image(models.Model):
 
     def __str__(self):
         return self.image
-

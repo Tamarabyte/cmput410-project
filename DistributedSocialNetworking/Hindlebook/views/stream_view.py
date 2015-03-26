@@ -11,11 +11,15 @@ from django.conf import settings
 import datetime
 import dateutil.parser
 
+from itertools import chain
+
 from Hindlebook.models import Post, Comment
 from Hindlebook.forms import PostForm, CommentForm
-from api.json_derulo import getForeignStreamPosts
+from api import json_derulo
+
 
 class StreamView(TemplateView):
+
     template_name = "stream.html"
 
     @method_decorator(login_required)
@@ -35,7 +39,9 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        new_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time) + getForeignStreamPosts(self.request.user.author, time)
+        local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
+        foreign_posts = json_derulo.getForeignStreamPosts(self.request.user.author, time)
+        new_posts = sorted(chain(local_posts, foreign_posts), key=lambda instance: instance.pubDate, reverse=reversed)
         new_posts.sort(key=lambda p: p.pubDate)
         for post in new_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
@@ -122,7 +128,8 @@ class CreateComment(View):
             response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": form, "alert": errors})}
             return JsonResponse(response_data, status=400)
 
-        comment.save()
+        if not comment.save():
+            json_derulo.sendForeignComment(comment)
 
         response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": CommentForm()})}
         response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
