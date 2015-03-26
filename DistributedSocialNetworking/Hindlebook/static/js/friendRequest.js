@@ -2,7 +2,7 @@ function follow() {
     var base_url = "/api/follow";
     var friend = {
                 "id": $("#friend-uuid").val(),
-                "host": $("friend-host").val(),
+                "host": $("#friend-host").val(),
                 "displayname": $("#friend-dn").val(),
                 "url": $("#friend-url").val()
             };
@@ -70,7 +70,7 @@ function unfollow() {
     var base_url = "/api/unfollow";
     var friend = {
                 "id": $("#friend-uuid").val(),
-                "host": $("friend-host").val(),
+                "host": $("#friend-host").val(),
                 "displayname": $("#friend-dn").val(),
                 "url": $("#friend-url").val()
             };
@@ -135,7 +135,7 @@ function friend() {
     var base_url = "/api/friendrequest";
     var friend = {
                 "id": $("#friend-uuid").val(),
-                "host": $("friend-host").val(),
+                "host": $("#friend-host").val(),
                 "displayname": $("#friend-dn").val(),
                 "url": $("#friend-url").val()
             };
@@ -153,12 +153,12 @@ function friend() {
         };
 
     console.log("trying to friend request lol")
-
     // THIS NEEDS TO BE RESOLVED, just a quick hack
     // to at least get it working... basically
     // JSON when stringifying everything is adding
     // backslashes so I'm fucking removing them fuck that
     // it was making the IDs not match up
+
     var myJSONString = JSON.stringify(jsonData);
     var regex = new RegExp("/", 'g');
     var myEscapedJSONString = myJSONString.replace(regex,"");
@@ -197,20 +197,6 @@ function friend() {
         }
         $("#friend-icon").toggleClass("icon-favourite-3 icon-broken-heart");
         $("#friend-icon").attr("onclick","unfriend()");
-        if (isForeign) {
-            console.log("wtf")
-            $.ajax({
-                clearForm : false,
-                contentType: "application/json; charset=utf-8",
-                //error: ajaxError,
-                type : "POST",
-                url : authorHost + "/api/friendrequest",
-                data : myEscapedJSONString,
-                success : function(returnHtml) {
-                    console.log("Succesfully sent friend reuqest to host: " + authorHost)
-                }
-            })
-        }
     };
 }
 
@@ -218,7 +204,7 @@ function unfriend() {
     var base_url = "/api/unfriend";
     var friend = {
                 "id": $("#friend-uuid").val(),
-                "host": $("friend-host").val(),
+                "host": $("#friend-host").val(),
                 "displayname": $("#friend-dn").val(),
                 "url": $("#friend-url").val()
             };

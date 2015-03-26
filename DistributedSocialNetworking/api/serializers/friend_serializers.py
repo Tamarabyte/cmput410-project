@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from Hindlebook.models import Author, Node
-from api.serializers import AuthorSerializer, PostSerializer
+from api.serializers import AuthorSerializer, PostSerializer, getForeignProfile
 import re
 
 
