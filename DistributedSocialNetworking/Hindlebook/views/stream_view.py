@@ -61,10 +61,10 @@ class StreamView(TemplateView):
 
         for comment in all_comments:
             response_data = {}
-            # response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
-            json = CommentSerializer(comment).data
-            json['author_url'] = reverse('profile', args=[json['author']['id']])
-            response_data["comment"] = json
+            response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+            # json = CommentSerializer(comment).data
+            # json['author_url'] = reverse('profile', args=[json['author']['id']])
+            # response_data["comment"] = json
             response_data["postGUID"] = comment.post.guid
             comments.append(response_data)
 
