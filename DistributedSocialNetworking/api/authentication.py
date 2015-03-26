@@ -73,7 +73,7 @@ class ForeignNodeAuthentication(BaseAuthentication):
         """
         Authenticate the host and password and return the vouched Foreign Author
         """
-        node = Node.objects.filter(host=host_name).first()
+        node = Node.objects.filter(host_name=host_name).first()
 
         if node is None:
             raise exceptions.AuthenticationFailed(_('Node %s does not exist.') % host_name)
