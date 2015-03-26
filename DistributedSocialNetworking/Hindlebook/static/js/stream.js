@@ -26,17 +26,16 @@ $(function() {
 
     function ajaxError(xhr, errmsg, err) {
         console.log(xhr.status + ": " + xhr.responseText);
-        }
+    }
 
-    /* End Post Ajax */
     $.ajax({
-            success: getSuccess,
-            dataType: "JSON",
-            data: {'last_time': time},
-            error: ajaxError,
-            type : "POST",
-            beforeSubmit : beforeSubmit
-        });
+        success: getSuccess,
+        dataType: "JSON",
+        data: {'last_time': time},
+        error: ajaxError,
+        type : "POST",
+        beforeSubmit : beforeSubmit
+    });
 
     setInterval(function() {
         $.ajax({

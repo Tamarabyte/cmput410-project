@@ -59,6 +59,7 @@ class StreamView(TemplateView):
 
 
 class CreatePost(View):
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(CreatePost, self).dispatch(*args, **kwargs)
@@ -95,6 +96,7 @@ class CreatePost(View):
 
 
 class CreateComment(View):
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(CreateComment, self).dispatch(*args, **kwargs)

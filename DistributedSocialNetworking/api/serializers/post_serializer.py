@@ -22,6 +22,7 @@ def getForeignProfile(uuid, node):
 
     if(response.status_code != 200):
         # Node not reachable or some other mishap
+        print(response.content)
         print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
         return None
 
@@ -70,6 +71,8 @@ class PostSerializer(serializers.ModelSerializer):
         if author is None:
             # New foreign author
             profileJSON = getForeignProfile(uuid, node)
+            if profileJSON is None:
+                profileJSON = {}
 
             github_id = profileJSON.get('github_id', None)
             about = profileJSON.get('about', None)
@@ -81,6 +84,8 @@ class PostSerializer(serializers.ModelSerializer):
         elif author.user is None:
             # Existing Foreign Author, update them
             profileJSON = getForeignProfile(uuid, node)
+            if profileJSON is None:
+                profileJSON = {}
 
             github_id = profileJSON.get('github_id', author.github_id)
             about = profileJSON.get('about', author.about)
