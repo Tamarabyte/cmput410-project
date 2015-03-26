@@ -12,7 +12,7 @@ class PublicPostsRequestFactory():
     # Static Factory
     def create(node):
         if node.team_number == 9:
-            return HindlebookAuthoredPostsRequest(node)
+            return HindlebookPublicPostsRequest(node)
         else:
             raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 

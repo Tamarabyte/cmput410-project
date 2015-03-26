@@ -52,18 +52,24 @@ def author_update_or_create(targetUUID, node):
     return author
 
 
+# def getForeignAuthorPosts(requesterUuid, targetUuid, node):
+#     ''' Gets all posts created by targetUuid a user on host node that
+#         are visible by logged in user requestUuid and returns them '''
+#     postsJSON = AuthoredPostsRequestFactory.create(node).get(requesterUuid, targetUuid).json()
+#     serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
+#     posts = None
+#     if serializer.is_valid(raise_exception=True):
+#         posts = serializer.save()
+#     return posts
+
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
-    ''' Gets all posts created by targetUuid a user on host node that
-        are visible by logged in user requestUuid and returns them '''
-    postsJSON = AuthoredPostsRequestFactory.create(node).get(requesterUuid, targetUuid).json()
-    serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
-    posts = None
-    if serializer.is_valid(raise_exception=True):
-        posts = serializer.save()
-    return posts
+    return []
 
+# def getForeignStreamPosts(userUuid, min_time):
+#     print(userUuid)
+#     return []
 
-def getForeignStreamPosts(userUuid, min_time):
+def getForeignStreamPosts(author, min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
         by uuid's stream. Should be called to create the stream for user uuid
         returns a list of post objects.'''
@@ -75,8 +81,9 @@ def getForeignStreamPosts(userUuid, min_time):
         if node == Settings.objects.all().first().node:
             continue
         try:
-            postsJSON = VisiblePostsRequestFactory.create(node).get(userUuid).json()
+            postsJSON = VisiblePostsRequestFactory.create(node).get(author.uuid).json()
         except Exception as e:
+            print('hi')
             print(node)
             print(str(e))
         try:
@@ -116,4 +123,3 @@ def getForeignAuthor(uuid):
             author.save()
             break
     return author
-
