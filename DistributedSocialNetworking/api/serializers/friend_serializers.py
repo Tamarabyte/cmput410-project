@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from Hindlebook.models import Author, Node
-from api.serializers import AuthorSerializer
+from api.serializers import AuthorSerializer, PostSerializer
 import re
 
 
@@ -82,10 +82,28 @@ class FriendRequestSerializer(serializers.Serializer):
         # Get or create Author
         author = Author.objects.filter(uuid=uuid).first()
         if author is None:
-            # TODO FIX ME: Insert Foreign Author Profile Grab
-            author = Author.objects.create(username=username, uuid=uuid, node=node)
-        # elif author.user is None:
-            # TODO: FIX ME: Insert Foreign Author Profile Update
+            # New foreign author
+            profileJSON = getForeignProfile(uuid, node)
+
+            github_id = profileJSON.get('github_id', None)
+            about = profileJSON.get('about', None)
+            username = profileJSON.get('username', username)
+
+            author = Author.objects.create(uuid=uuid, node=node, username=username,
+                                           github_id=github_id, about=about)
+
+        elif author.user is None:
+            # Existing Foreign Author, update them
+            profileJSON = getForeignProfile(uuid, node)
+
+            github_id = profileJSON.get('github_id', author.github_id)
+            about = profileJSON.get('about', author.about)
+            username = profileJSON.get('username', username)
+
+            author.username = username
+            author.github_id = github_id
+            author.about = about
+            author.save()
 
         return author
 

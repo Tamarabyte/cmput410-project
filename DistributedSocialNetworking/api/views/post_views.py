@@ -1,5 +1,5 @@
 from Hindlebook.models import Post, Category, Node, Author
-from api.serializers import PostSerializer
+from api.serializers import PostSerializer, getForeignProfile
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status, exceptions, HTTP_HEADER_ENCODING
@@ -31,10 +31,30 @@ def get_uuid_from_header(request):
 
 
 def get_author(uuid, node):
-    try:
-        author = Author.objects.get(uuid=uuid)
-    except Author.DoesNotExist:
-        author = Author.objects.create(uuid=uuid, username="DummyUsername", node=node)   # TODO: FIX ME: make a request for the username
+    author = Author.objects.filter(uuid=uuid).first()
+    if author is None:
+        # New foreign author
+        profileJSON = getForeignProfile(uuid, node)
+
+        github_id = profileJSON.get('github_id', None)
+        about = profileJSON.get('about', None)
+        username = profileJSON.get('username', "Unknown Username")
+
+        author = Author.objects.create(uuid=uuid, node=node, username=username,
+                                       github_id=github_id, about=about)
+
+    elif author.user is None:
+        # Existing Foreign Author, update them
+        profileJSON = getForeignProfile(uuid, node)
+
+        github_id = profileJSON.get('github_id', author.github_id)
+        about = profileJSON.get('about', author.about)
+        username = profileJSON.get('username', username)
+
+        author.username = username
+        author.github_id = github_id
+        author.about = about
+        author.save()
 
     return author
 
