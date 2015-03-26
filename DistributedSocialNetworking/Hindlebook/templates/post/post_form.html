@@ -5,7 +5,7 @@
         {% csrf_token %}
         <fieldset>
             <div class="col-lg-12">
-                {% render_field post_form.title placeholder="Title..." class+="form-control input-lg post-title-inp" autocomplete="off" %}
+                {% render_field post_form.title placeholder="Title..." class+="form-control input-sm post-title-inp" autocomplete="off" %}
                 {% if post_form.title.errors %}
                     <div class="error-container error">{{ post_form.title.errors.0|escape }}</div>
                 {% endif %}

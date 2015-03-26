@@ -111,10 +111,10 @@ a {
 }
 
 .post-block {
-    padding-top: 20px;
+    padding-top: 25px;
     padding-bottom: 15px;
     padding-right: 5px;
-    padding-left: 0;
+    padding-left: 15px;
 }
 
 .auth-forms .control-label {
@@ -386,6 +386,13 @@ float: right!important;
     margin-bottom: 80px;
 }
 
+.input-sm {
+  font-size: 14px;
+}
+
+.post-title-inp {
+  font-size: 18px;
+}
 
 .post-vis-inp {
     width: 160px;
@@ -404,12 +411,12 @@ float: right!important;
 .post-field-img {
   height: 34px;
   font-size: 18px;
-  background-color: #989EA0;
+  background-color: #34AACD;
   float: left;
   margin-top: 30px;
   padding: 10px;
   position: relative;
-  left: 3px;
+  left: 4px;
   border-bottom-left-radius: 5px;
   border-top-left-radius: 5px;
   z-index: 10;
@@ -417,13 +424,14 @@ float: right!important;
 
 .post-row  {
     text-align: left;
-    padding: 10px 50px;
+    padding: 10px 60px 10px 50px;
  }
 
 
 .post-author {
     font-size: 18px;
     margin-bottom: 0;
+    margin-top: 20px;
 }
 
 .post-title-inp {
@@ -436,8 +444,9 @@ float: right!important;
 }
 
 .post-tag {
-  background-color: #989EA0;
-  border-color: #989EA0;
+  background-color: #34AACD;
+  border-color: #34AACD;
+  font-size: 14px;
   float: right;
   margin-left: 5px;
   padding-top: 4px;
@@ -449,8 +458,10 @@ float: right!important;
 }
 
 .post-tag-select {
-  background-color: #7B8386 !important;
+  background-color: #34AACD !important;
   color: #fff !important;
+  border-color: #34AACD;
+  font-size: 14px;
 }
 
 .post-title {
@@ -564,6 +575,11 @@ float: right!important;
 
 .profile-about {
     font-size: smaller;
+    overflow: hidden;
+}
+
+.profile-field ~ .profile-field {
+  margin-top: 10px;
 }
 
 .profile-text {
@@ -635,6 +651,7 @@ float: right!important;
 
 .avatar {
     border-radius: 30%;
-    -moz-box-shadow:0px 0px 7px #222;
+    position: relative;
+    top: 20px;
 
 }
