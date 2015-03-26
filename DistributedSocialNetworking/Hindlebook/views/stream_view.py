@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 import datetime
 import dateutil.parser
@@ -60,9 +61,10 @@ class StreamView(TemplateView):
 
         for comment in all_comments:
             response_data = {}
-            # response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
-            serializer = CommentSerializer(comment)
-            response_data["comment"] = serializer.data
+            response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+            # json = CommentSerializer(comment).data
+            # json['author_url'] = reverse('profile', args=[json['author']['id']])
+            # response_data["comment"] = json
             response_data["postGUID"] = comment.post.guid
             comments.append(response_data)
 
