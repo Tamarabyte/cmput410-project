@@ -1,4 +1,3 @@
-from api.requests import HINDLEBOOK, DEV_HINDLEBOOK
 from requests.auth import HTTPBasicAuth
 import requests
 
@@ -11,13 +10,11 @@ class VisiblePostsRequestFactory():
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
-    def create(host):
-        if host == HINDLEBOOK['host']:
-            return HindlebookVisiblePostsRequest(host)
-        elif host == DEV_HINDLEBOOK['host']:
-            return DevHindlebookVisiblePostsRequest(host)
+    def create(node):
+        if node.team_number == 9:
+            return HindlebookAuthoredPostsRequest(node)
         else:
-            raise NotImplementedError('host `%s` does not have a corresponding factory.' % host)
+            raise NotImplementedError('node `%s` does not have a corresponding factory.' % node.host_name)
 
     create = staticmethod(create)
 
@@ -27,23 +24,9 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     Hindlebook specific Visible Post Request
     """
     def __init__(self, host, uuid):
-        self.host = host
-        self.url = "http://%s/api/author/posts" % host
-        self.auth = HTTPBasicAuth(HINDLEBOOK['username'], HINDLEBOOK['password'])
-
-    def get(self, uuid):
-        headers = {'uuid': uuid}
-        return requests.get(url=self.url, headers=headers, auth=self.auth)
-
-
-class DevHindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
-    """
-    Dev_Hindlebook specific Visible Post Request
-    """
-    def __init__(self, host, uuid):
-        self.host = host
-        self.url = "http://%s/api/author/posts" % host
-        self.auth = HTTPBasicAuth(DEV_HINDLEBOOK['username'], DEV_HINDLEBOOK['password'])
+        self.node = node
+        self.url = "http://%s/api/author/posts" % node.host_name
+        self.auth = HTTPBasicAuth(node.host_name, node.password)
 
     def get(self, uuid):
         headers = {'uuid': uuid}
