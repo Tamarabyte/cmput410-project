@@ -20,6 +20,7 @@ from api import json_derulo
 from api.serializers import CommentSerializer
 
 
+
 class StreamView(TemplateView):
 
     template_name = "stream.html"
@@ -60,6 +61,7 @@ class StreamView(TemplateView):
             all_comments = Comment.objects.all()
 
         for comment in all_comments:
+            # response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
             response_data = {}
             response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
             # json = CommentSerializer(comment).data

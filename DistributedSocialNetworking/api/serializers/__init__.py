@@ -1,4 +1,4 @@
 from api.serializers.author_serializers import AuthorSerializer, UserEditSerializer, ProfileSerializer
-from api.serializers.post_serializer import PostSerializer, NonSavingPostSerializer, getForeignProfile
+from api.serializers.post_serializer import PostSerializer, getForeignProfile
 from api.serializers.comment_serializer import CommentSerializer
 from api.serializers.friend_serializers import FriendQuerySerializer, FriendRequestSerializer
