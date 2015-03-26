@@ -2,7 +2,6 @@ import json
 import requests
 import datetime
 import dateutil.parser
-
 from Hindlebook.models import Node, Author, Settings, Post
 from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
 from api.serializers import NonSavingPostSerializer
@@ -31,26 +30,6 @@ from api.serializers import NonSavingPostSerializer
 
 
 # Module to hold outgoing API calls to get various info from other services.
-
-
-def author_update_or_create(targetUUID, node):
-    ''' Takes in a uuid and a node and update or creates that author in our
-        DB after requesting the info from that node '''
-    author = None
-
-    obj = ProfileRequestFactory.create(node).get(targetUUID).json()
-    try:
-        author = Author.objects.get(uuid=targetUUID, node = node)
-        author.github_id = obj['github_id']
-        author.about = obj['about']
-        author.username = obj['displayname']
-        author.save()
-    except Author.DoesNotExist:
-        author = Author.objects.create(uuid=targetUUID, username=obj['displayname'],
-                                       node=node, about=obj["about"], github_id=obj['github_id'])
-        author.save()
-    return author
-
 
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     ''' Gets all posts created by targetUuid a user on host node that

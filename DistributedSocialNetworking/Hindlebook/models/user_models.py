@@ -11,7 +11,7 @@ class Author(models.Model):
     about = models.CharField(max_length=250, blank=True, default="")
     uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, validators=[UuidValidator()], primary_key=True)
     username = models.CharField('username', max_length=30, blank=False)
-    
+
     friends = models.ManyToManyField('self', blank=True, related_name='friends_of', symmetrical=False, db_index=True)
     follows = models.ManyToManyField('self', blank=True, related_name='followed_by', symmetrical=False, db_index=True)
     github_id = models.CharField(max_length=30, blank=True, default='')
