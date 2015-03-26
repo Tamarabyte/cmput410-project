@@ -226,6 +226,12 @@ class NonSavingPostSerializer(serializers.ModelSerializer):
         # Create the post
         post = Post(author=author, **validated_data)
 
+        # Create categories if necessary
+        if categories_data is not None:
+            for category in categories_data:
+                if not Category.objects.filter(tag=category).exists():
+                    Category.objects.create(tag=category)
+
         # Add the categories
         for category in categories_data:
             post.categories.add(category)
