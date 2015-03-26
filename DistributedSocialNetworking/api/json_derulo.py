@@ -4,7 +4,7 @@ import datetime
 import dateutil.parser
 from Hindlebook.models import Node, Author, Settings, Post
 from api.serializers import NonSavingPostSerializer
-from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory
+from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory
 
 
 # Key for the Request Factories
@@ -99,7 +99,7 @@ def getForeignAuthor(uuid):
             continue
         obj = ProfileRequestFactory.create(node).get(uuid).json()
         try:
-            author = Author.objects.get(uuid=uuid, node = node)
+            author = Author.objects.get(uuid=uuid, node=node)
             # since there is no defined profile JSON, can't expect these to be in the request.
             # best to use obj.get('github_id', Default) which will give you Default if not in the request
             # indexing will throw an error
@@ -114,3 +114,35 @@ def getForeignAuthor(uuid):
             author.save()
             break
     return author
+
+
+def sendForeignComment(comment):
+    for node in Node.objects.all():
+        if node == Settings.objects.all().first().node:
+            continue
+        obj = PostRequestFactory.create(node)
+        try:
+            response = obj.get(comment.uuid)
+            if response.status_code != 200:
+                # Something went wrong with the get
+                print("Post request returned status code: %d" % (response.status_code))
+                continue
+
+            # We got a post from a server
+            postsJSON = response.json()
+            post = NonSavingPostSerializer(data=postsJSON["posts"], many=False)
+            post.comments.add(comment)
+
+            response = obj.put(post.guid, post)
+
+            if response != 200:
+                # Something went wrong with the post
+                print("Post request returned status code: %d" % (response.status_code))
+                break
+
+            # Post went out
+            break
+
+        except Exception as e:
+            print("Error in sendForeignComment: %s" % (e.msg))
+            break
