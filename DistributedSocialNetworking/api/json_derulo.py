@@ -65,16 +65,17 @@ def getForeignAuthorPosts(requesterUuid,targetUuid, node):
 
 def getForeignStreamPosts(userUuid,min_time):
     ''' Gets all the posts foreign posts that should be displayed in user denoted
-        by uuid's stream. Should be called to create the stream for user uuid 
+        by uuid's stream. Should be called to create the stream for user uuid
         returns a list of post objects.'''
     posts = []
     postsJSON = None
     for node in Node.objects.all():
         # Skip our node, don't want to ask ourselves unecessarily.
+        newposts = None
         if node == Settings.objects.all().first().node:
             continue
         try:
-            postsJSON = VisiblePostsRequestFactory.create(node.host,userUuid).get(userUuid).json()
+            postsJSON = VisiblePostsRequestFactory.create(node.host).get(userUuid).json()
         except Exception as e:
             print(node)
             print(str(e))
@@ -85,10 +86,11 @@ def getForeignStreamPosts(userUuid,min_time):
         except Exception as e:
             print("exception raised!")
             print(str(e))
-        if min_time != None:
-            posts += filter(lambda p: p.pubDate > min_time,newposts)
-        else:
-            posts += newposts
+        if (newposts != None):
+            if min_time != None:
+                posts += filter(lambda p: p.pubDate > min_time,newposts)
+            else:
+                posts += newposts
     return posts
 
 
