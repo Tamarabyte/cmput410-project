@@ -80,7 +80,7 @@ def getForeignStreamPosts(author, min_time):
         # Turn the JSON into Post objects!
         # If the serializer throws exceptions during validation, it will throw a HTTP 400
         # Don't catch it!
-        serializer = NonSavingPostSerializer(data=postsJSON["posts"], many=True)
+        serializer = PostSerializer(data=postsJSON["posts"], many=True)
         if serializer.is_valid(raise_exception=True):
             newposts = serializer.save()
 
