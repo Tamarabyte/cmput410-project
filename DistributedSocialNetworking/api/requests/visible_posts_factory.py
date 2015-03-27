@@ -41,9 +41,8 @@ class SocshizzleVisiblePostsRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/author" % node.host
+        self.url = "http://%s/posts" % node.host # Just get the public cause their apis fucky
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid):
-        self.url = self.url + "/%s/posts" % uuid
         return requests.get(url=self.url, auth=self.auth)
