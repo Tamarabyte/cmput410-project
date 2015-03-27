@@ -11,6 +11,8 @@ class AuthoredPostsRequestFactory():
 
     # Static Factory
     def create(node):
+        if node.team_number == 5:
+            return SocshizzleAuthoredPostsRequest(noe)
         if node.team_number == 9:
             return HindlebookAuthoredPostsRequest(node)
         else:
@@ -32,3 +34,17 @@ class HindlebookAuthoredPostsRequest(AuthoredPostsRequestFactory):
         self.url = self.url + "/%s/posts" % author_uuid
         self.headers = {'uuid': requester_uuid}
         return requests.get(url=self.url, headers=self.headers, auth=self.auth)
+
+
+class SocshizzleAuthoredPostsRequest(AuthoredPostsRequestFactory):
+    """
+    Socshizzle specific Authored Post Request
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "http://%s/author" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self, requester_uuid, author_uuid):
+        self.url = self.url + "/%s/posts" % author_uuid
+        return requests.get(url=self.url, auth=self.auth)
