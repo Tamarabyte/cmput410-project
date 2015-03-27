@@ -41,7 +41,7 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-            time = time + datetime.timedelta(0,1)
+            time = time + datetime.timedelta(0,3)
             json_derulo.getForeignStreamPosts(self.request.user.author, time)
         local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
 
