@@ -128,7 +128,7 @@ def getForeignAuthor(uuid):
             break
         except Author.DoesNotExist:
             author = Author.objects.create(uuid=uuid, username=obj['displayname'],
-                                           node=node, about=obj["about"], github_id=obj['github_id'])
+                                           node=node, about=obj["about"], github_id=obj['github_id'], avatar="foreign_avatar.jpg")
             author.save()
             break
     return author
