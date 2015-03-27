@@ -31,7 +31,7 @@ class PostSerializer(serializers.ModelSerializer):
     """
     comments = CommentSerializer(many=True, read_only=False)
     author = AuthorSerializer(read_only=False, required=True)
-    pubDate = serializers.DateTimeField()
+    pubDate = serializers.DateTimeField(required=True)
 
     def to_representation(self, instance):
         """
@@ -94,16 +94,22 @@ class PostSerializer(serializers.ModelSerializer):
 
         return author
 
-    def create_comments(self, post, comment_data):
+    def repackage_comment(self, comment_data):
         """
-        Creates the comments for `post` stored in `comment_data`
+        When you nest serializers, it renames your incoming fields...
+        Need to turn them back to the expected... yikes
         """
-        for comment in comment_data:
-            author = comment.pop('author', None)
-            if author is None:
-                raise serializers.ValidationError('The Author field of a Comment is required.')
-            author = self.get_author(author)
-            Comment.objects.create(author=author, post=post, **comment)
+        author = comment_data.pop('author', None)
+        if author is not None:
+            author['displayname'] = author['username']
+            author.pop('username', None)
+            author['id'] = author['uuid']
+            author.pop('uuid', None)
+            author['host'] = author['node']
+            author.pop('node', None)
+            comment_data['author'] = author
+
+        return comment_data
 
     def create(self, validated_data):
         """
@@ -126,23 +132,50 @@ class PostSerializer(serializers.ModelSerializer):
             post.categories.add(category)
 
         # Create the comments
-        self.create_comments(post, comment_data)
+        for comment_json in comment_data:
+            # Have to rename the vars.... this is stupid...
+            comment_json = self.repackage_comment(comment_json)
+
+            comment = Comment.objects.filter(guid=comment_json.get('id')).first()
+            if comment is None:
+                serializer = CommentSerializer(data=comment_json)
+                serializer.is_valid(raise_exception=True)
+                serializer.save(post=post)
 
         return post
 
     def update(self, instance, validated_data):
-        """Updates an instance of the Post Model"""
-
+        """
+        Updates an instance of the Post Model
+        """
         # Pop nested relationships, we need to handle them separately
         author_data = validated_data.pop('author', None)
         comment_data = validated_data.pop('comments', None)
+        categories_data = validated_data.pop('categories', None)
 
-        # Call Super to create the Post instance
-        instance = super(PostSerializer, self).update(instance, validated_data)
+        # Only update the post if it is timestamped as newer than ours
+        pubDate = validated_data.get('pubDate', None)
+        if pubDate > instance.pubDate:
+            # Call Super to update the Post instance
+            instance = super(PostSerializer, self).update(instance, validated_data)
 
-        # Create the comments, if provided
-        if comment_data is not None:
-            self.create_comments(instance, comment_data)
+        # Update the comments
+        for comment_json in comment_data:
+            # Have to rename the vars.... this is stupid...
+            comment_json = self.repackage_comment(comment_json)
+
+            guid = comment_json.get('guid')
+            comment = Comment.objects.filter(guid=guid).first()
+            if comment is None:
+                # create
+                serializer = CommentSerializer(data=comment_json)
+                serializer.is_valid(raise_exception=True)
+                comment = serializer.save(post=instance)
+            else:
+                # update
+                serializer = CommentSerializer(comment, data=comment_json)
+                serializer.is_valid(raise_exception=True)
+                comment = serializer.save()
 
         return instance
 

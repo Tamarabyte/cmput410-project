@@ -123,10 +123,6 @@ class PostDetails(APIView):
             # Fetch the post
             post = Post.objects.get(guid=guid)
 
-            # Purge old comments, if necessary
-            if request.data.get('comments', None) is not None:
-                post.comments.all().delete()
-
             # Serialize the post
             serializer = PostSerializer(post, data=request.data, partial=True)
             status_code = status.HTTP_200_OK

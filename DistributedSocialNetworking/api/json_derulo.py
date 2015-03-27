@@ -51,9 +51,6 @@ def json_to_posts(json):
             out.append(post)
         else:
             # update post
-            # Purge old comments, if necessary
-            if p.get('comments', None) is not None:
-                post.comments.all().delete()
             serializer = PostSerializer(post, data=p)
             serializer.is_valid(raise_exception=True)
             post = serializer.save()
