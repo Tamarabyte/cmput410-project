@@ -41,13 +41,11 @@
 
 {% block nav_scripts %}
     <script type="text/javascript">
-      $(document).ready( function() {
         $('#search-bar').hide();
         $("#search-toggle").click(function () {
           $('#search-bar').toggle();
           $('#search-nav').toggleClass("active");
           });
-      });
     //jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
     </script>
 {% endblock %}
