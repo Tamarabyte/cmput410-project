@@ -65,7 +65,7 @@ $(function() {
             error: ajaxError,
             type : "POST",
             beforeSubmit : beforeSubmit});
-    }, 2000);
+    }, 5000);
 
     
 
