@@ -4,13 +4,15 @@ import requests
 
 class ProfileRequestFactory():
     """
-    An Encapsulation for building Authored Post requests
+    An Encapsulation for building Profile Requests
     """
     def get(self):
         raise NotImplementedError('`get()` must be implemented.')
 
     # Static Factory
     def create(node):
+        if node.team_number == 5:
+            return SocshizzleProfileRequest(node)
         if node.team_number == 9:
             return HindlebookProfileRequest(node)
         else:
@@ -21,11 +23,25 @@ class ProfileRequestFactory():
 
 class HindlebookProfileRequest(ProfileRequestFactory):
     """
-    Hindlebook specific Authored Post Request
+    Hindlebook specific Profile Request
     """
     def __init__(self, node):
         self.node = node
         self.url = "http://%s/api/author" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self, author_uuid):
+        self.url = self.url + "/%s" % author_uuid
+        return requests.get(url=self.url, auth=self.auth)
+
+
+class SocshizzleProfileRequest(ProfileRequestFactory):
+    """
+    Socshizzle specific Profile Request
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "http://%s/author" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, author_uuid):

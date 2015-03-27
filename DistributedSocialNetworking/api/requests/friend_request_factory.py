@@ -13,6 +13,8 @@ class FriendRequestFactory():
 
     # Static Factory
     def create(node):
+        if node.team_number == 5:
+            return SocshizzleFriendRequest(node)
         if node.team_number == 9:
             return HindlebookFriendRequest(node)
         else:
@@ -34,4 +36,20 @@ class HindlebookFriendRequest(FriendRequestFactory):
         data = {"query": "friendrequest",
                 "author": AuthorSerializer(author).data,
                 "friend": AuthorSerializer(friend).data}
-        return requests.post(url=self.url,headers={"content-type":"application/json"}, data=json.dumps(data), auth=self.auth)
+        return requests.post(url=self.url, headers={"content-type": "application/json"}, data=json.dumps(data), auth=self.auth)
+
+
+class SocshizzleFriendRequest(FriendRequestFactory):
+    """
+    Socshizzle specific FriendRequest
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "http://%s/friendrequest" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def post(self, author, friend):
+        data = {"query": "friendrequest",
+                "author": AuthorSerializer(author).data,
+                "friend": AuthorSerializer(friend).data}
+        return requests.post(url=self.url, headers={"content-type": "application/json"}, data=json.dumps(data), auth=self.auth)
