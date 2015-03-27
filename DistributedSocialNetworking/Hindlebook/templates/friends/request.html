@@ -2,7 +2,7 @@
     <img class="avatar pull-left avatar-thumb" src="{{ MEDIA_URL }}{{ friend.avatar }}" height="80"></img>
     <div class="friend-text pull-left">
         <div class="friend-username"><a class="white-link" href="{% url "profile" friend.uuid %}">{{ friend.username }}</div>
-        <div class="friend-server"><a class="white-link" href="{{ friend.node.host }}">{{ friend.node.host_name }}</a></div>
+        <div class="friend-server"><a class="white-link" href="http://{{ friend.node.host }}">{{ friend.node.host_name }}</a></div>
 
         <input type="hidden" id="friend-uuid-{{ friend.uuid }}" value={{ friend.uuid }}/>
         <input type="hidden" id="friend-host-{{ friend.uuid }}" value={{ friend.node.host }}/>
