@@ -123,6 +123,7 @@ def getForeignAuthor(uuid):
             author.github_id = obj['github_id']
             author.about = obj['about']
             author.username = obj['displayname']
+            author.avatar = "foreign_avatar.jpg"
             author.save()
             break
         except Author.DoesNotExist:
