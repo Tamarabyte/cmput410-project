@@ -20,3 +20,17 @@ class FriendsView(TemplateView):
         context = super(FriendsView, self).get_context_data(**kwargs)
         context['author'] = self.author
         return context
+
+
+class NotificationsView(TemplateView):
+    template_name = 'friends/notifications.html'
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        self.author = self.request.user.author
+        return super(NotificationsView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(NotificationsView, self).get_context_data(**kwargs)
+        context['author'] = self.author
+        return context

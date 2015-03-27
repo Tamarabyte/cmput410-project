@@ -43,6 +43,11 @@ class ProfileView(TemplateView):
             local = False
         else:
             local = not context['author'].isForeign()
+            
+        if context["author"] in list(self.request.user.author.getFriendRequests()):
+            context['isRequest'] = 1
+        else:
+            context['isRequest'] = 0
 
         if local:
             context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
@@ -55,6 +60,7 @@ class ProfileView(TemplateView):
                 context['isFriends'] = 1
             else:
                 context['isFriends'] = 0
+                
         else:
             targetAuthor = getForeignAuthor(authorUUID)
             if targetAuthor:

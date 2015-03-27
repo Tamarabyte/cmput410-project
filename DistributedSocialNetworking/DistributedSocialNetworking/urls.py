@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^author/(?P<authorUUID>[\w-]+)/posts', ProfileStreamView.as_view(), name="profile_stream"),
 
     # Friends URLs
+    url(r'^requests$', NotificationsView.as_view(), name='requests'),
     url(r'^friends$', FriendsView.as_view(), name='friends'),
     url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsView.as_view(), name='friends_view'),
 

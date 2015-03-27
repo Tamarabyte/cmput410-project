@@ -1,0 +1,27 @@
+{% extends "base_header.html" %}
+{% load staticfiles %}
+
+{% block page %}
+<div class="container">
+    <div class="row">
+        {% for friend in author.getFriendRequests %}
+            {% if forloop.first %}
+                <div class="section-header text-shadow">Requests</div>
+            {% endif %}
+            {% include "friends/request.html" %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock page %}
+
+{% block scripts %}
+    <script>
+        var userUUID = "{{ user.author.uuid }}"
+        var userHost = "{{ user.author.node.host }}"
+        var userDN = "{{ user.author.username }}"
+        var isFriend = 0;
+        var removeIfUnfriend = 1;
+
+    </script>
+    <script type="text/javascript" src="{% static "js/friendRequest.js" %}" ></script>
+{% endblock scripts %}

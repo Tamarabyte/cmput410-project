@@ -32,7 +32,7 @@
                     <input type="hidden" id="friend-dn-{{ author.uuid }}" value={{ author.username }}/>
                     <input type="hidden" id="friend-url-{{ author.uuid }}" value={{ author.node.host }}"/author/"{{author.uuid}}/>
                     
-                    <a class="friend-link" onclick="friend('{{ author.uuid }}')" href="#"><span id="friend-icon-{{ author.uuid }}" class={% if isFriends = 0 %}"icon-favourite-3 friend-img-ico"{% else %}"icon-broken-heart friend-img-ico"{% endif %}></span></a>
+                    <a class="friend-link" onclick="friend('{{ author.uuid }}', {{ isRequest }})" href="#"><span id="friend-icon-{{ author.uuid }}" class={% if isFriends = 0 %}"icon-favourite-3 friend-img-ico"{% else %}"icon-broken-heart friend-img-ico"{% endif %}></span></a>
                     <a class="follow-link" href="#" onclick="follow('{{ author.uuid }}')"><span id="follow-icon-{{ author.uuid }}" class={% if isFollowing = 0 %}"icon-eye-3 friend-img-ico"{% else %}"icon-eye-4 friend-img-ico"{% endif %}></span></a>
             {% endif %}
 

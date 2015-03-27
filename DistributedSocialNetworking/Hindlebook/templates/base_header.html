@@ -18,7 +18,7 @@
         <ul class="nav navbar-nav">
           <li><a href="{% url "profile" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
           <li><a href="{% url "friends_view" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
-          <li><a href="#"><span class="badge">{{ user.author.getFriendRequestCount }}</span></a></li>
+          <li><a href="{% url "requests" %}"><span class="badge" id="notifications-badge">{{ user.author.getFriendRequestCount }}</span></a></li>
         </ul>
         
           <ul id="search-nav" class="nav navbar-nav navbar-right">

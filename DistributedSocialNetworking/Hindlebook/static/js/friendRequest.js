@@ -76,7 +76,7 @@ function follow(uuid) {
 
 }
 
-function friend(uuid) {
+function friend(uuid, is_pending) {
     var icon = $("#friend-icon-" + uuid);
     var base_url = "/api/friendrequest";
     if (isFriend)
@@ -109,8 +109,10 @@ function friend(uuid) {
     // it was making the IDs not match up
 
     var myJSONString = JSON.stringify(jsonData);
+    console.log("1");
     var regex = new RegExp("/", 'g');
     var myEscapedJSONString = myJSONString.replace(regex,"");
+    console.log("2");
     $.ajax({
         success: requestSuccess,
         clearForm : false,
@@ -120,7 +122,7 @@ function friend(uuid) {
         url : base_url,
         data : myEscapedJSONString,
         beforeSubmit : beforeSubmit
-    })
+    });
 
     function beforeSubmit(arr, form, options) {
         console.log("setting url");
@@ -148,8 +150,14 @@ function friend(uuid) {
             }
             else {
                 isFriend = 1
+                var requests = parseInt($("#notifications-badge").text()) - is_pending;
+                $("#notifications-badge").text(requests + "");
             }
         }
+        
+        
+        
+        
         icon.toggleClass("icon-favourite-3 icon-broken-heart");
         $(".friend-link").blur();
     };
