@@ -1,8 +1,8 @@
 <div id="following-{{ follower.uuid }}" class="well friend-container small-shadow col-lg-2 col-md-3 col-sm-4 col-xs-2">
     <img class="avatar pull-left" src="{{ MEDIA_URL }}{{ follower.avatar }}" height="80"></img>
     <div class="friend-text pull-left">
-        <div class="friend-username"><a class="blue-link" href="{% url "profile" follower.uuid %}">{{ follower.username }}</div>
-        <div class="friend-server"><a class="blue-link" href="{{ follower.node.host }}">{{ follower.node.host_name }}</a></div>
+        <div class="friend-username"><a class="white-link" href="{% url "profile" follower.uuid %}">{{ follower.username }}</div>
+        <div class="friend-server"><a class="white-link" href="{{ follower.node.host }}">{{ follower.node.host_name }}</a></div>
 
         <input type="hidden" id="friend-uuid-{{ follower.uuid }}" value={{ follower.uuid }}/>
         <input type="hidden" id="friend-host-{{ follower.uuid }}" value={{ follower.node.host }}/>

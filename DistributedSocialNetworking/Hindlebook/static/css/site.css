@@ -676,6 +676,16 @@ a:hover, a:focus {
     rgb(68, 68, 68) 30px 30px;
 }
 
+.text-shadow {
+  -moz-text-shadow:
+  rgb(245, 245, 245) 1px 1px,
+    rgb(245, 245, 245) 2px 2px,
+    rgb(245, 245, 245) 3px 3px;
+  text-shadow: rgb(245, 245, 245) 1px 1px,
+    rgb(245, 245, 245) 2px 2px,
+    rgb(245, 245, 245) 3px 3px;
+}
+
 .avatar {
     border-radius: 30%;
 }

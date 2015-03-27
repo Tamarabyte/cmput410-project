@@ -6,7 +6,7 @@
     <div class="row">
         {% for friend in author.getFriends %}
             {% if forloop.first %}
-                <div class="section-header">Friends</div>
+                <div class="section-header text-shadow">Friends</div>
             {% endif %}
             {% include "friends/friend.html" %}
         {% endfor %}
@@ -16,7 +16,7 @@
     <div class="row">
         {% for follower in author.getFollowing %}
             {% if forloop.first %}
-                <div class="section-header">Following</div>
+                <div class="section-header text-shadow">Following</div>
             {% endif %}
             {% include "friends/follower.html" %}
         {% endfor %}
