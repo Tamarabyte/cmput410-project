@@ -68,10 +68,12 @@ class AuthorAdmin(ModelAdmin):
     inlines = []
     
     ordering = ('username',)
+    filter_horizontal = ('friends', 'follows')
     list_display = ('username', 'uuid', 'date_added')
 
     fieldsets = (
-        (None, {'fields': ('username', 'node')}),
+        (None, {'fields': ('username', 'user', 'node')}),
         ('Personal', {'fields': ('about' ,'avatar', 'github_id')}),
+        ('Social', {'fields': ('friends', 'follows')}),
     )
 

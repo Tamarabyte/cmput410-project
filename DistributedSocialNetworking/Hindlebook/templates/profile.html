@@ -23,42 +23,17 @@
                     <a data-toggle="modal" data-target="#myModal" title="edit profile" data-tooltip><span class="icon-kub-edit"></span></a>
                 </div>
             {% else %}
-                    <form id="friendrequestform" action=".">
-                        {% csrf_token %}
-                     <input type="hidden" id="author-uuid" value={{ user.author.uuid }}/>
-                     <input type="hidden"  id="author-host" value={{ user.author.node.host }}/>
-                     <input type="hidden" id="author-dn" value={{ user.author.username }}/>
-                     <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
-                     <input type="hidden" id="friend-host" value={{ author.node.host }}/>
-                     <input type="hidden" id="friend-dn" value={{ author.username }}/>
-                     <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
-                     <div class="profile-icon text-right">
-                    {% if isFriends = 0 %}
-                       <div id="friend-button"><a href="#"><span id="friend-icon" class="icon-favourite-3" onClick="friend()"></span></a></div>
-                    {% else %}
-                        <div id="friend-button"><a href="#"><span id="friend-icon" class="icon-broken-heart"  onClick="unfriend()"></span></a></div>
-                    {% endif %}
-                        </div>
-                    </form>
 
-                    <form id="followform" action=".">
-                        {% csrf_token %}
-                     <input type="hidden" id="author-uuid" value={{ user.author.uuid }}/>
-                     <input type="hidden"  id="author-host" value={{ user.author.node.host }}/>
-                     <input type="hidden" id="author-dn" value={{ user.author.username }}/>
-                     <input type="hidden" id="friend-uuid" value={{ author.uuid }}/>
-                     <input type="hidden" id="friend-host" value={{ author.node.host }}/>
-                     <input type="hidden" id="friend-dn" value={{ author.username }}/>
-                     <input type="hidden" id="friend-url" value={{ author.node.host }}"/author/"{{author.uuid}}/>
-                     <div class="profile-icon text-right">
-                    {% if isFollowing = 0 %}
-                       <div id="follow-button"><a href="#"><span id="follow-icon" class="icon-screenshot" onClick="follow()"></span></a></div>
-                    {% else %}
-                        <div id="follow-button"><a href="#"><span id="follow-icon" class="icon-tl-undo"  onClick="unfollow()"></span></a></div>
-                    {% endif %}
-                     </div>
-                    </form>
-
+                    <input type="hidden" id="author-uuid" value={{ user.author.uuid }}/>
+                    <input type="hidden" id="author-host" value={{ user.author.node.host }}/>
+                    <input type="hidden" id="author-dn" value={{ user.author.username }}/>
+                    <input type="hidden" id="friend-uuid-{{ author.uuid }}" value={{ author.uuid }}/>
+                    <input type="hidden" id="friend-host-{{ author.uuid }}" value={{ author.node.host }}/>
+                    <input type="hidden" id="friend-dn-{{ author.uuid }}" value={{ author.username }}/>
+                    <input type="hidden" id="friend-url-{{ author.uuid }}" value={{ author.node.host }}"/author/"{{author.uuid}}/>
+                    
+                    <a class="friend-link" onclick="friend('{{ author.uuid }}')" href="#"><span id="friend-icon-{{ author.uuid }}" class={% if isFriends = 0 %}"icon-favourite-3 friend-img-ico"{% else %}"icon-broken-heart friend-img-ico"{% endif %}></span></a>
+                    <a class="follow-link" href="#" onclick="follow('{{ author.uuid }}')"><span id="follow-icon-{{ author.uuid }}" class={% if isFollowing = 0 %}"icon-eye-3 friend-img-ico"{% else %}"icon-eye-4 friend-img-ico"{% endif %}></span></a>
             {% endif %}
 
 
@@ -68,22 +43,37 @@
 
                 <!-- User Text and Avatar -->
             <div class="profile row">
-                    <div class="pull-left profile-img img-col col-lg-4 col-md-4 col-sm-5">
-                        <img class="avatar picture-shadow" src="{{ MEDIA_URL }}{{ author.avatar }}" height="200"></img>
+                    <div class="pull-left profile-img img-col col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <img class="avatar picture-shadow" src="{{ MEDIA_URL }}{{ author.avatar }}" width="200"></img>
                     </div>
-                    <div class="profile-text col-lg-8 col-md-8 col-sm-7">
+                    <div class="profile-text col-lg-8 col-md-8 col-sm-6 col-xs-12">
                         <div class="profile-name">{{ author.username }}</b></div>
                         <div>
                             <br>
                                 
                             <div class="profile-field">
-                                <div class="profile-about-title pull-left">Node: </div>
+                                <div class="profile-about-title pull-left">Node:</div>
                                 <div class="profile-host">
-                                    {{ author.node.host_name }}
+                                    <a href="{{ author.host }}">{{ author.node.host_name }}</a>
                                 </div>
                             </div>
                             <div class="profile-field">
-                                <div class="profile-about-title pull-left">About Me: </div>
+                                <div class="profile-about-title pull-left">Friends:</div>
+                                <div class="profile-host">
+                                    <a href="{% url "friends_view" authorUUID=author.uuid %}">{{ author.getFriends|length }} &nbsp;<i class="icon-kub-avatar-02"></i> </a>
+                                </div>
+                            </div>
+                            <div class="profile-field">
+                                <div class="profile-about-title pull-left">Github ID: </div>
+                                    {% if author.github_id %}
+                                        <a href="http://github.com/{{ author.github_id }}">{{ author.github_id }}</a>
+                                    {% else %}
+                                        Not Available
+                                    {% endif %}
+
+                            </div>
+                            <div class="profile-field">
+                                <div class="profile-about-title pull-left">About Me:</div>
                                 <div class="profile-about">
                                     {% if author.about %}
                                         {{ author.about }}
@@ -91,14 +81,6 @@
                                         This user has not entered any information about themselves yet.
                                     {% endif %}
                                 </div>
-                            </div>
-                            <div class="profile-field">
-                            <div class="profile-about-title pull-left">Github ID: </div>
-                                {% if author.github_id %}
-                                        {{ author.github_id }}
-                                {% else %}
-                                    Not Available
-                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -122,7 +104,12 @@
 <script>
     var authorHost = '{{ author.node|escapejs }}';
     var isFollowing = {{ isFollowing }};
+    var isFriend = {{ isFriends }};
     var isForeign = {% if author.isForeign %}1{% else %}0{% endif %};
+    var userUUID = "{{ user.author.uuid }}"
+    var userHost = "{{ user.author.node.host }}"
+    var userDN = "{{ user.author.username }}"
+    var removeIfUnfriend = 0;
     var form_options = {
         url : '{% url 'edit_profile' user.author.uuid %}',
         type : 'post',
@@ -142,13 +129,14 @@
         $('#profile_update_form').html(response["form"]);
     }
 
+
+
+
     //setUpAjaxForm($('#profile_update_form'), formOptions);
     $(document).ready(function (){
-        $('#profile_update_form').ajaxForm(form_options);
         var h = $('.profile-text').height();
-        console.log(h);
-        console.log((h-200));
-        $('.avatar').css("top", (h-200)/2);
+        $('.avatar').css("top", (h-$('.avatar').height())/2);
+        $('#profile_update_form').ajaxForm(form_options);
     });
 </script>
 

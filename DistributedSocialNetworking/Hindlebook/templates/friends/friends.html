@@ -1,0 +1,37 @@
+{% extends "base_header.html" %}
+{% load staticfiles %}
+
+{% block page %}
+<div class="container">
+    <div class="row">
+        {% for friend in author.getFriends %}
+            {% if forloop.first %}
+                <div class="section-header">Friends</div>
+            {% endif %}
+            {% include "friends/friend.html" %}
+        {% endfor %}
+    </div>
+    <br>
+    <br>
+    <div class="row">
+        {% for follower in author.getFollowing %}
+            {% if forloop.first %}
+                <div class="section-header">Following</div>
+            {% endif %}
+            {% include "friends/follower.html" %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock page %}
+
+{% block scripts %}
+    <script>
+        var userUUID = "{{ user.author.uuid }}"
+        var userHost = "{{ user.author.node.host }}"
+        var userDN = "{{ user.author.username }}"
+        var isFriend = 1;
+        var isFollowing = 1;
+        var removeIfUnfriend = 1;
+    </script>
+    <script type="text/javascript" src="{% static "js/friendRequest.js" %}" ></script>
+{% endblock scripts %}

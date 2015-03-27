@@ -29,7 +29,8 @@ urlpatterns = patterns('',
     url(r'^author/(?P<authorUUID>[\w-]+)/posts', ProfileStreamView.as_view(), name="profile_stream"),
 
     # Friends URLs
-    url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsListView.as_view(), name='friends_view'),
+    url(r'^friends$', FriendsView.as_view(), name='friends'),
+    url(r'^friends/(?P<authorUUID>[\w-]+)', FriendsView.as_view(), name='friends_view'),
 
     # Rest Api
     url(r'^api/', include('api.urls', namespace='api')),

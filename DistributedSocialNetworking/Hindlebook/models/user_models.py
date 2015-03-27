@@ -7,7 +7,7 @@ from Hindlebook.models import Node, UuidValidator
 class Author(models.Model):
     """Model for represting a Authors"""
 
-    user = models.OneToOneField(User, related_name="author", blank=True, null=True)
+    user = models.OneToOneField(User, related_name="author", blank=True, null=True, help_text="Set for local authors only")
     about = models.CharField(max_length=250, blank=True, default="")
     uuid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, validators=[UuidValidator()], primary_key=True)
     username = models.CharField('username', max_length=30, blank=False)
@@ -30,6 +30,9 @@ class Author(models.Model):
     # Two way friends implies "real" friendship
     def getFriends(self):
         return self.friends.all() & self.friends_of.all()
+
+    def getFollowing(self):
+        return self.follows.all()
 
     def getFriendsOfFriends(self):
         friends = self.getFriends()
