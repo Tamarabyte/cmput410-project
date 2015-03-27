@@ -73,9 +73,9 @@ class PostSerializer(serializers.ModelSerializer):
             github_id = profileJSON.get('github_id', None)
             about = profileJSON.get('about', None)
             username = profileJSON.get('username', username)
-
+            avatar = "foreign_avatar.jpg"
             author = Author.objects.create(uuid=uuid, node=node, username=username,
-                                           github_id=github_id, about=about)
+                                           github_id=github_id, about=about, avatar=avatar)
 
         elif author.user is None:
             # Existing Foreign Author, update them
@@ -86,7 +86,7 @@ class PostSerializer(serializers.ModelSerializer):
             github_id = profileJSON.get('github_id', author.github_id)
             about = profileJSON.get('about', author.about)
             username = profileJSON.get('username', username)
-
+            author.avatar = "foreign_avatar.jpg"
             author.username = username
             author.github_id = github_id
             author.about = about
