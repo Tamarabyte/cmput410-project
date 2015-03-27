@@ -31,7 +31,7 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 
 # Module to hold outgoing API calls to get various info from other services.
 
-def json_to_posts(json):
+def json_to_posts(json, node):
     posts = json["posts"]
 
     out = []
@@ -47,13 +47,12 @@ def json_to_posts(json):
             # create post
             serializer = PostSerializer(data=p)
             serializer.is_valid(raise_exception=True)
-            post = serializer.save()
-            out.append(post)
+            post = serializer.save(node=node)
         else:
             # update post
             serializer = PostSerializer(post, data=p)
             serializer.is_valid(raise_exception=True)
-            post = serializer.save()
+            post = serializer.save(node=node)
             out.append(post)
 
     return out
@@ -75,7 +74,7 @@ def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     postsJSON = response.json()
 
     # Turn the JSON into Post objects!
-    json_to_posts(postsJSON)
+    json_to_posts(postsJSON, node)
 
     return []
 
@@ -105,7 +104,7 @@ def getForeignStreamPosts(author, min_time):
         postsJSON = response.json()
 
         # Turn the JSON into Post objects in the DB!
-        json_to_posts(postsJSON)
+        json_to_posts(postsJSON, node)
 
     return []
 

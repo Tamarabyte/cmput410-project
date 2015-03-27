@@ -130,12 +130,18 @@ class PostSerializer(serializers.ModelSerializer):
         author_data = validated_data.pop('author')
         comment_data = validated_data.pop('comments')
         categories_data = validated_data.pop('categories')
+        source_node = validated_data.pop('node', None)
 
         # Get the Author
         author = self.get_author(author_data)
 
         # Create the post
         post = Post.objects.create(author=author, **validated_data)
+
+        # Append source
+        if source_node is not None:
+            post.source = source_node.host
+            post.save()
 
         # Add the categories
         for category in categories_data:
@@ -162,6 +168,7 @@ class PostSerializer(serializers.ModelSerializer):
         author_data = validated_data.pop('author', None)
         comment_data = validated_data.pop('comments', None)
         categories_data = validated_data.pop('categories', None)
+        source_node = validated_data.pop('node', None)
 
         # Only update the post if it is timestamped as newer than ours
         pubDate = validated_data.get('pubDate', None)
@@ -170,8 +177,13 @@ class PostSerializer(serializers.ModelSerializer):
             instance = super(PostSerializer, self).update(instance, validated_data)
             # Add the categories
             for category in categories_data:
-                if category not in post.categories:
-                    post.categories.add(category)
+                if category not in instance.categories:
+                    instance.categories.add(category)
+
+            # Append source
+            if source_node is not None:
+                instance.source = source_node.host
+                instance.save()
 
         # Update the comments
         for comment_json in comment_data:
