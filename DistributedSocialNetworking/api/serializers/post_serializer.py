@@ -18,7 +18,6 @@ def getForeignProfile(uuid, node):
 
     if(response.status_code != 200):
         # Node not reachable or some other mishap
-        print(response.content)
         print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
         return None
 
@@ -32,6 +31,17 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=False)
     author = AuthorSerializer(read_only=False, required=True)
     pubDate = serializers.DateTimeField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        # We need to add the categories to the DB before validation
+        data = kwargs.get('data', None)
+        if data is not None:
+            categories = data.get('categories', None)
+            if categories is not None:
+                for category in categories:
+                    Category.objects.get_or_create(tag=category)
+
+        super(PostSerializer, self).__init__(*args, **kwargs)
 
     def to_representation(self, instance):
         """
@@ -158,6 +168,10 @@ class PostSerializer(serializers.ModelSerializer):
         if pubDate > instance.pubDate:
             # Call Super to update the Post instance
             instance = super(PostSerializer, self).update(instance, validated_data)
+            # Add the categories
+            for category in categories_data:
+                if category not in post.categories:
+                    post.categories.add(category)
 
         # Update the comments
         for comment_json in comment_data:
