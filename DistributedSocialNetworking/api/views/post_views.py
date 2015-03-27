@@ -66,16 +66,6 @@ class PostDetails(APIView):
     GET, POST, or PUT an author post
     """
 
-    def add_categories(self, data):
-        """
-        Adds Categories to the database if necessary
-        """
-        categories = data.get('categories', None)
-        if categories is not None:
-            for category in categories:
-                if not Category.objects.filter(tag=category).exists():
-                    Category.objects.create(tag=category)
-
     def get(self, request, guid, format=None):
         """
         Get, serialize, and return an instance of Post
@@ -88,6 +78,8 @@ class PostDetails(APIView):
         """
         Get, serialize, and return an instance of Post
         """
+        node = request.user
+
         if Post.objects.filter(guid=guid).exists():
             return Response({"error": ["Post already exists."]}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,7 +93,7 @@ class PostDetails(APIView):
 
         # Validate the Serializer
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.save(node=node)
             return Response({"posts": [serializer.data]}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -109,14 +101,12 @@ class PostDetails(APIView):
         """
         Creates or Updates an instance of Post
         """
+        node = request.user
 
         # Rename `content-type` to content_type
         content_type = request.data.pop('content-type', None)
         if content_type is not None:
             request.data['content_type'] = content_type
-
-        # Add new categories to our database... Yeah...
-        self.add_categories(request.data)
 
         if Post.objects.filter(guid=guid).exists():
             # Put as Update
@@ -132,7 +122,7 @@ class PostDetails(APIView):
             status_code = status.HTTP_201_CREATED
 
         if serializer.is_valid(raise_exception=True):
-            serializer.save()
+            serializer.save(node=node)
             return Response({"posts": [serializer.data]}, status=status_code)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
