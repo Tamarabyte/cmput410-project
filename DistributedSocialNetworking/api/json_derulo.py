@@ -116,6 +116,8 @@ def getForeignAuthor(uuid):
             print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
             continue
 
+        obj = response.json()
+
         try:
             author = Author.objects.get(uuid=uuid, node=node)
             # since there is no defined profile JSON, can't expect these to be in the request.
