@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.serializers import FriendQuerySerializer, FriendRequestSerializer
@@ -65,6 +65,15 @@ class FriendRequest(APIView):
     """
     POST a friend request
     """
+    def echo_request(author, friend):
+        request = FriendRequestFactory.create(friend.node)
+        try:
+            response = request.post(author, friend)
+            if response.status_code != 200:
+                logger.log("HTTP %s returned from %s on friend request echo." % (response.status_code, node.host))
+        except NotImplementedError:
+            logger.log("Node %s NotImplementedError on friend request echo." % (node.host))
+
     def post(self, request, format=None):
         # Validate the request body
         serializer = FriendRequestSerializer(data=request.data)
@@ -78,10 +87,7 @@ class FriendRequest(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
         if friend.isForeign():
             # Echo request to foreign Author's Node
-            request = FriendRequestFactory.create(friend.node)
-            response = request.post(author, friend)
-            if response.status_code != 200:
-                logger.log("HTTP %s returned from %s on friend request echo." % (response.status_code, node.host))
+            self.echo_request(author, friend)
 
         if friend not in author.friends.all():
             author.friends.add(friend)
