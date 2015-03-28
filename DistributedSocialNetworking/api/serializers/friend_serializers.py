@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from Hindlebook.models import Author, Node
-from api.serializers import AuthorSerializer, PostSerializer, getForeignProfile
+from api.serializers import AuthorSerializer, PostSerializer
+from api.serializers.utils import get_author
 import re
 
 
@@ -12,29 +13,12 @@ class FriendQuerySerializer(serializers.Serializer):
     author = serializers.CharField(max_length=40, required=True)
     authors = serializers.ListField(child=serializers.CharField(max_length=40, required=True))
 
-    def uuid_validator(self, value):
-        """
-        Validates a UUID
-        """
-        regex = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
-        match = regex.match(value)
-        # return bool(match)
-        return True  # Hack for SHA-1 LOL (Pretend Robbie did this)
-
     def validate_query(self, value):
         """
         Check that the friends: query key exists
         """
         if(value != "friends"):
             raise serializers.ValidationError("Missing or invalid 'query: friends'")
-        return value
-
-    def validate_author(self, value):
-        """
-        Check that the author is a valid UUID
-        """
-        if self.uuid_validator(value) is False:
-            raise serializers.ValidationError("Author UUID is invalid")
         return value
 
     def validate_authors(self, value):
@@ -44,8 +28,6 @@ class FriendQuerySerializer(serializers.Serializer):
         authors = []
 
         for uuid in value:
-            if self.uuid_validator(uuid) is False:
-                continue  # Bad UUID, skip it
             if Author.objects.filter(uuid=uuid).first():
                 authors.append(uuid)  # This is a valid author
         return authors
@@ -67,49 +49,8 @@ class FriendRequestSerializer(serializers.Serializer):
             raise serializers.ValidationError("Missing or invalid 'query: friendrequest'")
         return value
 
-    def author_validator(self, value):
-        """
-        A Validator for the Author/Friend fields of a friend request
-        """
-        username = value.get('username', "")
-        uuid = value.get('uuid')
-        node = value.get('node')
-
-        # Reject unknown hosts
-        node = Node.objects.filter(host=node).first()
-        if node is None:
-            raise serializers.ValidationError("Invalid or unknown Host: %s" % node)
-
-        # Get or create Author
-        author = Author.objects.filter(uuid=uuid).first()
-        if author is None:
-            # New foreign author
-            profileJSON = getForeignProfile(uuid, node)
-
-            github_id = profileJSON.get('github_id', "")
-            about = profileJSON.get('about', "")
-            username = profileJSON.get('username', username)
-
-            author = Author.objects.create(uuid=uuid, node=node, username=username,
-                                           github_id=github_id, about=about)
-
-        elif author.user is None:
-            # Existing Foreign Author, update them
-            profileJSON = getForeignProfile(uuid, node)
-
-            github_id = profileJSON.get('github_id', author.github_id)
-            about = profileJSON.get('about', author.about)
-            username = profileJSON.get('username', username)
-
-            author.username = username
-            author.github_id = github_id
-            author.about = about
-            author.save()
-
-        return author
-
     def validate_author(self, value):
-        return self.author_validator(value)
+        return getAuthor(value)
 
     def validate_friend(self, value):
-        return self.author_validator(value)
+        return getAuthor(value)

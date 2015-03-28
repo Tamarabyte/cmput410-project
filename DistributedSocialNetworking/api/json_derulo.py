@@ -2,7 +2,7 @@ import json
 import requests
 import datetime
 import dateutil.parser
-from Hindlebook.models import Node, Author, Settings, Post, Comment
+from Hindlebook.models import Node, Author, Post, Comment
 from api.serializers import PostSerializer
 from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory
 
@@ -85,11 +85,7 @@ def getForeignStreamPosts(author, min_time):
         returns a list of post objects.'''
     posts = []
     postsJSON = None
-    for node in Node.objects.all():
-
-        # Skip our node, don't want to ask ourselves unecessarily.
-        if node == Settings.objects.all().first().node:
-            continue
+    for node in Node.objects.getActiveNodes():
 
         # Make a request for this nodes visible posts
         request = VisiblePostsRequestFactory.create(node)
@@ -111,9 +107,8 @@ def getForeignStreamPosts(author, min_time):
 
 def getForeignAuthor(uuid):
     author = None
-    for node in Node.objects.all():
-        if node == Settings.objects.all().first().node:
-            continue
+    for node in Node.objects.getActiveNodes():
+
         obj = ProfileRequestFactory.create(node).get(uuid).json()
         try:
             author = Author.objects.get(uuid=uuid, node=node)
@@ -135,9 +130,8 @@ def getForeignAuthor(uuid):
 
 
 def sendForeignComment(comment):
-    for node in Node.objects.all():
-        if node == Settings.objects.all().first().node:
-            continue
+    for node in Node.objects.getActiveNodes():
+
         obj = PostRequestFactory.create(node)
         try:
             response = obj.get(comment.uuid)

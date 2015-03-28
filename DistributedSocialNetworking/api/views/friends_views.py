@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from api.serializers import FriendQuerySerializer, FriendRequestSerializer
 from api.requests.friend_request_factory import FriendRequestFactory
 from Hindlebook.models import Author
+from Hindlebook.utilites import Logger
+logger = Logger()
 
 
 class FriendQuery(APIView):
@@ -54,7 +56,6 @@ class Friend2Friend(APIView):
                 friends = "NO"
 
         except Author.DoesNotExist:
-            # TODO: FIX ME: Add logic to create foreign user from Robby
             friends = "NO"
 
         return Response({"query": "friends", "authors": [authorID1, authorID2], "friends": friends})
@@ -68,22 +69,19 @@ class FriendRequest(APIView):
         # Validate the request body
         serializer = FriendRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
 
         author = serializer.validated_data['author']
-        friend = serializer.validated_data['friend'] 
-
+        friend = serializer.validated_data['friend']
 
         if author.isForeign() and friend.isForeign():
             return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
                             status=status.HTTP_400_BAD_REQUEST)
         if friend.isForeign():
-            # If we got here not both friend and author are foreign
-            # Thus author is local friend is foreign, echo request!
+            # Echo request to foreign Author's Node
             request = FriendRequestFactory.create(friend.node)
-            response = request.post(author,friend)
+            response = request.post(author, friend)
             if response.status_code != 200:
-                print("Node %s returned status code %s for friend request!!!" %(node.host_name,response.status_code))
+                logger.log("HTTP %s returned from %s on friend request echo." % (response.status_code, node.host))
 
         if friend not in author.friends.all():
             author.friends.add(friend)
