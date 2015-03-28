@@ -121,15 +121,16 @@ def getForeignAuthor(uuid):
             # since there is no defined profile JSON, can't expect these to be in the request.
             # best to use obj.get('github_id', Default) which will give you Default if not in the request
             # indexing will throw an error
-            author.github_id = obj.get('github_id', "")
-            author.about = obj.get('about', "")
+            author.github_id = obj.get('github_username', "")
+            author.about = obj.get('bio', "")
             author.username = obj.get('displayname', "Unknown Author")
             author.avatar = "foreign_avatar.jpg"
             author.save()
             break
         except Author.DoesNotExist:
-            author = Author.objects.create(uuid=uuid, obj.get('displayname', "Unknown Author"),
-                                           node=node, about=obj.get('about', ""), github_id=obj.get('github_id', ""), avatar="foreign_avatar.jpg")
+            author = Author.objects.create(uuid=uuid, username=obj.get('displayname', "Unknown Author"),
+                                           node=node, about=obj.get('bio', ""), github_id=obj.get('github_username', ""),
+                                           avatar="foreign_avatar.jpg")
             author.save()
             break
     return author
