@@ -39,7 +39,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         # Pop nested relationships, we need to handle them separately
         friends_data = validated_data.pop('friends', None)
 
-        return super(ProfileSerializer, self).create(validated_data)
+        instance = super(ProfileSerializer, self).create(validated_data)
+
+        # Add default avatar
+        instance.avatar = "foreign_avatar.jpg"
 
     def update(self, instance, validated_data):
         """

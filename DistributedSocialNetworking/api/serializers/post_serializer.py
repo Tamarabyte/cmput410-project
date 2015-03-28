@@ -67,7 +67,7 @@ class PostSerializer(serializers.ModelSerializer):
         source_node = validated_data.pop('node', None)
 
         # Get the Author
-        author = get_author(author_data)
+        author = get_author(author_data.get('uuid'), author_data.get('node'))
 
         # Create the post
         post = Post.objects.create(author=author, **validated_data)

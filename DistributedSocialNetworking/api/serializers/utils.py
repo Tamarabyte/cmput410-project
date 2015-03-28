@@ -7,12 +7,10 @@ from api.serializers import ProfileSerializer
 logger = Logger()
 
 
-def getForeignProfile(uuid, node):
+def get_foreign_profile_data(uuid, node):
     """
     Fetches the profile for the foreign user specified by uuid from the specfied node
     """
-    author = None
-
     request = ProfileRequestFactory.create(node)
     response = request.get(uuid)
 
@@ -21,11 +19,9 @@ def getForeignProfile(uuid, node):
         logger.log(response.content)
         logger.log("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
         print("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
-        return None
+        return {}
 
-    data = response.json()
-
-    return data
+    return response.json()
 
 
 def get_node(node_string):
@@ -41,46 +37,31 @@ def get_node(node_string):
     return node
 
 
-def get_author(author_data):
+def get_author(uuid, host):
     """
     Gets the Author, creats a new one if necesary
     """
-    if author_data is None:
+    if not uuid or not host:
         return None
 
-    # Get Author/Host info
-    uuid = author_data.get('uuid', )
-    host = author_data.get('node')
-    username = author_data.get('username')
-
-    node = get_node(host)
-
+    # Get Author
     author = Author.objects.filter(uuid=uuid).first()
+
     if author is None:
-        # New foreign author
-        profile_data = getForeignProfile(uuid, node)
-
-        github_id = profile_data.get('github_id', "")
-        about = profile_data.get('about', "")
-        username = profile_data.get('username', username)
-        avatar = "foreign_avatar.jpg"
-
-        author = Author.objects.create(uuid=uuid, node=node, username=username,
-                                       github_id=github_id, about=about, avatar=avatar)
+        # New foreign author, create them
+        profile_data = get_foreign_profile_data(uuid, get_node(host))
+        print('hi')
+        print(profile_data)
+        serializer = ProfileSerializer(data=profile_data)
+        serializer.is_valid(raise_exception=True)
+        author = serializer.save()
 
     elif author.user is None:
         # Existing Foreign Author, update them
-        profileJSON = getForeignProfile(uuid, node)
-        if profileJSON is None:
-            profileJSON = {}
-
-        github_id = profileJSON.get('github_id', author.github_id)
-        about = profileJSON.get('about', author.about)
-        username = profileJSON.get('username', username)
-        author.avatar = "foreign_avatar.jpg"
-        author.username = username
-        author.github_id = github_id
-        author.about = about
-        author.save()
+        profile_data = get_foreign_profile_data(uuid, get_node(host))
+        print(profile_data)
+        serializer = ProfileSerializer(author, data=profile_data)
+        serializer.is_valid(raise_exception=True)
+        author = serializer.save()
 
     return author

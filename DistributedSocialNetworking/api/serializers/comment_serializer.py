@@ -18,7 +18,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         # Pop nested relationships, we need to handle them separately
         author_data = validated_data.pop('author', None)
-        validated_data['author'] = get_author(author_data)
+        validated_data['author'] = get_author(author_data.get('uuid'), author_data.get('node'))
 
         return super(CommentSerializer, self).create(validated_data)
 
@@ -34,7 +34,7 @@ class CommentSerializer(serializers.ModelSerializer):
         # Only Update comments if they are newer
         if pubDate and pubDate > instance.pubDate:
             # Set the author
-            validated_data['author'] = get_author(author_data)
+            validated_data['author'] = get_author(author_data.get('uuid'), author_data.get('node'))
             # Call Super to update the Comment instance
             instance = super(CommentSerializer, self).update(instance, validated_data)
 
