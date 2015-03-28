@@ -58,9 +58,9 @@ def get_author(author_data):
 
 
 
-        github_id = profileJSON.get('github_id', "")
-        about = profileJSON.get('about', "")
-        username = profileJSON.get('username', username)
+        github_id = profile_data.get('github_id', "")
+        about = profile_data.get('about', "")
+        username = profile_data.get('username', username)
         avatar = "foreign_avatar.jpg"
 
         author = Author.objects.create(uuid=uuid, node=node, username=username,
