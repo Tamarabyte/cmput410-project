@@ -109,21 +109,27 @@ def getForeignAuthor(uuid):
     author = None
     for node in Node.objects.getActiveNodes():
 
-        obj = ProfileRequestFactory.create(node).get(uuid).json()
+        request = ProfileRequestFactory.create(node)
+        response = request.get(uuid)
+        if(response.status_code != 200):
+            # Node not reachable
+            print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+            continue
+
         try:
             author = Author.objects.get(uuid=uuid, node=node)
             # since there is no defined profile JSON, can't expect these to be in the request.
             # best to use obj.get('github_id', Default) which will give you Default if not in the request
             # indexing will throw an error
-            author.github_id = obj['github_id']
-            author.about = obj['about']
-            author.username = obj['displayname']
+            author.github_id = obj.get('github_id', "")
+            author.about = obj.get('about', "")
+            author.username = obj.get('displayname', "Unknown Author")
             author.avatar = "foreign_avatar.jpg"
             author.save()
             break
         except Author.DoesNotExist:
-            author = Author.objects.create(uuid=uuid, username=obj['displayname'],
-                                           node=node, about=obj["about"], github_id=obj['github_id'], avatar="foreign_avatar.jpg")
+            author = Author.objects.create(uuid=uuid, obj.get('displayname', "Unknown Author"),
+                                           node=node, about=obj.get('about', ""), github_id=obj.get('github_id', ""), avatar="foreign_avatar.jpg")
             author.save()
             break
     return author

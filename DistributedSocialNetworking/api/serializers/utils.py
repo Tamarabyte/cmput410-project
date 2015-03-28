@@ -2,6 +2,7 @@ from rest_framework import serializers
 from Hindlebook.models import Node, Author
 from Hindlebook.utilites import Logger
 from api.requests import ProfileRequestFactory
+from api.serializers import ProfileSerializer
 
 logger = Logger()
 
@@ -19,9 +20,9 @@ def getForeignProfile(uuid, node):
         # Node not reachable or some other mishap
         logger.log(response.content)
         logger.log("HTTP %s returned from %s on friend request echo." % (response.status_code, node.host))
-        return {}
+        return None
 
-    return response.json()
+    data = response.json()
 
 
 def get_node(node_string):
@@ -53,7 +54,9 @@ def get_author(author_data):
     author = Author.objects.filter(uuid=uuid).first()
     if author is None:
         # New foreign author
-        profileJSON = getForeignProfile(uuid, node)
+        profile_data = getForeignProfile(uuid, node)
+
+
 
         github_id = profileJSON.get('github_id', "")
         about = profileJSON.get('about', "")

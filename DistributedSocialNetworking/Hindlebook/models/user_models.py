@@ -4,6 +4,7 @@ from itertools import chain
 import uuid as uuid_import
 from Hindlebook.models import Node, UuidValidator
 
+
 class Author(models.Model):
     """Model for represting a Authors"""
 

@@ -31,6 +31,29 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_bio(self, obj):
         return getattr(obj, 'bio', Author._meta.get_field('about').get_default())
 
+    def create(self, validated_data):
+        """
+        Creates and return a new `Profile` instance, given the validated data.
+        """
+
+        # Pop nested relationships, we need to handle them separately
+        friends_data = validated_data.pop('friends', None)
+
+        return super(ProfileSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Updates and returns an instance of the `User` Model with validated data
+        """
+
+        # Pop nested relationships, we need to handle them separately
+        friends_data = validated_data.pop('friends', None)
+
+        # Call Super to update the Comment instance
+        instance = super(ProfileSerializer, self).update(instance, validated_data)
+
+        return instance
+
     class Meta:
         model = Author
         fields = ['id', 'host', 'displayname', 'friends', 'github_username', 'bio']
