@@ -33,6 +33,7 @@ class StreamView(TemplateView):
         context['posts'] = None
         context['post_form'] = PostForm()
         context['comment_form'] = CommentForm()
+        context['github_id'] = self.request.user.author.github_id
         return context
 
     def post(self, *args, **kwargs):
