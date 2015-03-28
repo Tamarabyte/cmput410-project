@@ -66,6 +66,10 @@ class FriendRequest(APIView):
     POST a friend request
     """
     def echo_request(author, friend):
+        """
+        Echo friend request to foreign author's node
+        If it fails, we don't really care so we bite it.
+        """
         request = FriendRequestFactory.create(friend.node)
         try:
             response = request.post(author, friend)
