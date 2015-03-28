@@ -27,7 +27,7 @@ class HindlebookProfileRequest(ProfileRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/api/author" % node.host
+        self.url = "%s/api/author" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, author_uuid):
@@ -41,7 +41,7 @@ class SocshizzleProfileRequest(ProfileRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/author" % node.host
+        self.url = "%s/author" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, author_uuid):

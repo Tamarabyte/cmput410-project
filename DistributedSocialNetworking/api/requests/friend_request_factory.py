@@ -29,7 +29,7 @@ class HindlebookFriendRequest(FriendRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/api/friendrequest" % node.host
+        self.url = "%s/api/friendrequest" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
@@ -45,7 +45,7 @@ class SocshizzleFriendRequest(FriendRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/friendrequest" % node.host
+        self.url = "%s/friendrequest" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
