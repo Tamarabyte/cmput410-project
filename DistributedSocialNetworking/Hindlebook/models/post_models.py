@@ -1,12 +1,13 @@
 from Hindlebook.models.user_models import Author
 from Hindlebook.models import UuidValidator
-
+from datetime import datetime
 from django.db import models
 from django.db.models import Q
 from itertools import chain
 import uuid as uuid_import
 import functools
 import operator
+from django.utils import timezone
 
 
 class Category(models.Model):
@@ -95,7 +96,7 @@ class Post(models.Model):
 
     author = models.ForeignKey(Author, related_name="posts")
 
-    pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
+    pubDate = models.DateTimeField('date published', default=timezone.now, db_index=True)
 
     content_type_choices = (("text/plain", "Text"), ("text/x-markdown", "Markdown"), ("text/html", "HTML"))
     content_type = models.CharField(max_length=15, blank=True, choices=content_type_choices, default="text/plain")
@@ -121,7 +122,7 @@ class Comment(models.Model):
     author = models.ForeignKey(Author, related_name="comments")
 
     comment = models.CharField(max_length=2048)
-    pubDate = models.DateTimeField('date published', auto_now_add=True, db_index=True)
+    pubDate = models.DateTimeField('date published', default=timezone.now, db_index=True)
 
     def save(self, *argv, **kwargs):
         if Post.objects.filter(guid=self.post) is not None:
