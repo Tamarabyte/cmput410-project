@@ -27,7 +27,7 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/api/author/posts" % node.host
+        self.url = "%s/api/author/posts" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid):
@@ -41,7 +41,7 @@ class SocshizzleVisiblePostsRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/posts" % node.host # Just get the public cause their apis fucky
+        self.url = "%s/posts" % node.host # Just get the public cause their apis fucky
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid):

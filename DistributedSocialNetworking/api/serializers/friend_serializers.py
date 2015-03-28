@@ -19,7 +19,7 @@ class FriendQuerySerializer(serializers.Serializer):
         regex = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
         match = regex.match(value)
         # return bool(match)
-        return True # Hack for SHA-1 LOL (Pretend Robbie did this)
+        return True  # Hack for SHA-1 LOL (Pretend Robbie did this)
 
     def validate_query(self, value):
         """
@@ -71,7 +71,7 @@ class FriendRequestSerializer(serializers.Serializer):
         """
         A Validator for the Author/Friend fields of a friend request
         """
-        username = value.get('username')
+        username = value.get('username', "")
         uuid = value.get('uuid')
         node = value.get('node')
 

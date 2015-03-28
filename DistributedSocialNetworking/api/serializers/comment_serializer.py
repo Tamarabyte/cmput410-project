@@ -52,8 +52,8 @@ class CommentSerializer(serializers.ModelSerializer):
             if profileJSON is None:
                 profileJSON = {}
 
-            github_id = profileJSON.get('github_id', None)
-            about = profileJSON.get('about', None)
+            github_id = profileJSON.get('github_id', "")
+            about = profileJSON.get('about', "")
             username = profileJSON.get('username', username)
 
             author = Author.objects.create(uuid=uuid, node=node, username=username,

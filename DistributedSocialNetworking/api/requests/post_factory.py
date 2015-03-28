@@ -33,7 +33,7 @@ class HindlebookPostRequest(PostRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/api/post" % node.host
+        self.url = "%s/api/post" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, post_id):
@@ -57,7 +57,7 @@ class SocshizzlePostRequest(PostRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "http://%s/post" % node.host
+        self.url = "%s/post" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, post_id):
