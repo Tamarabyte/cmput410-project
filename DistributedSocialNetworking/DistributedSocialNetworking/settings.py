@@ -105,3 +105,28 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s:  %(message)s',
+        },
+    },
+    'handlers': {
+        'file':{
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename' :  os.path.join(BASE_DIR, 'log.txt'),
+        },
+    },
+    'loggers': {
+        'custom': {
+            'handlers': ['file'],
+            'propagate': False,
+            'level': 'DEBUG',
+        },
+    }
+}
