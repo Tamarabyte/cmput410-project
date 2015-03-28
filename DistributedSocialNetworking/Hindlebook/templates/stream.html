@@ -46,13 +46,16 @@
 
 {% block scripts %}
 <script>
-    $(document).ready(function(){ 
-        GitHubActivity.feed({
-            username: "{{ github_id }}",
-            selector: "#github stream",
-            limit: 7,
-        })
-    });
+    var githubid = "{{ github_id }}"
+    if (githubid !== "") {
+        $(document).ready(function(){ 
+            GitHubActivity.feed({
+                username: githubid,
+                selector: "#github stream",
+                limit: 7,
+            })
+        });
+    }
 </script>
 
 <script>
