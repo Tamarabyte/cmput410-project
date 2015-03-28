@@ -19,10 +19,13 @@ def getForeignProfile(uuid, node):
     if(response.status_code != 200):
         # Node not reachable or some other mishap
         logger.log(response.content)
-        logger.log("HTTP %s returned from %s on friend request echo." % (response.status_code, node.host))
+        logger.log("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
+        print("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
         return None
 
     data = response.json()
+
+    return data
 
 
 def get_node(node_string):
@@ -31,6 +34,7 @@ def get_node(node_string):
     """
     node = Node.objects.filter(host=node_string).first()
     if node is None:
+        print
         logger.log("Unknown host '%s' during serialization, throwing exception" % node_string)
         raise serializers.ValidationError('Invalid or Unknown Host: %s' % node_string)
 
@@ -55,8 +59,6 @@ def get_author(author_data):
     if author is None:
         # New foreign author
         profile_data = getForeignProfile(uuid, node)
-
-
 
         github_id = profile_data.get('github_id', "")
         about = profile_data.get('about', "")
