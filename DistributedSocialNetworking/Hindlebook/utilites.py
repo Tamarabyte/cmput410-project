@@ -19,7 +19,7 @@ from django.core import serializers
  # log a stack trace (default 5 depth)
  logger.trace()
  
- # log an object
+ # log a django object
  logger.obj(obj)
 """
 

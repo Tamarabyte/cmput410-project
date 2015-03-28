@@ -8,8 +8,14 @@ class NodeAdmin(ModelAdmin):
     exclude = []
     inlines = []
 
-    list_display = ('host_name', 'host', 'get_primarykey')
+    list_display = ('host_name', 'get_primarykey', 'is_connected')
     ordering = ('host_name', )
+    
+    fieldsets = (
+        (None, {'fields': ('host', 'team_number', 'is_connected')}),
+        ('Basic Auth Incoming (From Them)', {'fields': ('host_name','password')}),
+        ('Basic Auth Outgoing (To Them)', {'fields': ('our_username','our_password')}),
+    )
 
 
     def get_primarykey(self, obj):
