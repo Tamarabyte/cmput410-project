@@ -2,9 +2,17 @@ from django.db import models
 import uuid as uuid_import
 
 
+class ExtendedNodeManager(models.Manager):
+    def getActiveNodes(self):
+        return self.get_queryset().filter(is_connected=True)
+    
+
 class Node(models.Model):
     """Model for representing different servers"""
 
+    # extended manager with some utility methods
+    objects = ExtendedNodeManager()
+    
     # address of the nodes host
     host = models.CharField(max_length=100, blank=False, unique=True, help_text="URL of the host. ex. http://hindlebook.tamarabyte.com ")
     # short name for identifying the nodes host
