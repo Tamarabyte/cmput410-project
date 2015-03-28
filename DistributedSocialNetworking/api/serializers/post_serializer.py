@@ -67,7 +67,7 @@ class PostSerializer(serializers.ModelSerializer):
         # Get Author/Host info
         uuid = author_data.get('uuid')
         host = author_data.get('node')
-        username = author_data.get('username')
+        username = author_data.get('username', "")
 
         node = Node.objects.filter(host=host).first()
         if node is None:
@@ -80,8 +80,8 @@ class PostSerializer(serializers.ModelSerializer):
             if profileJSON is None:
                 profileJSON = {}
 
-            github_id = profileJSON.get('github_id', None)
-            about = profileJSON.get('about', None)
+            github_id = profileJSON.get('github_id', "")
+            about = profileJSON.get('about', "")
             username = profileJSON.get('username', username)
             avatar = "foreign_avatar.jpg"
             author = Author.objects.create(uuid=uuid, node=node, username=username,

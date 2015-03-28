@@ -71,7 +71,7 @@ class FriendRequestSerializer(serializers.Serializer):
         """
         A Validator for the Author/Friend fields of a friend request
         """
-        username = value.get('username')
+        username = value.get('username', "")
         uuid = value.get('uuid')
         node = value.get('node')
 
