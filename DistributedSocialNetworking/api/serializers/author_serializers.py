@@ -17,12 +17,23 @@ class AuthorSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """ Used for sending author JSON data to other nodes """
     displayname = serializers.CharField(source='username')
-    host = serializers.CharField(source='node')
+    host = serializers.CharField(source='node.host')
     id = serializers.CharField(source='uuid')
+    friends = AuthorSerializer(many=True)
+    github_username = serializers.SerializerMethodField(source='github_id')
+    bio = serializers.SerializerMethodField(source='about')
+
+    # Optional field, specify default
+    def get_github_username(self, obj):
+        return getattr(obj, 'github_username', Author._meta.get_field('github_id').get_default())
+
+    # Optional field, specify default
+    def get_bio(self, obj):
+        return getattr(obj, 'bio', Author._meta.get_field('about').get_default())
 
     class Meta:
         model = Author
-        fields = ["displayname", "host", "id", 'about', 'github_id', 'node']
+        fields = ['id', 'host', 'displayname', 'friends', 'github_username', 'bio']
 
 
 class UserEditSerializer(serializers.ModelSerializer):
