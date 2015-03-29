@@ -15,6 +15,8 @@ class FriendRequestFactory():
     def create(node):
         if node.team_number == 5:
             return SocshizzleFriendRequest(node)
+        if node.team_number == 8:
+            return Team8FriendRequest(node)
         if node.team_number == 9:
             return HindlebookFriendRequest(node)
         else:
@@ -31,6 +33,22 @@ class HindlebookFriendRequest(FriendRequestFactory):
         self.node = node
         self.url = "%s/api/friendrequest" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def post(self, author, friend):
+        data = {"query": "friendrequest",
+                "author": AuthorSerializer(author).data,
+                "friend": AuthorSerializer(friend).data}
+        return requests.post(url=self.url, headers={"content-type": "application/json"}, data=json.dumps(data), auth=self.auth)
+
+
+class Team8FriendRequest(FriendRequestFactory):
+    """
+    Team 8 specific FriendRequest
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "%s/api/friendrequest" % node.host
+        self.auth - HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
         data = {"query": "friendrequest",

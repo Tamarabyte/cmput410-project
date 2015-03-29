@@ -17,6 +17,8 @@ class FriendQueryRequestFactory():
     def create(node):
         if node.team_number == 5:
             return SocshizzleFriendQueryRequest(node)
+        if node.team_number == 8:
+            return Team8FriendQueryRequest(node)
         if node.team_number == 9:
             return HindlebookFriendQueryRequest(node)
         else:
@@ -45,6 +47,26 @@ class HindlebookFriendQueryRequest(FriendQueryRequestFactory):
                 "authors": uuids}
         return requests.get(url=self.url, data=data, auth=self.auth)
 
+
+class Team8FriendQueryRequest(FriendQueryRequestFactory):
+    """
+    Team 8 specific FriendQuery
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "%s/firends" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self, uuid1, uuid2):
+        self.url = self.url + "/%s/%s" % (uuid1, uuid2)
+        return requests.get(url=self.url, auth=self.auth)
+
+    def post(self, uuid, uuids=[]):
+        self.url = self.url + "/%s" % uuid
+        data = {"query": friends,
+                "author": uuid,
+                "authors": uuids}
+        return requests.get(url=self.url, data=data, auth=self.auth)
 
 class SocshizzleFriendQueryRequest(FriendQueryRequestFactory):
     """

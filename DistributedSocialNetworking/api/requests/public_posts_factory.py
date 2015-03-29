@@ -13,6 +13,8 @@ class PublicPostsRequestFactory():
     def create(node):
         if node.team_number == 5:
             return SocshizzlePublicPostsRequest(node)
+        if node.team_number == 8:
+            return Team8PublicPostRequest(node)
         if node.team_number == 9:
             return HindlebookPublicPostsRequest(node)
         else:
@@ -24,6 +26,19 @@ class PublicPostsRequestFactory():
 class HindlebookPublicPostsRequest(PublicPostsRequestFactory):
     """
     Hindlebook specific Public Post Request
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "%s/api/posts" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self):
+        return requests.get(url=self.url, auth=self.auth)
+
+
+class Team8PublicePostRequest(PublicPostsRequestFactory):
+    """
+    Team 8 specific Public Post Request
     """
     def __init__(self, node):
         self.node = node

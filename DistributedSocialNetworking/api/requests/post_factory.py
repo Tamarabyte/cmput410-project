@@ -19,6 +19,8 @@ class PostRequestFactory():
     def create(node):
         if node.team_number == 5:
             return SocshizzlePostRequest(node)
+        if node.team_number == 8:
+            return Team8PostRequest(node)
         if node.team_number == 9:
             return HindlebookPostRequest(node)
         else:
@@ -30,6 +32,30 @@ class PostRequestFactory():
 class HindlebookPostRequest(PostRequestFactory):
     """
     Hindlebook specific GET/PUT/POST Post requests
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "%s/api/post" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self, post_id):
+        self.url = self.url + "/%s" % post_id
+        return requests.get(url=self.url, auth=self.auth)
+
+    def post(self, post_id, post):
+        self.url = self.url + "/%s" % post_id
+        data = PostSerializer(post).data
+        return requests.post(url=self.url, data=data, auth=self.auth)
+
+    def put(self, post_id, post):
+        self.url = self.url + "/%s" % post_id
+        data = PostSerializer(post).data
+        return requests.put(url=self.url, data=data, auth=self.auth)
+
+
+class Team8PostRequest(PostRequestFactory):
+    """
+    Team 8 specific GET/PUT/POST Post requests
     """
     def __init__(self, node):
         self.node = node

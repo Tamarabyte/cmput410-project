@@ -13,6 +13,8 @@ class VisiblePostsRequestFactory():
     def create(node):
         if node.team_number == 5:
             return SocshizzleVisiblePostsRequest(node)
+        if node.team_number == 8:
+            return Team8VisiblePostRequest(node)
         if node.team_number == 9:
             return HindlebookVisiblePostsRequest(node)
         else:
@@ -34,6 +36,19 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
         headers = {'uuid': uuid}
         return requests.get(url=self.url, headers=headers, auth=self.auth)
 
+
+class Team8VisblePostRequest(VisiblePostsRequestFactory):
+    """
+    Team 8 specific Visible Post Request
+    """
+    def __init__(self, node):
+        self.node = node
+        self.url = "%s/api/author/posts" % node.host
+        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+
+    def get(self, uuid):
+        headers = {'uuid': uuid}
+        return requests.get(url=self.url, headers=headers, auth=self.auth)
 
 class SocshizzleVisiblePostsRequest(VisiblePostsRequestFactory):
     """
