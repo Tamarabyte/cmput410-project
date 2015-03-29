@@ -4,6 +4,9 @@ from model_mommy import mommy
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 import base64
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class PostApiTests(APITestCase):
@@ -14,10 +17,18 @@ class PostApiTests(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # Create Authors
-        self.author1 = mommy.make(Author)
-        self.author2 = mommy.make(Author)
-        self.author3 = mommy.make(Author)
+        # Create Node
+        self.node1 = mommy.make(Node, host='http://test.com', host_name='test', password='test', is_connected=False)
+
+        # Create Users
+        self.user1 = mommy.make(User)
+        self.user2 = mommy.make(User)
+        self.user3 = mommy.make(User)
+
+        # Create authors
+        self.author1 = mommy.make(Author, node=self.node1, user=self.user1)
+        self.author2 = mommy.make(Author, node=self.node1, user=self.user2)
+        self.author3 = mommy.make(Author, node=self.node1, user=self.user3)
 
         # Create Public Posts
         self.post1_by_a1 = mommy.make(Post, author=self.author1)
@@ -29,8 +40,6 @@ class PostApiTests(APITestCase):
         self.private1_by_a1 = mommy.make(Post, author=self.author1, visibility='PRIVATE')
         self.private2_by_a1 = mommy.make(Post, author=self.author1, visibility='PRIVATE')
         self.private1_by_a2 = mommy.make(Post, author=self.author2, visibility='PRIVATE')
-
-        self.node1 = mommy.make(Node, host='test', host_name='test', password='test')
 
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded

@@ -20,8 +20,8 @@ class APITests(APITestCase):
         self.client = APIClient()
 
         # A dummy node to test authentication
-        self.node1 = mommy.make(Node, host='test', host_name='test', password='test')
-        self.node2 = mommy.make(Node, host='node2', host_name='node2', password='node2')
+        self.node1 = mommy.make(Node, host='http://test.com', host_name='test', password='test', is_connected=False)
+        self.node2 = mommy.make(Node, host='http://node2.com', host_name='node2', password='node2', is_connected=False)
 
         # Create Users
         self.user1 = mommy.make(User)
