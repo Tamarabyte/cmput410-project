@@ -11,17 +11,27 @@ def get_foreign_profile_data(uuid, node):
     """
     Fetches the profile for the foreign user specified by uuid from the specfied node
     """
-    request = ProfileRequestFactory.create(node)
-    response = request.get(uuid)
+    try:
+        request = ProfileRequestFactory.create(node)
+        response = request.get(uuid)
 
-    if(response.status_code != 200):
-        # Node not reachable or some other mishap
-        logger.log(response.content)
-        logger.log("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
-        print("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
-        return {}
+        if(response.status_code != 200):
+            # Node not reachable or some other mishap
+            logger.log(response.content)
+            logger.log("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
+            print("HTTP %s returned from %s on profile request." % (response.status_code, node.host))
+            return {}
 
-    return response.json()
+        data = response.json()
+    except NotImplementedError:
+        logger.log("Frien Request Factory not implemented for %s." % (node.host))
+        data = {}
+    except :
+        # This probably means we couldn't issue a request, only seen this using local tests
+        logger.log("Exception thrown on profile request to %s." % (node.host))
+        data = {}
+
+    return data
 
 
 def get_node(node_string):
@@ -57,8 +67,7 @@ def get_author(uuid, host):
             author = serializer.save()
 
         except:
-            print("Debug: returning None for Author in utils.py")
-            logger.log("Couldn't parse new Author profile for %s from %s." % (uuid, host.host))
+            logger.log("Couldn't parse new Author profile for %s from %s." % (uuid, host))
             author = None
 
     elif author.user is None:

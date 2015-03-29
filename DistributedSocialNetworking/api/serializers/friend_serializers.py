@@ -50,7 +50,17 @@ class FriendRequestSerializer(serializers.Serializer):
         return value
 
     def validate_author(self, value):
-        return get_author(value.get('uuid'), value.get('node'))
+        author = get_author(value.get('uuid'), value.get('node'))
+
+        if not author:
+            raise serializers.ValidationError("Invalid or Unknown author in 'query: friendrequest'")
+
+        return author
 
     def validate_friend(self, value):
-        return get_author(value.get('uuid'), value.get('node'))
+        friend = get_author(value.get('uuid'), value.get('node'))
+
+        if not friend:
+            raise serializers.ValidationError("Invalid or Unknown friend in 'query: friendrequest'")
+
+        return friend
