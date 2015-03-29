@@ -57,7 +57,7 @@ class StreamView(TemplateView):
                 display_content = post.content
             else:
                 display_content = post.content
-            bleach.clean(display_content)
+            display_content = bleach.clean(display_content)
             response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
