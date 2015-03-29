@@ -58,9 +58,13 @@ class StreamView(TemplateView):
             else:
                 display_content = post.content
             ALLOWED_TAGS = bleach.ALLOWED_TAGS
-            markdown_tags = ['h1', 'h2', 'h3', 'p', 'br', 'em', 'strong', 'code', 's', 'ul', 'li', 'ol', 'a']
+            markdown_tags = ['h1', 'h2', 'h3', 'p', 'br', 'em', 'strong', 'code', 's', 'ul', 'li', 'ol', 'a', 'iframe']
+            ALLOWED_ATTR = {
+                'iframe': ['src', 'height', 'width'],
+                'a': ['src']
+            }
             ALLOWED_TAGS += markdown_tags
-            display_content = bleach.clean(display_content, tags=ALLOWED_TAGS)
+            display_content = bleach.clean(display_content, ALLOWED_TAGS, ALLOWED_ATTR)
             response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
