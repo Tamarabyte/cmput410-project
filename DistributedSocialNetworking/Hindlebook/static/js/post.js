@@ -23,8 +23,8 @@ $(function() {
         console.log("Form was valid!");
         $('#post-form').html(response["form"]);
         $('#post-form').clearForm();
-        $("#id_visibility").val("PUBLIC")
-        $("#id_content_type").val("text/plain")
+        $("#id_visibility").val("PUBLIC");
+        $("#id_content_type").val("text/plain");
         $('#stream').prepend(response["post"]);
         $('.add_comment_button[data-postGUID="' + response["created_guid"] +'"]').click(showCommentForm);
         time = response['time'];
