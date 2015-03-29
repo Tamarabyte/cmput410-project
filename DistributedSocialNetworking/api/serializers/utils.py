@@ -50,44 +50,28 @@ def get_author(uuid, host):
     if author is None:
         # New foreign author, create them
         profile_data = get_foreign_profile_data(uuid, get_node(host))
-        serializer = ProfileSerializer(data=profile_data)
+        serializer = ProfileSerializer(data=profile_data, partial=True)
 
         try:
             serializer.is_valid(raise_exception=True)
             author = serializer.save()
 
-            github_id = profile_data.get("github_username", None)
-            if github_id:
-                author.github_id = github_id
-                author.save()
-
-            about = profile_dats.get("bio", None)
-            if about:
-                about.about = about
-                author.save()
-
         except:
             print("Debug: returning None for Author in utils.py")
+            logger.log("Couldn't parse new Author profile for %s from %s." % (uuid, host.host))
             author = None
 
     elif author.user is None:
         # Existing Foreign Author, update them
         profile_data = get_foreign_profile_data(uuid, get_node(host))
-        serializer = ProfileSerializer(author, data=profile_data)
+        serializer = ProfileSerializer(author, data=profile_data, partial=True)
+
+        # try:
         serializer.is_valid(raise_exception=True)
         author = serializer.save()
 
-        print("profile data")
-        print(profile_data)
-
-        github_id = profile_data.get("github_username", None)
-        if github_id:
-            author.github_id = github_id
-            author.save()
-
-        about = profile_data.get("bio", None)
-        if about:
-            about.about = about
-            author.save()
+        # except:
+            # logger.log("Couldn't parse update data of Author profile for %s from %s." % (uuid, host.host))
+            # TBH, we don't care if we can't handle their bad data
 
     return author

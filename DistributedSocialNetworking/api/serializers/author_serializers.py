@@ -20,8 +20,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     host = serializers.CharField(source='node')
     id = serializers.CharField(source='uuid')
     friends = AuthorSerializer(many=True)
-    # github_username = serializers.CharField(source='github_id', allow_null=True, default=Author._meta.get_field('github_id').get_default())
-    # bio = serializers.CharField(source='about', allow_null=True, default=Author._meta.get_field('about').get_default())
+    github_username = serializers.CharField(source='github_id')
+    bio = serializers.CharField(source='about')
 
     def to_representation(self, instance):
         """
@@ -43,6 +43,21 @@ class ProfileSerializer(serializers.ModelSerializer):
             logger.log("Unknown host '%s' during serialization, throwing exception" % value)
             raise serializers.ValidationError('Invalid or Unknown Host: %s' % value)
         return node
+
+    def is_valid(self, raise_exception=False):
+        if 'displayname' not in self.initial_data:
+            raise ValidationError("Profile data missing required field: displayname")
+
+        if 'host' not in self.initial_data:
+            raise ValidationError("Profile data missing required field: host")
+
+        if 'id' not in self.initial_data:
+            raise ValidationError("Profile data missing required field: id")
+
+        if 'friends' not in self.initial_data:
+            raise ValidationError("Profile data missing required field: friends")
+
+        return super(ProfileSerializer, self).is_valid(raise_exception)
 
     def create(self, validated_data):
         """
@@ -68,6 +83,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         # We don't update hosts
         node = validated_data.pop('node', None)
 
+        # We don't update UUIDs
+        node = validated_data.pop('uuid', None)
+
         # Call Super to update the Comment instance
         instance = super(ProfileSerializer, self).update(instance, validated_data)
 
@@ -75,7 +93,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ['id', 'host', 'displayname', 'friends']
+        fields = ['id', 'host', 'displayname', 'friends', 'bio', 'github_username']
 
 
 class UserEditSerializer(serializers.ModelSerializer):

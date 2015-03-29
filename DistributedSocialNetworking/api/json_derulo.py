@@ -136,34 +136,3 @@ def getForeignAuthor(uuid):
             author.save()
             break
     return author
-
-
-def sendForeignComment(comment):
-    for node in Node.objects.getActiveNodes():
-
-        obj = PostRequestFactory.create(node)
-        try:
-            response = obj.get(comment.uuid)
-            if response.status_code != 200:
-                # Something went wrong with the get
-                print("Post request returned status code: %d" % (response.status_code))
-                continue
-
-            # We got a post from a server
-            postsJSON = response.json()
-            post = NonSavingPostSerializer(data=postsJSON["posts"], many=False)
-            post.comments.add(comment)
-
-            response = obj.put(post.guid, post)
-
-            if response != 200:
-                # Something went wrong with the post
-                print("Post request returned status code: %d" % (response.status_code))
-                break
-
-            # Post went out
-            break
-
-        except Exception as e:
-            print("Error in sendForeignComment: %s" % (e.msg))
-            break
