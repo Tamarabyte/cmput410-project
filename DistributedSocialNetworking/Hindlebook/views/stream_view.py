@@ -12,6 +12,9 @@ from django.core.urlresolvers import reverse
 import datetime
 import dateutil.parser
 
+import markdown
+import bleach
+
 from itertools import chain
 
 from Hindlebook.models import Post, Comment
@@ -42,13 +45,20 @@ class StreamView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-            time = time + datetime.timedelta(0,3)
+            time = time + datetime.timedelta(0, 3)
             json_derulo.getForeignStreamPosts(self.request.user.author, time)
         local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
 
         for post in local_posts:
             response_data = {}
-            response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+            if (post.content_type == "text/x-markdown"):
+                display_content = markdown.markdown(post.content)
+            elif (post.content_type == "text/html"):
+                display_content = post.content
+            else:
+                display_content = post.content
+            bleach.clean(display_content)
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
             posts.append(response_data)
