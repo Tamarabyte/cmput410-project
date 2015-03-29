@@ -30,7 +30,7 @@ class PostApiTests(APITestCase):
         self.private2_by_a1 = mommy.make(Post, author=self.author1, visibility='PRIVATE')
         self.private1_by_a2 = mommy.make(Post, author=self.author2, visibility='PRIVATE')
 
-        self.node1 = mommy.make(Node, host='test', password='test')
+        self.node1 = mommy.make(Node, host='test', host_name='test', password='test')
 
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
