@@ -50,7 +50,7 @@ class FriendRequestSerializer(serializers.Serializer):
         return value
 
     def validate_author(self, value):
-        return getAuthor(value)
+        return get_author(value.get('uuid'), value.get('node'))
 
     def validate_friend(self, value):
-        return getAuthor(value)
+        return get_author(value.get('uuid'), value.get('node'))
