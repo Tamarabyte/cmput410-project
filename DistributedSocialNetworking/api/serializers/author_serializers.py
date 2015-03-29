@@ -1,6 +1,6 @@
 from django.forms import widgets
 from rest_framework import serializers
-from Hindlebook.models import Author
+from Hindlebook.models import Author, Node
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -17,19 +17,32 @@ class AuthorSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     """ Used for sending author JSON data to other nodes """
     displayname = serializers.CharField(source='username')
-    host = serializers.CharField(source='node.host')
+    host = serializers.CharField(source='node')
     id = serializers.CharField(source='uuid')
     friends = AuthorSerializer(many=True)
-    github_username = serializers.SerializerMethodField(source='github_id')
-    bio = serializers.SerializerMethodField(source='about')
+    # github_username = serializers.CharField(source='github_id', allow_null=True, default=Author._meta.get_field('github_id').get_default())
+    # bio = serializers.CharField(source='about', allow_null=True, default=Author._meta.get_field('about').get_default())
 
-    # Optional field, specify default
-    def get_github_username(self, obj):
-        return getattr(obj, 'github_username', Author._meta.get_field('github_id').get_default())
+    def to_representation(self, instance):
+        """
+        Object instance -> Dict of primitive datatypes.
+        """
 
-    # Optional field, specify default
-    def get_bio(self, obj):
-        return getattr(obj, 'bio', Author._meta.get_field('about').get_default())
+        ret = super(ProfileSerializer, self).to_representation(instance)
+
+        # Node to host string
+        node = ret.pop('host')
+        ret['host'] =  Node.objects.filter(host=node).first().host
+
+        return ret
+
+    def validate_host(self, value):
+        node = Node.objects.filter(host=value).first()
+        if node is None:
+            print("Unknown host '%s' during serialization, throwing exception" % value)
+            logger.log("Unknown host '%s' during serialization, throwing exception" % value)
+            raise serializers.ValidationError('Invalid or Unknown Host: %s' % value)
+        return node
 
     def create(self, validated_data):
         """
@@ -52,6 +65,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         # Pop nested relationships, we need to handle them separately
         friends_data = validated_data.pop('friends', None)
 
+        # We don't update hosts
+        node = validated_data.pop('node', None)
+
         # Call Super to update the Comment instance
         instance = super(ProfileSerializer, self).update(instance, validated_data)
 
@@ -59,7 +75,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ['id', 'host', 'displayname', 'friends', 'github_username', 'bio']
+        fields = ['id', 'host', 'displayname', 'friends']
 
 
 class UserEditSerializer(serializers.ModelSerializer):
