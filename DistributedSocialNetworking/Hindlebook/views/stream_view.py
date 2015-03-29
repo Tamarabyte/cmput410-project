@@ -52,12 +52,15 @@ class StreamView(TemplateView):
         for post in local_posts:
             response_data = {}
             if (post.content_type == "text/x-markdown"):
-                display_content = markdown.markdown(post.content)
+                display_content = markdown.markdown(post.content, strip=True)
             elif (post.content_type == "text/html"):
                 display_content = post.content
             else:
                 display_content = post.content
-            display_content = bleach.clean(display_content)
+            ALLOWED_TAGS = bleach.ALLOWED_TAGS
+            markdown_tags = ['h1', 'h2', 'h3', 'p', 'br', 'em', 'strong', 'code', 's', 'ul', 'li', 'ol', 'a']
+            ALLOWED_TAGS += markdown_tags
+            display_content = bleach.clean(display_content, tags=ALLOWED_TAGS)
             response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
