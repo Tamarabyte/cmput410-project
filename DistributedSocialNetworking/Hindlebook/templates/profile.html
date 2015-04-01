@@ -46,13 +46,13 @@
             <!-- User Text and Avatar -->
             <div class="profile row">
                     <div class="pull-left profile-img img-col col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                        <div class="profile-name">{{ author.username }}</div>
+
                         <img class="avatar picture-shadow" src="{{ MEDIA_URL }}{{ author.avatar }}" width="200"></img>
                     </div>
                     <div class="profile-text col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div>
                             <br>
-                                
+                            <div class="profile-name">{{ author.username }}</div>    
                             <div class="profile-field">
                                 <div class="profile-about-title pull-left">Node:</div>
                                 <div class="profile-host">
@@ -155,8 +155,6 @@
 
     //setUpAjaxForm($('#profile_update_form'), formOptions);
     $(document).ready(function (){
-        var h = $('.profile-text').height();
-        $('.avatar').css("top", (h-$('.avatar').height())/2);
         $('#profile_update_form').ajaxForm(form_options);
     });
 </script>

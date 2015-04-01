@@ -3,17 +3,16 @@
 <div class="row">
     <div class="well post-block">
         <div class="row">
-            <div class="pull-left"><img class="post-img picture-shadow" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="100"></img></div>
+            <div class="pull-left"><img class="post-img picture-shadow" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="80"></img></div>
             <div class="post-row">
                 <div class="post-date">{{ post.pubDate }}</div>
                 {% for category in post.categories.all %}
                     <span class="label label-info post-tag">{{ category }}</span>
                 {% endfor %}
                 <div class="post-title">{{ post.title }}</div>
-
                  <div class="post-author"><a href="{% url "profile" post.author.uuid %}">by {{ post.author.username }}</a></div>
 
-                <div class="post-content">{{ post.getDisplayContent|safe }}</div>
+                <div class="post-content">{{ display_content|safe }}</div>
                 
 
 
