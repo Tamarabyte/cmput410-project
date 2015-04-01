@@ -19,7 +19,7 @@ class APITests(APITestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # A dummy node to test authentication
+        # Dummy nodes to test authentication
         self.node1 = mommy.make(Node, host='http://test.com', host_name='test', password='test',
                                 is_connected=False, team_number=9)
         self.node2 = mommy.make(Node, host='http://node2.com', host_name='node2', password='node2',
@@ -36,20 +36,22 @@ class APITests(APITestCase):
         self.author3 = mommy.make(Author, node=self.node1, user=self.user3)
 
         # Create posts
-        self.post1 = mommy.make(Post, author=self.author1)
-        self.post2 = mommy.make(Post, author=self.author2)
+        self.post1 = mommy.make(Post, author=self.author1, title='Post by author1')
+        self.post2 = mommy.make(Post, author=self.author2, title='Post by author2')
 
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
+        # Note: since a node is logged in, we implicitly trust it, and assume correct user is making the requests
         self.client.credentials(HTTP_AUTHORIZATION='Basic dGVzdDp0ZXN0',
                                 HTTP_UUID="%s" % self.author1.uuid)
 
     def testFriend2FriendGetQuerySuccess(self):
         """
-        Test a successful friend2friend query
+        Test GET friend2friend query
+        api method: service/api/friends/{AUTHOR1_UUID}/{AUTHOR2_UUID}
         """
 
-        # Authors are now friends
+        # Set authors to be friends
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
 
@@ -68,9 +70,11 @@ class APITests(APITestCase):
 
     def testFriendQueryPostSuccessOneFriend(self):
         """
-        Test a successful friend query with one friend in list
+        Test POST friend query with one friend in list
+        api method: service/api/friends/{AUTHOR_UUID}
         """
 
+        # The uuid of the authors
         id1 = str(self.author1.uuid)
         id2 = str(self.author2.uuid)
 
@@ -78,10 +82,11 @@ class APITests(APITestCase):
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
 
+        # Some uuids of unknown authors
         fakeUUID = str(uuid_import.uuid4())
         fakeUUID2 = str(uuid_import.uuid4())
 
-        # Send a query with some non-friend uuids
+        # JSON request with some non-friend uuids
         JSONdata = json.dumps({"query": "friends", "author": id1, "authors": [fakeUUID, id2, fakeUUID2]})
 
         # POST request for friend querying
@@ -99,10 +104,11 @@ class APITests(APITestCase):
 
     def testFriendRequestSuccess(self):
         """
-        Test sending a successful bidirectional friend request
+        Test POST bidirectional friend requests
+        api method: service/api/friendrequest
         """
 
-        # The serialized format of an author
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
 
@@ -112,6 +118,7 @@ class APITests(APITestCase):
         # POST request with the json
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
 
+        # The server should return 200
         self.assertEquals(response.status_code, 200, "Response not 200")
 
         # Author 1 has sent one friend request
@@ -126,15 +133,17 @@ class APITests(APITestCase):
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
-        # They both have sent one request, they are 'true' friends
+        # They both have sent a request, they are 'true' friends
         self.assertQuerysetEqual(self.author1.getFriends(), ["<Author: %s>" % self.author2.username])
         self.assertQuerysetEqual(self.author2.getFriends(), ["<Author: %s>" % self.author1.username])
 
     def testFriendRequestRepeated(self):
         """
-        Test sending a friend request multiple times
+        Test POST a friend request multiple times
+        api method: service/api/friendrequest
         """
 
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
 
@@ -154,9 +163,11 @@ class APITests(APITestCase):
 
     def testFriendRequestFollows(self):
         """
-        Test sending a friend request will follow that person
+        Test POST a friend request will follow that person
+        api method: service/api/friendrequest
         """
 
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
 
@@ -174,7 +185,8 @@ class APITests(APITestCase):
 
     def testFriendRequestFriendNotFound(self):
         """
-        Test sending a friend request from local author to unknown author
+        Test POST a friend request from local author to unknown author
+        api method: service/api/friendrequest
         """
         # Friend request from local author
         author1 = AuthorSerializer(self.author1)
@@ -193,7 +205,8 @@ class APITests(APITestCase):
 
     def testFriendRequestAuthorNotFound(self):
         """
-        Test sending a friend request from an unknown author to a local author
+        Test POST a friend request from an unknown author to a local author
+        api method: service/api/friendrequest
         """
         # Friend request to local author
         author1 = AuthorSerializer(self.author1)
@@ -212,13 +225,11 @@ class APITests(APITestCase):
 
     def testFriendRequestFromUnknownNode(self):
         """
-        Unkown Hosts should be rejected
+        Test POST a friend request from unknown node
+        api method: service/api/friendrequest
         """
-        # Friend request to local author
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
-
-        # Form a user with a Node that doesn't exist in our db
-        self.author2.node = self.node2
         author2 = AuthorSerializer(self.author2)
 
         # Set wrong credentials
@@ -229,19 +240,19 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
-        # The server should return 401
+        # The server should return 401 since we're not logged in with correct node credentials
         self.assertEquals(response.status_code, 401, "Response should be 401")
 
     def testUnfriendSuccess(self):
         """
-        Test sending a successful unfriend request
+        Test POST an unfriend request
+        api method: service/api/unfriend
         """
-
         # Set authors to be friends
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
 
-        # The serialized format of an author
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
 
@@ -249,7 +260,6 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
         response = self.client.post('/api/unfriend', JSONdata, format='json')
 
-        # The server should return 200
         self.assertEquals(response.status_code, 200, "Response should be 200")
 
         # The friendship should now be symmetrically broken
@@ -258,10 +268,10 @@ class APITests(APITestCase):
 
     def testFollowSuccess(self):
         """
-        Test sending a successful follow request
+        Test POST a follow request
+        api method: service/api/follow
         """
-
-        # The serialized format of an author
+        # The serialized format of the authors
         author1 = AuthorSerializer(self.author1)
         author2 = AuthorSerializer(self.author2)
 
@@ -269,7 +279,6 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
         response = self.client.post('/api/follow', JSONdata, format='json')
 
-        # The server should return 200
         self.assertEquals(response.status_code, 200, "Response should be 200")
 
         # Author 1 should now follow Author 2
@@ -277,9 +286,9 @@ class APITests(APITestCase):
 
     def testUnfollowSuccess(self):
         """
-        Test sending a successful follow request
+        Test POST an unfollow request
+        api method: service/api/unfollow
         """
-
         # Set author 1 to follow author 2
         self.author1.friends.add(self.author2)
 
@@ -291,7 +300,6 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
         response = self.client.post('/api/unfollow', JSONdata, format='json')
 
-        # The server should return 200
         self.assertEquals(response.status_code, 200, "Response should be 200")
 
         # Author 1 should no longer follow Author 2
