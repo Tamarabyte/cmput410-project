@@ -1,12 +1,6 @@
 {% extends "base_header.html" %}
 {% load staticfiles %}
 
-{% block stylesheets %}
-<link rel="stylesheet" href="{% static "css/github-activity.css" %}">
-<link rel="stylesheet" href="{% static "css/octicons.css" %}">
-
-{% endblock %}
-
 {% block page %}
 <div class="container stream">
     <!-- New Post Form -->
@@ -35,29 +29,10 @@
 	{% endfor %}
     </div> <!-- /stream -->
 </div> <!-- /container -->
-<div class="container stream git">
-    <div class="row">
-        <div id="github stream">
-        </div>
-    </div>
-</div>
 
 {% endblock %}
 
 {% block scripts %}
-<script>
-    var githubid = "{{ github_id }}"
-    if (githubid !== "") {
-        $(document).ready(function(){ 
-            GitHubActivity.feed({
-                username: githubid,
-                selector: "#github stream",
-                limit: 7,
-            })
-        });
-    }
-</script>
-
 <script>
 var time = "";
 var category_choices;
@@ -108,9 +83,7 @@ function magicSuggest() {
 	magicSuggest();
 
 </script>
-<script type="text/javascript" src="{% static "js/mustache.min.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/jquery.form.js" %}" ></script>
-<script type="text/javascript" src="{% static "js/github-activity.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/post.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/comment.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/stream.js" %}" ></script>

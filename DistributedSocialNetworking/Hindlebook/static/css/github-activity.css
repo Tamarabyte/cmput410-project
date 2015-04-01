@@ -18,8 +18,8 @@ html, body {
 }
 
 .gha-feed, .gha-feed h2, .gha-feed h3, .gha-feed p, .gha-feed ul, .gha-feed li {
-  margin: 0;
-  padding: 0;
+  margin-top:10px;
+  padding-top: 0;
 }
 
 .gha-feed ul {
@@ -51,15 +51,30 @@ span.gha-time {
   font-size: 12px; 
 }
 
-.gha-feed a {
-  color: #4183c4;
+.link:hover, .link:visited, .link:active {
+	text-decoration: none;
+	color: #3AD2C7;
+}
+
+.link:hover {
+	color: #298982 !important;;
+}
+
+.link:visited {
+	color: #36B6AD;
+}
+
+.gha-feed a, .gha-feed a:hover, gha-feed a:visited, gha-feed a:active {
+  color: #D22A11;
   text-decoration: none;
   font-weight: bold;
 }
 
 .gha-feed a:hover {
-  text-decoration: underline;
+	color: #97310e !important;
 }
+
+
 
 .gha-feed pre {
   padding: 0;
@@ -77,14 +92,7 @@ span.gha-time {
   padding: 10px;
   height: 67px;
   border-bottom: 1px solid #ddd;
-  background: #ffffff; /* Old browsers */
-  background: -moz-linear-gradient(top,  #ffffff 0%, #f4f4f4 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f4f4f4)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #ffffff 0%,#f4f4f4 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #ffffff 0%,#f4f4f4 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #ffffff 0%,#f4f4f4 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #ffffff 0%,#f4f4f4 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f4f4f4',GradientType=0 ); /* IE6-9 */
+  background: #ffffff; 
 }
 
 .gha-footer {
@@ -121,7 +129,7 @@ span.gha-time {
 
 .gha-github-icon {
   display: inline;
-  float: left;
+  float: right;
   padding: 9px 0 0;
   width: 35px;
   height: 35px;
@@ -135,22 +143,19 @@ span.gha-time {
 .gha-gravatar {
   display: inline;
   float: right;
-  margin-right: 10px;
-  padding-right: 20px;
-  max-width: 60px;
-  height: 67px;
+  margin-right: 5px;
+  max-width: 75px;
+  height: 75px;
 }
 
 .gha-gravatar img {
-  padding: 3px;
   width: 100%;
   border: 1px solid #ddd;
-  box-shadow: 1px 1px 3px #ccc;
 }
 
 .gha-activity {
   clear: both;
-  padding: 10px 0;
+  padding: 10px 10px;
   width: 100%;
   border-bottom: 1px solid #ddd;
 }
@@ -158,12 +163,12 @@ span.gha-time {
 
 .gha-activity.gha-small {
   margin-top: 5px;
-  font-weight: normal;
+  font-weight: bold;
   font-size: 13px;
 }
 
 .gha-activity.gha-small a {
-  font-weight: normal;
+  font-weight: bold;
 }
 
 .gha-activity.gha-small .gha-message {
@@ -214,7 +219,13 @@ span.gha-time {
   width: calc(100% - 50px);
 }
 
-.gha-message-commits { font-size: 11px; }
+.gha-message-commits { 
+	font-size: 11px; 
+}
+
+.gha-commits li {
+	margin-top: 0;
+}
 
 .gha-message-merge {
   padding: 3px 7px;

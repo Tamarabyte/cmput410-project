@@ -1,6 +1,12 @@
 {% extends "base_header.html" %}
 {% load staticfiles %}
 
+{% block stylesheets %}
+<link rel="stylesheet" href="{% static "css/github-activity.css" %}">
+<link rel="stylesheet" href="{% static "css/octicons.css" %}">
+
+{% endblock %}
+
 {% block page %}
 
 {% if user.author.uuid == author.uuid %}
@@ -14,9 +20,9 @@
 </div><!-- /.modal -->
 {% endif %}
 
-<div class = "container stream">
-
-    <div class="profile-banner row large-shadow">
+<div class="container">
+<div class="col1 col-lg-5 col-md-12 col-sm-12">
+        <div class="profile-banner row large-shadow">
             <!-- User Buttons -->
             {% if user.author.uuid == author.uuid %}
                 <div class="profile-icon profile-edit-icon text-right">
@@ -35,19 +41,15 @@
                     <a class="friend-link" onclick="friend('{{ author.uuid }}', {{ isRequest }})" href="#"><span id="friend-icon-{{ author.uuid }}" class={% if isFriends = 0 %}"icon-favourite-3 friend-img-ico"{% else %}"icon-broken-heart friend-img-ico"{% endif %}></span></a>
                     <a class="follow-link" href="#" onclick="follow('{{ author.uuid }}')"><span id="follow-icon-{{ author.uuid }}" class={% if isFollowing = 0 %}"icon-eye-3 friend-img-ico"{% else %}"icon-eye-4 friend-img-ico"{% endif %}></span></a>
             {% endif %}
-
-
-
-
             <!-- End User Buttons -->
 
-                <!-- User Text and Avatar -->
+            <!-- User Text and Avatar -->
             <div class="profile row">
-                    <div class="pull-left profile-img img-col col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                    <div class="pull-left profile-img img-col col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="profile-name">{{ author.username }}</div>
                         <img class="avatar picture-shadow" src="{{ MEDIA_URL }}{{ author.avatar }}" width="200"></img>
                     </div>
-                    <div class="profile-text col-lg-8 col-md-8 col-sm-6 col-xs-12">
-                        <div class="profile-name">{{ author.username }}</b></div>
+                    <div class="profile-text col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div>
                             <br>
                                 
@@ -85,22 +87,41 @@
                         </div>
                     </div>
             </div>
-                <!-- End User Text and Avatar-->
-                <div class="clearfix"></div>
+            <!-- End User Text and Avatar-->
+            <div class="clearfix"></div>
     </div> <!-- profile banner -->
 
+
+    <div class="git">
+        <div class="row">
+            <div id="github">
+            </div>
+        </div>
+    </div>
 </div>
-<div class = "container stream">
+    
+<div class="col-lg-6 col-md-12 col-sm-12">
+<div class = "stream">
 
-    <div class="profile-stream">
-        {% include 'posts_and_comments.html' %}
-    </div> <!-- /container -->
-
-
+    {% include 'posts_and_comments.html' %}
 </div> <!-- container -->
+</div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+        <script>
+    var githubid = "{{ author.github_id }}"
+    if (githubid !== "") {
+        $(document).ready(function(){ 
+            GitHubActivity.feed({
+                username: githubid,
+                selector: "#github",
+                limit: 7,
+            })
+        });
+    }
+    </script>
 <script>
     var authorHost = '{{ author.node|escapejs }}';
     var isFollowing = {{ isFollowing }};
@@ -156,6 +177,8 @@
     $("#comment-form").data("postGUID", data);
     console.log($("#comment-form").data("postGUID"));
 }; </script>
+<script type="text/javascript" src="{% static "js/mustache.min.js" %}" ></script>
+<script type="text/javascript" src="{% static "js/github-activity.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/post.js" %}" ></script>
 <script type="text/javascript" src="{% static "js/comment.js" %}" ></script>
 {% endblock scripts %}
