@@ -231,3 +231,68 @@ class APITests(APITestCase):
 
         # The server should return 401
         self.assertEquals(response.status_code, 401, "Response should be 401")
+
+    def testUnfriendSuccess(self):
+        """
+        Test sending a successful unfriend request
+        """
+
+        # Set authors to be friends
+        self.author1.friends.add(self.author2)
+        self.author2.friends.add(self.author1)
+
+        # The serialized format of an author
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
+
+        # POST request with the json
+        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        response = self.client.post('/api/unfriend', JSONdata, format='json')
+
+        # The server should return 200
+        self.assertEquals(response.status_code, 200, "Response should be 200")
+
+        # The friendship should now be symmetrically broken
+        self.assertQuerysetEqual(self.author1.getFriends(), [], "Author 1 should have 0 friends")
+        self.assertQuerysetEqual(self.author2.getFriends(), [], "Author 2 should have 0 friends")
+
+    def testFollowSuccess(self):
+        """
+        Test sending a successful follow request
+        """
+
+        # The serialized format of an author
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
+
+        # POST request with the json
+        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        response = self.client.post('/api/follow', JSONdata, format='json')
+
+        # The server should return 200
+        self.assertEquals(response.status_code, 200, "Response should be 200")
+
+        # Author 1 should now follow Author 2
+        self.assertQuerysetEqual(self.author1.getFollowing(), ["<Author: %s>" % self.author2.username])
+
+    def testUnfollowSuccess(self):
+        """
+        Test sending a successful follow request
+        """
+
+        # Set author 1 to follow author 2
+        self.author1.friends.add(self.author2)
+
+        # The serialized format of an author
+        author1 = AuthorSerializer(self.author1)
+        author2 = AuthorSerializer(self.author2)
+
+        # POST request with the json
+        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        response = self.client.post('/api/unfollow', JSONdata, format='json')
+
+        # The server should return 200
+        self.assertEquals(response.status_code, 200, "Response should be 200")
+
+        # Author 1 should no longer follow Author 2
+        self.assertQuerysetEqual(self.author1.getFollowing(), [])
