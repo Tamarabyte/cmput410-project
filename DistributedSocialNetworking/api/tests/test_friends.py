@@ -188,13 +188,8 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
-        # The server should return 200
-        self.assertEquals(response.status_code, 200, "Response should be 200")
-
-        # Server should have created a foreign author from unknown UUID
-        foreignAuthor = Author.objects.get(uuid=fakeUUID)
-        self.assertEquals(foreignAuthor.username, self.author2.username, "Created foreign author has wrong name")
-        self.assertQuerysetEqual(self.author1.getUnacceptedFriends(), ["<Author: %s>" % foreignAuthor.username])
+        # The server should return 400 if it can't find the correct friend
+        self.assertEquals(response.status_code, 400, "Response should be 400")
 
     def testFriendRequestAuthorNotFound(self):
         """
@@ -212,13 +207,8 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
-        # The server should return 200
-        self.assertEquals(response.status_code, 200, "Response should be 200")
-
-        # Server should have created a foreign author from unknown UUID
-        foreignAuthor = Author.objects.get(uuid=fakeUUID)
-        self.assertEquals(foreignAuthor.username, self.author2.username, "Created foreign author has wrong name")
-        self.assertQuerysetEqual(foreignAuthor.getUnacceptedFriends(), ["<Author: %s>" % self.author1.username])
+        # The server should return 400 if it can't find the correct friend
+        self.assertEquals(response.status_code, 400, "Response should be 400")
 
     def testFriendRequestFromUnknownNode(self):
         """
@@ -230,11 +220,14 @@ class APITests(APITestCase):
         # Form a user with a Node that doesn't exist in our db
         self.author2.node = self.node2
         author2 = AuthorSerializer(self.author2)
-        Node.objects.filter(host=self.author2.node).delete()
+
+        # Set wrong credentials
+        self.client.credentials(HTTP_AUTHORIZATION='Basic ZmFrZTpmYWtl',
+                                HTTP_UUID="%s" % self.author1.uuid)
 
         # The JSON with unknown author, valid friend
         JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
-        # The server should return 400
-        self.assertEquals(response.status_code, 400, "Response should be 400")
+        # The server should return 401
+        self.assertEquals(response.status_code, 401, "Response should be 401")
