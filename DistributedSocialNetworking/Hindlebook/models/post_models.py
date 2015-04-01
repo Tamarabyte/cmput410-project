@@ -1,13 +1,16 @@
 from Hindlebook.models.user_models import Author
 from Hindlebook.models import UuidValidator
-from datetime import datetime
+from django.utils import timezone
 from django.db import models
 from django.db.models import Q
-from itertools import chain
+
 import uuid as uuid_import
+from datetime import datetime
+from itertools import chain
+import markdown
+import bleach
 import functools
 import operator
-from django.utils import timezone
 
 
 class Category(models.Model):
@@ -110,6 +113,23 @@ class Post(models.Model):
     # Get the comments for this Post
     def getComments(self):
         return self.comments.all()
+
+    def getDisplayContent(self):
+        if (self.content_type == "text/x-markdown"):
+            return self.cleanHTML(markdown.markdown(self.content, strip=True))
+        return self.cleanHTML(self.content)
+
+    def cleanHTML(self, html):
+        ALLOWED_TAGS = bleach.ALLOWED_TAGS
+        markdown_tags = ['h1', 'h2', 'h3', 'p', 'br', 'em', 'strong', 'code', 's', 'ul', 'li', 'ol', 'a', 'iframe']
+        ALLOWED_ATTR = {
+            'iframe': ['src', 'height', 'width'],
+            'a': ['src']
+        }
+        ALLOWED_TAGS += markdown_tags
+        return bleach.clean(html, ALLOWED_TAGS, ALLOWED_ATTR)
+
+
 
 class Comment(models.Model):
 
