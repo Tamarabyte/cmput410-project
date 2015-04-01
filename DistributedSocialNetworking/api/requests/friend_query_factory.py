@@ -54,19 +54,21 @@ class Team8FriendQueryRequest(FriendQueryRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/firends" % node.host
-        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
+        self.url = "%s/friends" % node.host
 
-    def get(self, uuid1, uuid2):
+    def get(self, uuid1, uuid2, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s/%s" % (uuid1, uuid2)
         return requests.get(url=self.url, auth=self.auth)
 
-    def post(self, uuid, uuids=[]):
+    def post(self, uuid, uuids=[], requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s" % uuid
         data = {"query": friends,
                 "author": uuid,
                 "authors": uuids}
         return requests.get(url=self.url, data=data, auth=self.auth)
+
 
 class SocshizzleFriendQueryRequest(FriendQueryRequestFactory):
     """

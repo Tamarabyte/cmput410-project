@@ -60,18 +60,20 @@ class Team8PostRequest(PostRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "%s/api/post" % node.host
-        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
-    def get(self, post_id):
+    def get(self, post_id, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s" % post_id
         return requests.get(url=self.url, auth=self.auth)
 
-    def post(self, post_id, post):
+    def post(self, post_id, post, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s" % post_id
         data = PostSerializer(post).data
         return requests.post(url=self.url, data=data, auth=self.auth)
 
-    def put(self, post_id, post):
+    def put(self, post_id, post, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s" % post_id
         data = PostSerializer(post).data
         return requests.put(url=self.url, data=data, auth=self.auth)

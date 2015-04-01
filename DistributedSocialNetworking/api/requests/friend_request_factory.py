@@ -48,9 +48,9 @@ class Team8FriendRequest(FriendRequestFactory):
     def __init__(self, node):
         self.node = node
         self.url = "%s/api/friendrequest" % node.host
-        self.auth - HTTPBasicAuth(node.our_username, node.our_password)
 
-    def post(self, author, friend):
+    def post(self, author, friend, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         data = {"query": "friendrequest",
                 "author": AuthorSerializer(author).data,
                 "friend": AuthorSerializer(friend).data}

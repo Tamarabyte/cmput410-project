@@ -36,16 +36,16 @@ class HindlebookPublicPostsRequest(PublicPostsRequestFactory):
         return requests.get(url=self.url, auth=self.auth)
 
 
-class Team8PublicePostRequest(PublicPostsRequestFactory):
+class Team8PublicPostRequest(PublicPostsRequestFactory):
     """
     Team 8 specific Public Post Request
     """
     def __init__(self, node):
         self.node = node
         self.url = "%s/api/posts" % node.host
-        self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
-    def get(self):
+    def get(self, requester_uuid="YourAuthSucks"):
+        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         return requests.get(url=self.url, auth=self.auth)
 
 
