@@ -89,13 +89,12 @@ class ProfileSerializer(serializers.ModelSerializer):
         # Call Super to update the Comment instance
         instance = super(ProfileSerializer, self).update(instance, validated_data)
 
+
         return instance
 
     class Meta:
         model = Author
         fields = ['id', 'host', 'displayname', 'friends', 'bio', 'github_username']
-
-
 class UserEditSerializer(serializers.ModelSerializer):
     """ Used locally to allow users to edit their user profile"""
 
