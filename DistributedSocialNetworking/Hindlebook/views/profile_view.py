@@ -62,7 +62,6 @@ class ProfileView(TemplateView):
                 context['isFriends'] = 0
                 
         else:
-            context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author)
             targetAuthor = getForeignAuthor(authorUUID)
             if targetAuthor:
                 context['author'] = targetAuthor
