@@ -47,7 +47,7 @@ class Team8PostRequest(AuthoredPostsRequestFactory):
         self.node = node
         self.url = "%s/api/author" % node.host
 
-    def get(self, requester_uuid="YourAuthSucks", author_uuid):
+    def get(self, author_uuid, requester_uuid="YourAuthSucks"):
         self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
         self.url = self.url + "/%s/posts" % author_uuid
         # self.headers = {'uuid': requester_uuid}
