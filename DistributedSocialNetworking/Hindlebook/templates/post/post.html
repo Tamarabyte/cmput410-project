@@ -3,22 +3,23 @@
 <div class="row">
     <div class="well post-block">
         <div class="row">
-            <div class="pull-left"><img class="post-img picture-shadow" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="80"></img></div>
+
             <div class="post-row">
-                <div class="post-date">{{ post.pubDate }}</div>
-                {% for category in post.categories.all %}
-                    <span class="label label-info post-tag">{{ category }}</span>
-                {% endfor %}
+
+                <div class="pull-left"><img class="post-img" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="80"></img></div>
                 <div class="post-title">{{ post.title }}</div>
                  <div class="post-author"><a href="{% url "profile" post.author.uuid %}">by {{ post.author.username }}</a></div>
 
                 <div class="post-content">{{ display_content|safe }}</div>
                 
+                <div class="post-meta">
 
+                {% for category in post.categories.all %}
+                    <span class="label label-info post-tag">{{ category }}</span>
+                {% endfor %}
+                <span class="post-date">{{ post.pubDate }}</span>
 
-
-
-                <br>
+                </div>
             </div>
         </div> <!-- /row -->
     </div>   <!-- /well -->

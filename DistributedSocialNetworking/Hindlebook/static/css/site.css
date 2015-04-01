@@ -144,10 +144,7 @@ a {
 }
 
 .post-block {
-    padding-top: 25px;
-    padding-bottom: 15px;
-    padding-right: 5px;
-    padding-left: 15px;
+    padding: 15px;
 }
 
 .auth-forms .control-label {
@@ -160,7 +157,7 @@ a {
     -moz-box-shadow:0px 0px 7px #222;
     -webkit-box-shadow:0px 0px 7px #222;
     box-shadow:0px 0px 7px #222;
-    margin: 5px 40px;
+    margin: 5px 20px 5px 0;
 }
 
 
@@ -457,7 +454,7 @@ float: right!important;
 
 .post-row  {
     text-align: left;
-    padding: 10px 60px 10px 50px;
+    padding: 0 17px 0 20px;
  }
 
 
@@ -473,13 +470,18 @@ float: right!important;
     text-align: right;
     font-size: 14px;
     color: #FFF;
+    margin-left: 10px;
+}
+
+.post-meta {
+  text-align:right;
+  position: relative;
 }
 
 .post-tag {
   background-color: #34AACD;
   border-color: #34AACD;
   font-size: 14px;
-  float: right;
   margin-left: 5px;
   padding-top: 4px;
   margin-top: 5px;
@@ -515,6 +517,7 @@ float: right!important;
   width: 300px;
   margin-top: 30px;
   float: left;
+  height: 34px;
   margin-right: 8px;
 }
 
