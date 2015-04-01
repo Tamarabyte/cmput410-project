@@ -39,6 +39,10 @@ class APITests(APITestCase):
         self.post1 = mommy.make(Post, author=self.author1, title='Post by author1')
         self.post2 = mommy.make(Post, author=self.author2, title='Post by author2')
 
+        # Serialize the authors
+        self.author1Data = AuthorSerializer(self.author1)
+        self.author2Data = AuthorSerializer(self.author2)
+
         # Set credentials for Node 1
         # If you change test/test above, this will break... lol. b64encode would not work so I hardcoded
         # Note: since a node is logged in, we implicitly trust it, and assume correct user is making the requests
@@ -73,7 +77,6 @@ class APITests(APITestCase):
         Test POST friend query with one friend in list
         api method: service/api/friends/{AUTHOR_UUID}
         """
-
         # The uuid of the authors
         id1 = str(self.author1.uuid)
         id2 = str(self.author2.uuid)
@@ -90,7 +93,7 @@ class APITests(APITestCase):
         JSONdata = json.dumps({"query": "friends", "author": id1, "authors": [fakeUUID, id2, fakeUUID2]})
 
         # POST request for friend querying
-        response = self.client.post('/api/friends/%s' % id1, user=self.author1, data=JSONdata, content_type='application/json; charset=utf')
+        response = self.client.post('/api/friends/%s' % id1, data=JSONdata, content_type='application/json; charset=utf')
 
         self.assertEquals(response.status_code, 200, "Response not 200")
 
@@ -107,13 +110,8 @@ class APITests(APITestCase):
         Test POST bidirectional friend requests
         api method: service/api/friendrequest
         """
-
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # JSON format for a friend request
-        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
+        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data})
 
         # POST request with the json
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
@@ -126,7 +124,7 @@ class APITests(APITestCase):
         self.assertQuerysetEqual(self.author2.getUnacceptedFriends(), [])
 
         # JSON format for the symmetrical request
-        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": author2.data, "friend": author1.data})
+        JSONdata = JSONdata = json.dumps({"query": "friendrequest", "author": self.author2Data.data, "friend": self.author1Data.data})
 
         # POST the symmetrical request
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
@@ -142,14 +140,10 @@ class APITests(APITestCase):
         Test POST a friend request multiple times
         api method: service/api/friendrequest
         """
-
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
+        # Send the same friend request multiple times
         for i in range(0, 3):
             # JSON format for a friend request
-            JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
+            JSONdata = json.dumps({"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data})
 
             # POST request with the json
             response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
@@ -166,13 +160,8 @@ class APITests(APITestCase):
         Test POST a friend request will follow that person
         api method: service/api/friendrequest
         """
-
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # JSON format for friend request
-        JSONdata = json.dumps({"query": "friendrequest", "author": author1.data, "friend": author2.data})
+        JSONdata = json.dumps({"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data})
 
         # POST request with json
         response = self.client.post('/api/friendrequest', data=JSONdata, content_type='application/json; charset=utf')
@@ -188,16 +177,13 @@ class APITests(APITestCase):
         Test POST a friend request from local author to unknown author
         api method: service/api/friendrequest
         """
-        # Friend request from local author
-        author1 = AuthorSerializer(self.author1)
-
         # A fake UUID that doesn't exist in our db
         fakeUUID = str(uuid_import.uuid4())
         self.author2.uuid = fakeUUID
-        author2 = AuthorSerializer(self.author2)
+        foreignAuthor = AuthorSerializer(self.author2)
 
         # The JSON with valid author, unknown friend
-        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        JSONdata = {"query": "friendrequest", "author": self.author1Data.data, "friend": foreignAuthor.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
         # The server should return 400 if it can't find the correct friend
@@ -208,16 +194,13 @@ class APITests(APITestCase):
         Test POST a friend request from an unknown author to a local author
         api method: service/api/friendrequest
         """
-        # Friend request to local author
-        author1 = AuthorSerializer(self.author1)
-
         # Form a user with a UUID that doesn't exist in our db
         fakeUUID = str(uuid_import.uuid4())
         self.author2.uuid = fakeUUID
-        author2 = AuthorSerializer(self.author2)
+        foreignAuthor = AuthorSerializer(self.author2)
 
         # The JSON with unknown author, valid friend
-        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        JSONdata = {"query": "friendrequest", "author": foreignAuthor.data, "friend": self.author1Data.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
         # The server should return 400 if it can't find the correct friend
@@ -228,16 +211,12 @@ class APITests(APITestCase):
         Test POST a friend request from unknown node
         api method: service/api/friendrequest
         """
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # Set wrong credentials
         self.client.credentials(HTTP_AUTHORIZATION='Basic ZmFrZTpmYWtl',
                                 HTTP_UUID="%s" % self.author1.uuid)
 
-        # The JSON with unknown author, valid friend
-        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        # POST request with the JSON
+        JSONdata = {"query": "friendrequest", "author": self.author2Data.data, "friend": self.author1Data.data}
         response = self.client.post('/api/friendrequest', JSONdata, format='json')
 
         # The server should return 401 since we're not logged in with correct node credentials
@@ -252,12 +231,8 @@ class APITests(APITestCase):
         self.author1.friends.add(self.author2)
         self.author2.friends.add(self.author1)
 
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # POST request with the json
-        JSONdata = {"query": "friendrequest", "author": author2.data, "friend": author1.data}
+        JSONdata = {"query": "friendrequest", "author": self.author2Data.data, "friend": self.author1Data.data}
         response = self.client.post('/api/unfriend', JSONdata, format='json')
 
         self.assertEquals(response.status_code, 200, "Response should be 200")
@@ -271,12 +246,8 @@ class APITests(APITestCase):
         Test POST a follow request
         api method: service/api/follow
         """
-        # The serialized format of the authors
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # POST request with the json
-        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        JSONdata = {"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data}
         response = self.client.post('/api/follow', JSONdata, format='json')
 
         self.assertEquals(response.status_code, 200, "Response should be 200")
@@ -292,12 +263,8 @@ class APITests(APITestCase):
         # Set author 1 to follow author 2
         self.author1.friends.add(self.author2)
 
-        # The serialized format of an author
-        author1 = AuthorSerializer(self.author1)
-        author2 = AuthorSerializer(self.author2)
-
         # POST request with the json
-        JSONdata = {"query": "friendrequest", "author": author1.data, "friend": author2.data}
+        JSONdata = {"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data}
         response = self.client.post('/api/unfollow', JSONdata, format='json')
 
         self.assertEquals(response.status_code, 200, "Response should be 200")
