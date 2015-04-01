@@ -111,7 +111,6 @@ class Post(models.Model):
     def getComments(self):
         return self.comments.all()
 
-
 class Comment(models.Model):
 
     """Model for representing a Comment on a Post made by an Author"""

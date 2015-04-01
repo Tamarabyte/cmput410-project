@@ -25,7 +25,7 @@ class PostAdmin(ModelAdmin):
 
 
     fieldsets = (
-        (None, {'fields': ('author', 'visibility')}),
+        (None, {'fields': ('author', 'visibility', 'content_type')}),
         ('Post', {'fields': ('title', 'description', 'content', 'categories')}),
         ('Server Details', {'fields': ('guid', 'origin', 'source')}),
     )
