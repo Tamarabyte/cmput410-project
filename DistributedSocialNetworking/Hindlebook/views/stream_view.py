@@ -12,9 +12,6 @@ from django.core.urlresolvers import reverse
 import datetime
 import dateutil.parser
 
-import markdown
-import bleach
-
 from itertools import chain
 
 from Hindlebook.models import Post, Comment
@@ -22,15 +19,6 @@ from Hindlebook.forms import PostForm, CommentForm
 from api import json_derulo
 from api.serializers import CommentSerializer
 
-def cleanHTML(html):
-    ALLOWED_TAGS = bleach.ALLOWED_TAGS
-    markdown_tags = ['h1', 'h2', 'h3', 'p', 'br', 'em', 'strong', 'code', 's', 'ul', 'li', 'ol', 'a', 'iframe']
-    ALLOWED_ATTR = {
-        'iframe': ['src', 'height', 'width'],
-        'a': ['src']
-    }
-    ALLOWED_TAGS += markdown_tags
-    return bleach.clean(html, ALLOWED_TAGS, ALLOWED_ATTR)
 
 class StreamView(TemplateView):
 
@@ -60,14 +48,7 @@ class StreamView(TemplateView):
 
         for post in local_posts:
             response_data = {}
-            if (post.content_type == "text/x-markdown"):
-                display_content = markdown.markdown(post.content, strip=True)
-            elif (post.content_type == "text/html"):
-                display_content = post.content
-            else:
-                display_content = post.content
-            display_content = cleanHTML(display_content)
-            response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
             posts.append(response_data)
@@ -119,16 +100,10 @@ class CreatePost(View):
         post.save()
         # When we don't pass form.save(commit=True) we have to explicitly save m2m fields later
         form.save_m2m()
-        if (post.content_type == "text/x-markdown"):
-            display_content = markdown.markdown(post.content, strip=True)
-        elif (post.content_type == "text/html"):
-            display_content = post.content
-        else:
-            display_content = post.content
-        display_content = cleanHTML(display_content)
+
         response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
         response_data["time"] = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
-        response_data["post"] = render_to_string("post/post.html", {"post": post, "display_content": display_content, "MEDIA_URL": settings.MEDIA_URL})
+        response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
         response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
         response_data["created_guid"] = post.guid
         return JsonResponse(response_data, status=201)
