@@ -10,7 +10,7 @@
                 <div class="post-title">{{ post.title }}</div>
                  <div class="post-author"><a href="{% url "profile" post.author.uuid %}">by {{ post.author.username }}</a></div>
 
-                <div class="post-content">{{ display_content|safe }}</div>
+                <div class="post-content">{{ post.getDisplayContent|safe }}</div>
                 
                 <div class="post-meta">
 
