@@ -29,7 +29,7 @@ class HindlebookVisiblePostsRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/api/author/posts" % node.host
+        self.url = "%s/author/posts" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, uuid):
@@ -43,7 +43,7 @@ class Team8VisiblePostRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/api/author/posts" % node.host
+        self.url = "%s/author/posts" % node.host
 
     def get(self, uuid, requester_uuid="YourAuthSucks"):
         self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username), self.node.our_password)

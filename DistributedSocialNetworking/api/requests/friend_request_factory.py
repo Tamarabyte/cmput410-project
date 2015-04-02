@@ -31,7 +31,7 @@ class HindlebookFriendRequest(FriendRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/api/friendrequest" % node.host
+        self.url = "%s/friendrequest" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def post(self, author, friend):
@@ -47,7 +47,7 @@ class Team8FriendRequest(FriendRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/api/friendrequest" % node.host
+        self.url = "%s/friendrequest" % node.host
 
     def post(self, author, friend, requester_uuid="YourAuthSucks"):
         self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
