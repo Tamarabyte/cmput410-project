@@ -39,10 +39,11 @@ class StreamView(TemplateView):
     def post(self, *args, **kwargs):
         posts = []
         comments = []
+        o_time = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-            time = time + datetime.timedelta(0, 3)
+            # time = time + datetime.timedelta(0, 3)
             json_derulo.getForeignStreamPosts(self.request.user.author, time)
         local_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
 
@@ -59,16 +60,12 @@ class StreamView(TemplateView):
             all_comments = Comment.objects.all()
 
         for comment in all_comments:
-            # response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": PostForm()})}
             response_data = {}
             response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
-            # json = CommentSerializer(comment).data
-            # json['author_url'] = reverse('profile', args=[json['author']['id']])
-            # response_data["comment"] = json
             response_data["postGUID"] = comment.post.guid
             comments.append(response_data)
 
-        return JsonResponse({'posts': posts, 'comments': comments, 'time': datetime.datetime.now(dateutil.tz.tzutc()).isoformat()})
+        return JsonResponse({'posts': posts, 'comments': comments, 'time': o_time})
 
 
 class CreatePost(View):

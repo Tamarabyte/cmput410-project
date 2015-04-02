@@ -130,7 +130,6 @@ class Post(models.Model):
         return bleach.clean(html, ALLOWED_TAGS, ALLOWED_ATTR)
 
 
-
 class Comment(models.Model):
 
     """Model for representing a Comment on a Post made by an Author"""
