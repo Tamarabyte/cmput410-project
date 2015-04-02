@@ -46,16 +46,16 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def is_valid(self, raise_exception=False):
         if 'displayname' not in self.initial_data:
-            raise ValidationError("Profile data missing required field: displayname")
+            raise serializers.ValidationError("Profile data missing required field: displayname")
 
         if 'host' not in self.initial_data:
-            raise ValidationError("Profile data missing required field: host")
+            raise serializers.ValidationError("Profile data missing required field: host")
 
         if 'id' not in self.initial_data:
-            raise ValidationError("Profile data missing required field: id")
+            raise serializers.ValidationError("Profile data missing required field: id")
 
         if 'friends' not in self.initial_data:
-            raise ValidationError("Profile data missing required field: friends")
+            raise serializers.ValidationError("Profile data missing required field: friends")
 
         return super(ProfileSerializer, self).is_valid(raise_exception)
 
