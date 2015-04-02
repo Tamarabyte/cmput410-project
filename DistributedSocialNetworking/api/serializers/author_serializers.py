@@ -20,8 +20,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     host = serializers.CharField(source='node')
     id = serializers.CharField(source='uuid')
     friends = AuthorSerializer(many=True)
-    github_username = serializers.CharField(source='github_id')
-    bio = serializers.CharField(source='about')
+    github_username = serializers.CharField(source='github_id', required=False)
+    bio = serializers.CharField(source='about', required=False)
 
     def to_representation(self, instance):
         """
@@ -66,11 +66,31 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         # Pop nested relationships, we need to handle them separately
         friends_data = validated_data.pop('friends', None)
+        github_id = self.initial_data.get('github_username', None)
+        about = self.initial_data.get('bio', None)
 
         instance = super(ProfileSerializer, self).create(validated_data)
 
         # Add default avatar
         instance.avatar = "foreign_avatar.jpg"
+
+        # Github ID
+        if github_id:
+            try:
+                instance.github_id = github_id
+            except:
+                # Invalid Github
+                instance.github_id = ""
+
+        # About
+        if about:
+            try:
+                instance.about = about
+            except:
+                # Invalid about
+                instance.about = ""
+
+        return instance
 
     def update(self, instance, validated_data):
         """
@@ -84,17 +104,18 @@ class ProfileSerializer(serializers.ModelSerializer):
         node = validated_data.pop('node', None)
 
         # We don't update UUIDs
-        node = validated_data.pop('uuid', None)
+        uuid = validated_data.pop('uuid', None)
 
         # Call Super to update the Comment instance
         instance = super(ProfileSerializer, self).update(instance, validated_data)
-
 
         return instance
 
     class Meta:
         model = Author
         fields = ['id', 'host', 'displayname', 'friends', 'bio', 'github_username']
+
+
 class UserEditSerializer(serializers.ModelSerializer):
     """ Used locally to allow users to edit their user profile"""
 

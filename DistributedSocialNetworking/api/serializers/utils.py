@@ -62,13 +62,13 @@ def get_author(uuid, host):
         profile_data = get_foreign_profile_data(uuid, get_node(host))
         serializer = ProfileSerializer(data=profile_data, partial=True)
 
-        try:
-            serializer.is_valid(raise_exception=True)
-            author = serializer.save()
+        # try:
+        serializer.is_valid(raise_exception=True)
+        author = serializer.save()
 
-        except:
-            logger.log("Couldn't parse new Author profile for %s from %s." % (uuid, host))
-            author = None
+        # except:
+        #     logger.log("Couldn't parse new Author profile for %s from %s." % (uuid, host))
+        #     author = None
 
     elif author.user is None:
         # Existing Foreign Author, update them
