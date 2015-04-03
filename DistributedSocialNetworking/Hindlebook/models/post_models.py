@@ -83,6 +83,9 @@ class ExtendedPostManager(models.Manager):
     def all(self):
         return super(ExtendedPostManager, self).all().filter(is_deleted=False)
 
+    def all_with_deleted(self):
+        return super(ExtendedPostManager, self).all()
+
 
 class Post(models.Model):
 
