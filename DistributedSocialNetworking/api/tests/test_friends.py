@@ -222,9 +222,9 @@ class APITests(APITestCase):
         # The server should return 401 since we're not logged in with correct node credentials
         self.assertEquals(response.status_code, 401, "Response should be 401")
 
-    def testUnfriendSuccess(self):
+    def testUnfriendRequestFail(self):
         """
-        Test POST an unfriend request
+        Test POST an unfriend request from another node, which is unauthorized
         api method: service/api/unfriend
         """
         # Set authors to be friends
@@ -235,29 +235,22 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": self.author2Data.data, "friend": self.author1Data.data}
         response = self.client.post('/api/unfriend', JSONdata, format='json')
 
-        self.assertEquals(response.status_code, 200, "Response should be 200")
+        self.assertEquals(response.status_code, 403, "Response should be 403")
 
-        # The friendship should now be symmetrically broken
-        self.assertQuerysetEqual(self.author1.getFriends(), [], "Author 1 should have 0 friends")
-        self.assertQuerysetEqual(self.author2.getFriends(), [], "Author 2 should have 0 friends")
-
-    def testFollowSuccess(self):
+    def testFollowRequestSuccess(self):
         """
-        Test POST a follow request
+        Test POST a follow request from another node, which is unauthorized
         api method: service/api/follow
         """
         # POST request with the json
         JSONdata = {"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data}
         response = self.client.post('/api/follow', JSONdata, format='json')
 
-        self.assertEquals(response.status_code, 200, "Response should be 200")
+        self.assertEquals(response.status_code, 403, "Response should be 403")
 
-        # Author 1 should now follow Author 2
-        self.assertQuerysetEqual(self.author1.getFollowing(), ["<Author: %s>" % self.author2.username])
-
-    def testUnfollowSuccess(self):
+    def testUnfollowRequestFail(self):
         """
-        Test POST an unfollow request
+        Test POST an unfollow request from another node, which is unauthorized
         api method: service/api/unfollow
         """
         # Set author 1 to follow author 2
@@ -267,7 +260,4 @@ class APITests(APITestCase):
         JSONdata = {"query": "friendrequest", "author": self.author1Data.data, "friend": self.author2Data.data}
         response = self.client.post('/api/unfollow', JSONdata, format='json')
 
-        self.assertEquals(response.status_code, 200, "Response should be 200")
-
-        # Author 1 should no longer follow Author 2
-        self.assertQuerysetEqual(self.author1.getFollowing(), [])
+        self.assertEquals(response.status_code, 403, "Response should be 403")
