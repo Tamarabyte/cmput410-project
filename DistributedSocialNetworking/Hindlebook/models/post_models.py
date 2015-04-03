@@ -80,13 +80,15 @@ class ExtendedPostManager(models.Manager):
             key=lambda instance: instance.pubDate, reverse=True)
         return all_visible_posts
 
+    def all(self):
+        return super(ExtendedPostManager, self).all().filter(is_deleted=False)
+
 
 class Post(models.Model):
 
     """Model for representing a Post made by an Author"""
 
-    objects = models.Manager()
-    objects_ext = ExtendedPostManager()
+    objects = ExtendedPostManager()
 
     guid = models.CharField(max_length=40, blank=True, default=uuid_import.uuid4, primary_key=True, validators=[UuidValidator()])
     source = models.CharField(max_length=100, blank=True, default='')

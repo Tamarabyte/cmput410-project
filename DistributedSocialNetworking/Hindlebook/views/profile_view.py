@@ -11,16 +11,13 @@ import dateutil
 import datetime
 import json
 
-
 from Hindlebook.models import Post, Author, Comment
 from Hindlebook.forms import ProfileEditForm, CommentForm
 from api.json_derulo import getForeignAuthor, getForeignAuthorPosts
 
 
-
-
-
 class ProfileView(TemplateView):
+
     template_name = 'profile.html'
 
     @method_decorator(login_required)
@@ -50,7 +47,7 @@ class ProfileView(TemplateView):
             context['isRequest'] = 0
 
         if local:
-            context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
+            context['posts'] = Post.objects.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author )
 
             if self.request.user.author in list(context["author"].followed_by.all()):
                 context['isFollowing'] = 1
@@ -85,7 +82,7 @@ class ProfileView(TemplateView):
         time = None
         if self.request.POST['last_time'] != '':
             time = dateutil.parser.parse(self.request.POST['last_time'])
-        all_posts = Post.objects_ext.get_all_visibile_posts(active_author=self.request.user.author, page_author=page_author, reversed=False, min_time=time)
+        all_posts = Post.objects.get_all_visibile_posts(active_author=self.request.user.author, page_author=page_author, reversed=False, min_time=time)
 
         for post in all_posts:
             response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
@@ -140,6 +137,6 @@ class ProfileStreamView(TemplateView):
         context = super(ProfileStreamView, self).get_context_data(**kwargs)
         authorUUID = self.kwargs.get('authorUUID', self.request.user.author.uuid)
         profile_author = Author.objects.filter(uuid=authorUUID)
-        context['posts'] = Post.objects_ext.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author)
+        context['posts'] = Post.objects.get_profile_visibile_posts(active_author=self.request.user.author, page_author=profile_author)
         context['comment_form'] = CommentForm()
         return context

@@ -1,12 +1,11 @@
 from django.test import TestCase
 
-from itertools import chain
-
 from Hindlebook.models import Author, Post, Comment
 from model_mommy import mommy
 
 
 class AuthorTestCases(TestCase):
+
     """ Tests related to Author model """
 
     def setUp(self):
@@ -69,11 +68,11 @@ class PostTestCases(TestCase):
 
     # Test Post privacy
     def test_post_privacy(self):
-        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author1),
+        self.assertQuerysetEqual(Post.objects.get_all_visibile_posts(self.author1),
                                  ["<Post: %s>" % self.post1_by_a2.content,
                                   "<Post: %s>" % self.post2_by_a1.content,
                                   "<Post: %s>" % self.post1_by_a1.content])
-        self.assertQuerysetEqual(Post.objects_ext.get_all_visibile_posts(self.author2),
+        self.assertQuerysetEqual(Post.objects.get_all_visibile_posts(self.author2),
                                  ["<Post: %s>" % self.post1_by_a2.content,
                                   "<Post: %s>" % self.post1_by_a1.content])
 

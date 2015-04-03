@@ -32,6 +32,7 @@ def get_uuid_from_header(request):
 
 
 class PostDetails(APIView):
+
     """
     GET, POST, or PUT an author post
     """
@@ -132,7 +133,7 @@ class AuthoredPosts(APIView):
         if author is None:
             posts = Post.objects.filter(visibility='PUBLIC')
         else:
-            posts = Post.objects_ext.get_profile_visibile_posts(author, pageAuthor)
+            posts = Post.objects.get_profile_visibile_posts(author, pageAuthor)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
@@ -175,7 +176,7 @@ class VisiblePosts(APIView):
         if author is None:
             posts = Post.objects.filter(visibility='PUBLIC')
         else:
-            posts = Post.objects_ext.get_all_visibile_posts(author)
+            posts = Post.objects.get_all_visibile_posts(author)
 
         # Serialize all of the posts
         serializer = PostSerializer(posts, many=True)
