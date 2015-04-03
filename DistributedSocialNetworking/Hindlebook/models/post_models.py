@@ -107,6 +107,8 @@ class Post(models.Model):
     visibility_choices = (("PUBLIC", "Public"), ("FOAF", "Friends of Friends Only"), ("FRIENDS", "Friends Only"), ("PRIVATE", "Private"), ("SERVERONLY", "Server Only"))
     visibility = models.CharField(default="PUBLIC", max_length=10, blank=False, choices=visibility_choices, db_index=True)
 
+    is_deleted = models.BooleanField(default=False)
+
     def __str__(self):
         return str(self.content)
 
