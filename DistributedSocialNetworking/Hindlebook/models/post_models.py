@@ -82,8 +82,11 @@ class ExtendedPostManager(models.Manager):
 
     def all(self, hide_deleted=True):
         if hide_deleted:
-            return super(ExtendedPostManager, self).all().filter(is_deleted=False)
-        return super(ExtendedPostManager, self).all()
+            return self.get_queryset()
+        return super(ExtendedPostManager,self).get_queryset()
+
+    def get_queryset(self):
+        return super(ExtendedPostManager,self).get_queryset().filter(is_deleted=False)
 
 
 class Post(models.Model):
