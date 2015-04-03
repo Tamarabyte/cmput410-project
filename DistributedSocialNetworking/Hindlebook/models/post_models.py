@@ -80,10 +80,9 @@ class ExtendedPostManager(models.Manager):
             key=lambda instance: instance.pubDate, reverse=True)
         return all_visible_posts
 
-    def all(self):
-        return super(ExtendedPostManager, self).all().filter(is_deleted=False)
-
-    def all_with_deleted(self):
+    def all(self, hide_deleted=True):
+        if hide_deleted:
+            return super(ExtendedPostManager, self).all().filter(is_deleted=False)
         return super(ExtendedPostManager, self).all()
 
 
