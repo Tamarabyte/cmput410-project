@@ -1,6 +1,7 @@
 from rest_framework import status, exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
 from api.serializers import FriendQuerySerializer, FriendRequestSerializer
 from api.requests.friend_request_factory import FriendRequestFactory
 from Hindlebook.models import Author
@@ -106,6 +107,10 @@ class FollowRequest(APIView):
     """
     POST a follow query
     """
+
+    # Other nodes can't use this API call
+    authentication_classes = (SessionAuthentication,)
+
     def post(self, request, format=None):
         # Validate the request body
         serializer = FriendRequestSerializer(data=request.data)
@@ -129,6 +134,10 @@ class UnfollowRequest(APIView):
     """
     POST a unfollow query
     """
+
+    # Other nodes can't use this API call
+    authentication_classes = (SessionAuthentication,)
+
     def post(self, request, format=None):
         # Validate the request body
         serializer = FriendRequestSerializer(data=request.data)
@@ -151,6 +160,9 @@ class UnfriendRequest(APIView):
     """
     POST an unfriend query
     """
+
+    # Other nodes can't use this API call
+    authentication_classes = (SessionAuthentication,)
 
     def post(self, request, format=None):
         # Validate the request body

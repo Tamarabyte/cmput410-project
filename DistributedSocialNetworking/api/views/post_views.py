@@ -104,6 +104,7 @@ class DeletePost(APIView):
     POST to delete a post with given uuid
     """
 
+    # Other nodes can't use this API call
     authentication_classes = (SessionAuthentication,)
 
     def post(self, request, postuuid, format=None):
