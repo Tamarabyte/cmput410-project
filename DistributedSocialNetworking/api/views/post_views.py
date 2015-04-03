@@ -97,6 +97,24 @@ class PostDetails(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class DeletePost(APIView):
+    """
+    POST to delete a post with given uuid
+    """
+
+    def post(self, request, postuuid, format=None):
+        # TODO: authorization
+
+        # Get the post
+        post = get_object_or_404(Post, guid=postuuid, is_deleted=False)
+
+        # Signify that the post is deleted
+        post.is_deleted = True
+
+        # Return 200
+        return Response()
+
+
 class AuthoredPosts(APIView):
     """
     GET posts from given author
