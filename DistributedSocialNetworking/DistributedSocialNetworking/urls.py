@@ -20,8 +20,9 @@ urlpatterns = patterns('',
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
     url(r'^author/posts', RedirectView.as_view(pattern_name='stream')),
-    url(r'^post/create/(?P<postGUID>[\w-]+)', CreatePost.as_view(), name="create_post"),
+    url(r'^post/create/(?P<postGUID>[\w-]+)', PostView.as_view(), name="create_post"),
     url(r'^post/(?P<postGUID>[\w-]+)/create/(?P<commentGUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
+    url(r'^post/(?P<postGUID>[\w-]+)', PostView.as_view(), name="delete_post"),
 
     # Profile URLs
     url(r'^profile/(?P<authorUUID>[\w-]+)/edit', ProfileUpdateView.as_view(), name='edit_profile'),

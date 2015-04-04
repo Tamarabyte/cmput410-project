@@ -46,10 +46,10 @@ class StreamView(TemplateView):
             # time = time + datetime.timedelta(0, 3)
             json_derulo.getForeignStreamPosts(self.request.user.author, time)
         local_posts = Post.objects.get_all_visibile_posts(active_author=self.request.user.author, reversed=False, min_time=time)
-
+        user_id = self.request.user.author.uuid
         for post in local_posts:
             response_data = {}
-            response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "user_id": user_id, "MEDIA_URL": settings.MEDIA_URL})
             response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
             response_data["created_guid"] = post.guid
             posts.append(response_data)
@@ -68,11 +68,11 @@ class StreamView(TemplateView):
         return JsonResponse({'posts': posts, 'comments': comments, 'time': o_time})
 
 
-class CreatePost(View):
+class PostView(View):
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
-        return super(CreatePost, self).dispatch(*args, **kwargs)
+        return super(PostView, self).dispatch(*args, **kwargs)
 
     def put(self, request, postGUID, *args, **kwargs):
         put = QueryDict(request.body)
@@ -97,13 +97,21 @@ class CreatePost(View):
         post.save()
         # When we don't pass form.save(commit=True) we have to explicitly save m2m fields later
         form.save_m2m()
-
+        user_id = request.user.author.uuid
         response_data = {'form': render_to_string("post/post_form.html", {"post_form": PostForm()})}
         response_data["time"] = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
-        response_data["post"] = render_to_string("post/post.html", {"post": post, "MEDIA_URL": settings.MEDIA_URL})
+        response_data["post"] = render_to_string("post/post.html", {"post": post, "user_id": user_id, "MEDIA_URL": settings.MEDIA_URL})
         response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
         response_data["created_guid"] = post.guid
         return JsonResponse(response_data, status=201)
+
+    def delete(self, request, postGUID, *args, **kwargs):
+        print(postGUID)
+        post = Post.objects.get(guid=postGUID)
+        if (request.user.author.uuid == post.author.uuid):
+            post.is_deleted = True
+            post.save()
+        return JsonResponse({}, status=200)
 
 
 class CreateComment(View):
