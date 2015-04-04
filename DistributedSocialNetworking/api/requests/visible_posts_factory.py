@@ -1,5 +1,6 @@
 from requests.auth import HTTPBasicAuth
 import requests
+import base64
 
 
 class VisiblePostsRequestFactory():
@@ -43,11 +44,10 @@ class Team8VisiblePostRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/author/posts" % node.host
+        self.url = "%s/api/author/posts" % node.host
 
-    def get(self, uuid, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username), self.node.our_password)
-        # headers = {'uuid': uuid}
+    def get(self, uuid, requester_uuid="user"):
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         return requests.get(url=self.url, auth=self.auth)
 
 

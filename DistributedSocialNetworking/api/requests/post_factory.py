@@ -2,6 +2,7 @@ from requests.auth import HTTPBasicAuth
 import requests
 
 
+
 class PostRequestFactory():
     """
     An Encapsulation for building GET/PUT/POST Post requests
@@ -35,22 +36,20 @@ class HindlebookPostRequest(PostRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/post" % node.host
+        self.url = "%s/api/post" % node.host
         self.auth = HTTPBasicAuth(node.our_username, node.our_password)
 
     def get(self, post_id):
         self.url = self.url + "/%s" % post_id
         return requests.get(url=self.url, auth=self.auth)
 
-    def post(self, post_id, post):
+    def post(self, post_id, serializedPost):
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.post(url=self.url, data=data, auth=self.auth)
+        return requests.post(url=self.url, data=serializedPost, auth=self.auth)
 
-    def put(self, post_id, post):
+    def put(self, post_id, serializedPost):
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.put(url=self.url, data=data, auth=self.auth)
+        return requests.put(url=self.url, data=serializedPost, auth=self.auth)
 
 
 class Team8PostRequest(PostRequestFactory):
@@ -62,21 +61,19 @@ class Team8PostRequest(PostRequestFactory):
         self.url = "%s/post" % node.host
 
     def get(self, post_id, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         self.url = self.url + "/%s" % post_id
         return requests.get(url=self.url, auth=self.auth)
 
-    def post(self, post_id, post, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
+    def post(self, post_id, serializedPost, requester_uuid="YourAuthSucks"):
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.post(url=self.url, data=data, auth=self.auth)
+        return requests.post(url=self.url, data=serializedPost, auth=self.auth)
 
-    def put(self, post_id, post, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
+    def put(self, post_id, serializedPost, requester_uuid="YourAuthSucks"):
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.put(url=self.url, data=data, auth=self.auth)
+        return requests.put(url=self.url, data=serializedPost, auth=self.auth)
 
 
 class SocshizzlePostRequest(PostRequestFactory):
@@ -92,12 +89,10 @@ class SocshizzlePostRequest(PostRequestFactory):
         self.url = self.url + "/%s" % post_id
         return requests.get(url=self.url, auth=self.auth)
 
-    def post(self, post_id, post):
+    def post(self, post_id, serializedPost):
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.post(url=self.url, data=data, auth=self.auth)
+        return requests.post(url=self.url, data=serializedPost, auth=self.auth)
 
-    def put(self, post_id, post):
+    def put(self, post_id, serializedPost):
         self.url = self.url + "/%s" % post_id
-        data = PostSerializer(post).data
-        return requests.put(url=self.url, data=data, auth=self.auth)
+        return requests.put(url=self.url, data=serializedPost, auth=self.auth)

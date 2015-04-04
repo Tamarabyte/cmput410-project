@@ -9,6 +9,15 @@ class AuthorSerializer(serializers.ModelSerializer):
     host = serializers.CharField(source='node')
     id = serializers.CharField(source='uuid')
 
+    def validate_host(self, value):
+            node = Node.objects.filter(host=value).first()
+            if value == 'team8':
+                node = Node.objects.filter(team_number=8).first()
+            if node is None:
+                print("Unknown host '%s' during serialization, throwing exception" % value)
+                logger.log("Unknown host '%s' during serialization, throwing exception" % value)
+                raise serializers.ValidationError('Invalid or Unknown Host: %s' % value)
+            return node
     class Meta:
         model = Author
         fields = ["displayname", "host", "id"]
@@ -31,18 +40,28 @@ class ProfileSerializer(serializers.ModelSerializer):
         ret = super(ProfileSerializer, self).to_representation(instance)
 
         # Node to host string
+        # Hack for team 8 bullshit should be rmoeved when they fix 
+        # their shit. 
+        # FIX ME
         node = ret.pop('host')
-        ret['host'] =  Node.objects.filter(host=node).first().host
+        print(node)
+        if node == 'team8':
+            ret['host'] = Node.objects.filter(team_number=8).first().host
+        else:
+            ret['host'] =  Node.objects.filter(host=node).first().host
 
         return ret
 
     def validate_host(self, value):
         node = Node.objects.filter(host=value).first()
+        if value == 'team8':
+            node = Node.objects.filter(team_number=8).first()
         if node is None:
             print("Unknown host '%s' during serialization, throwing exception" % value)
             logger.log("Unknown host '%s' during serialization, throwing exception" % value)
             raise serializers.ValidationError('Invalid or Unknown Host: %s' % value)
         return node
+
 
     def is_valid(self, raise_exception=False):
         if 'displayname' not in self.initial_data:
@@ -55,7 +74,11 @@ class ProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Profile data missing required field: id")
 
         if 'friends' not in self.initial_data:
-            raise serializers.ValidationError("Profile data missing required field: friends")
+            # More bullshit hacks to make team 8 work.
+            if 'connections' not in self.initial_data:
+                raise serializers.ValidationError("Profile data missing required field: friends")
+            else:
+                self.initial_data['friends'] = self.initial_data['connections']
 
         return super(ProfileSerializer, self).is_valid(raise_exception)
 

@@ -141,8 +141,13 @@ class CreateComment(View):
             response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": form, "alert": errors})}
             return JsonResponse(response_data, status=400)
 
-        if not comment.save():
-            json_derulo.sendForeignComment(comment)
+        comment.save()
+        try:
+            if post.isForeign():
+                print("Is foreign")
+                json_derulo.sendForeignComment(comment, post.author.node)
+        except Exception as e:
+            print(str(e))
 
         response_data = {'form': render_to_string("comment/comment_form.html", {"comment_form": CommentForm()})}
         response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
