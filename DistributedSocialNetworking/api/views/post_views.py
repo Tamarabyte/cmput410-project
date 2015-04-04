@@ -4,6 +4,7 @@ from api.serializers.utils import get_author
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions, status, exceptions, HTTP_HEADER_ENCODING
+from rest_framework.authentication import SessionAuthentication
 from django.utils.translation import ugettext_lazy as _
 from django.shortcuts import get_object_or_404
 
@@ -103,14 +104,16 @@ class DeletePost(APIView):
     POST to delete a post with given uuid
     """
 
-    def post(self, request, postuuid, format=None):
-        # TODO: authorization
+    # Other nodes can't use this API call
+    authentication_classes = (SessionAuthentication,)
 
+    def post(self, request, postuuid, format=None):
         # Get the post
         post = get_object_or_404(Post, guid=postuuid, is_deleted=False)
 
         # Signify that the post is deleted
         post.is_deleted = True
+        post.save(update_fields=['is_deleted'])
 
         # Return 200
         return Response()
