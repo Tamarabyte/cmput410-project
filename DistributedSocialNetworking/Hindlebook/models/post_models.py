@@ -27,8 +27,42 @@ class Category(models.Model):
 
 class ExtendedPostManager(models.Manager):
 
+    def get_all_following_posts(self, active_author, reversed=True, min_time=None):
+        """
+        Gets all the posts the active user can see that the user is following
+        """
+        #  Get list of people user is following
+        following = active_author.getFollowing()
+        #  Get list of friends
+        friends = active_author.getFriends()
+        #  Get list of friends of friends
+        friends_ext = active_author.getFriendsOfFriends()
+
+        #  This is a safe way to add values to the filters that could be None
+        q_list = [Q()]
+        if min_time is not None:
+            q_list.append(Q(pubDate__gt=min_time))
+            my_posts = Post.objects.filter(pubDate__gt=min_time, author=active_author)  # My posts
+        else:
+            my_posts = Post.objects.filter(author=active_author)  # My posts
+        if following is not None:
+            q_list.append(Q(author__in=following))
+        q_reduced = functools.reduce(operator.and_, q_list)
+
+        public_posts = Post.objects.filter(q_reduced, visibility="PUBLIC").exclude(author=active_author)  # Public Posts
+        friend_posts = Post.objects.filter(q_reduced, visibility="FRIENDS", author__in=friends).exclude(author=active_author)  # Friend Posts from my frineds
+        foff_posts = Post.objects.filter(q_reduced, visibility="FOAF", author__in=friends_ext).exclude(author=active_author)  # FOAF posts from FOAFS
+
+        #  Merge lists
+        all_visible_posts = sorted(
+            chain(my_posts, public_posts, friend_posts, foff_posts,),
+            key=lambda instance: instance.pubDate, reverse=reversed)
+        return all_visible_posts
+
     def get_all_visibile_posts(self, active_author, reversed=True, min_time=None):
-        """Gets all the posts visible to the provided user"""
+        """
+        Gets all the posts visible to the provided user
+        """
         #  Get list of friends
         friends = active_author.getFriends()
         #  Get list of friends of friends

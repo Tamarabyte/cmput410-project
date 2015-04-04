@@ -12,11 +12,11 @@
       <div class="container-fluid">
 
         <div class="navbar-header">
-          <a class="navbar-brand" href="{% url "stream" %}">Hindleb <i class="title-img icon-glasses"></i> k</a>
+          <a class="navbar-brand" href="{% url "following_stream" %}">Hindleb <i class="title-img icon-glasses"></i> k</a>
         </div> <!-- /navbar-header -->
   
         <ul class="nav navbar-nav">
-          <li><a href="#"><i class="icon-globe navbar-img"></i></a></li>
+          <li><a href="{% url "stream" %}"><i class="icon-globe navbar-img"></i></a></li>
           <li><a href="{% url "profile" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
           <li><a href="{% url "friends_view" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
           <li><a href="{% url "requests" %}"><span class="badge" id="notifications-badge">{{ user.author.getFriendRequestCount }}</span></a></li>

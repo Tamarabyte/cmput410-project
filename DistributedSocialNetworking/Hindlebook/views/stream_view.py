@@ -68,6 +68,54 @@ class StreamView(TemplateView):
         return JsonResponse({'posts': posts, 'comments': comments, 'time': o_time})
 
 
+class FollowingStreamView(TemplateView):
+
+    template_name = "stream.html"
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(FollowingStreamView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(FollowingStreamView, self).get_context_data(**kwargs)
+        context['posts'] = None
+        context['post_form'] = PostForm()
+        context['comment_form'] = CommentForm()
+        context['github_id'] = self.request.user.author.github_id
+        return context
+
+    def post(self, *args, **kwargs):
+        posts = []
+        comments = []
+        o_time = datetime.datetime.now(dateutil.tz.tzutc()).isoformat()
+        time = None
+        if self.request.POST['last_time'] != '':
+            time = dateutil.parser.parse(self.request.POST['last_time'])
+            json_derulo.getForeignStreamPosts(self.request.user.author, time)
+
+        local_posts = Post.objects.get_all_following_posts(active_author=self.request.user.author, reversed=False, min_time=time)
+        user_id = self.request.user.author.uuid
+        for post in local_posts:
+            response_data = {}
+            response_data["post"] = render_to_string("post/post.html", {"post": post, "user_id": user_id, "MEDIA_URL": settings.MEDIA_URL})
+            response_data["post"] += render_to_string("post/post_footer.html", {"post": post})
+            response_data["created_guid"] = post.guid
+            posts.append(response_data)
+
+        if time is not None:
+            all_comments = Comment.objects.filter(pubDate__gt=time)
+        else:
+            all_comments = Comment.objects.all()
+
+        for comment in all_comments:
+            response_data = {}
+            response_data["comment"] = render_to_string("comment/comment.html", {"comment": comment})
+            response_data["postGUID"] = comment.post.guid
+            comments.append(response_data)
+
+        return JsonResponse({'posts': posts, 'comments': comments, 'time': o_time})
+
+
 class PostView(View):
 
     @method_decorator(login_required)

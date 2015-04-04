@@ -19,6 +19,7 @@ urlpatterns = patterns('',
 
     # Stream URLs
     url(r'^$', StreamView.as_view(), name="stream"),
+    url(r'^myStream', FollowingStreamView.as_view(), name="following_stream"),
     url(r'^author/posts', RedirectView.as_view(pattern_name='stream')),
     url(r'^post/create/(?P<postGUID>[\w-]+)', PostView.as_view(), name="create_post"),
     url(r'^post/(?P<postGUID>[\w-]+)/create/(?P<commentGUID>[\w-]+)', CreateComment.as_view(), name="create_post"),
