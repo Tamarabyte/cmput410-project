@@ -1,5 +1,5 @@
 
-<div class="row">
+<div class="comment-{{ comment.post.guid }}">
     <div class="well comment-block">
             <span class="comment-author"><a href="{% url "profile" comment.author.uuid %}">{{ comment.author }}</a></span> <span class="comment-date pull-right">{{ comment.pubDate }}</span>: <span class=comment-comment>{{ comment.comment }}</span>
     </div> <!-- well -->

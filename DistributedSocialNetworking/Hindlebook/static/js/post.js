@@ -61,6 +61,7 @@ function deletePost(post_uuid) {
     function postSuccess(response, status, xhr, form) {
         console.log("Post " + post_uuid + " deleted!");
         $('#post-' + post_uuid).remove();
+        $('.comment-' + post_uuid).remove();
     }
 
     function ajaxError(xhr, errmsg, err) {
