@@ -44,15 +44,17 @@ function deletePost(post_uuid) {
     console.log("Trying to delete post "+ post_uuid);
     /* Post Ajax */
     var base_url = "/post/" + post_uuid + "/";
-
-    $.ajax({
-        success: postSuccess,
-        error: ajaxError,
-        url : base_url,
-        clearForm : false,
-        type : "DELETE",
-        beforeSubmit : beforeSubmit
-    });
+    if (confirm("Post will be deleted permanently. Press okay to delete.") == true) {
+        $.ajax({
+            success: postSuccess,
+            error: ajaxError,
+            url : base_url,
+            clearForm : false,
+            type : "DELETE",
+            beforeSubmit : beforeSubmit
+        });
+    } else {}
+    
     
     function beforeSubmit(arr, form, options) {
         console.log(options["url"]);
