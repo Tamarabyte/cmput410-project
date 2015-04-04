@@ -4,7 +4,7 @@ import datetime
 import dateutil.parser
 from Hindlebook.models import Node, Author, Post, Comment
 from api.serializers import PostSerializer
-from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory, CommentRequestFactory
+from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory, CommentRequestFactory,FriendQueryRequestFactory
 
 # Key for the Request Factories
 #
@@ -154,3 +154,17 @@ def sendForeignComment(comment,node):
     
     return response
 
+def areFriends(ourUser,targetAuthor):
+    # Function to find out if two users, ourUser located on our server
+    # and targetAuthor located on a seperate server are friends.
+    # Returns 1 if they are, 0 if they aren't.
+    request = FriendQueryRequestFactory.create(targetAuthor.node)
+    response = request.get(ourUser.uuid,targetAuthor.uuid)
+    if(response.status_code != 200):
+        # Node not reachable
+        print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+    answer = response.json()["friends"]
+    if answer == "YES":
+        return 1
+    else:
+        return 0

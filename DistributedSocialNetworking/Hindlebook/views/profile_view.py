@@ -13,7 +13,7 @@ import json
 
 from Hindlebook.models import Post, Author, Comment
 from Hindlebook.forms import ProfileEditForm, CommentForm
-from api.json_derulo import getForeignAuthor, getForeignAuthorPosts
+from api.json_derulo import getForeignAuthor, getForeignAuthorPosts, areFriends
 
 
 class ProfileView(TemplateView):
@@ -63,8 +63,7 @@ class ProfileView(TemplateView):
             print(targetAuthor.node.host)
             if targetAuthor:
                 context['author'] = targetAuthor
-                #TODO query host server to check if they are friends for isfriends
-                context['isFriends'] = 0
+                context['isFriends'] = areFriends(self.request.user.author,targetAuthor)
                 if targetAuthor in self.request.user.author.follows.all():
                     context['isFollowing'] = 1
                 else:
