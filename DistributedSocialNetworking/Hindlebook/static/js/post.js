@@ -62,6 +62,8 @@ function deletePost(post_uuid) {
         console.log("Post " + post_uuid + " deleted!");
         $('#post-' + post_uuid).remove();
         $('.comment-' + post_uuid).remove();
+        $('#'+post_uuid).remove();
+        $('#comment-button-' + post_uuid).remove();
     }
 
     function ajaxError(xhr, errmsg, err) {
