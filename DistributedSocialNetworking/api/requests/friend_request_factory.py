@@ -47,7 +47,7 @@ class Team8FriendRequest(FriendRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/friendrequest" % node.host
+        self.url = "%s/api/friendrequest" % node.host
 
     def post(self, author, friend, requester_uuid="YourAuthSucks"):
         self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)

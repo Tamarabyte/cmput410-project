@@ -54,7 +54,7 @@ class Team8FriendQueryRequest(FriendQueryRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/friends" % node.host
+        self.url = "%s/api/friends" % node.host
 
     def get(self, uuid1, uuid2, requester_uuid="YourAuthSucks"):
         self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)

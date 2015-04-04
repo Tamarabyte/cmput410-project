@@ -44,7 +44,7 @@ class Team8VisiblePostRequest(VisiblePostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/author/posts" % node.host
+        self.url = "%s/api/author/posts" % node.host
 
     def get(self, uuid, requester_uuid="user"):
         self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)

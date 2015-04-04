@@ -1,5 +1,5 @@
 from Hindlebook.models.user_models import Author
-from Hindlebook.models import UuidValidator
+from Hindlebook.models import UuidValidator, Settings
 from django.utils import timezone
 from django.db import models
 from django.db.models import Q
@@ -91,6 +91,7 @@ class ExtendedPostManager(models.Manager):
 
 class Post(models.Model):
 
+
     """Model for representing a Post made by an Author"""
 
     objects = ExtendedPostManager()
@@ -137,6 +138,9 @@ class Post(models.Model):
         }
         ALLOWED_TAGS += markdown_tags
         return bleach.clean(html, ALLOWED_TAGS, ALLOWED_ATTR)
+
+    def isForeign(self):
+        return not self.source == Settings.objects.all().first().node.host
 
 
 class Comment(models.Model):

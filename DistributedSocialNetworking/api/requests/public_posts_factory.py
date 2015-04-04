@@ -42,7 +42,7 @@ class Team8PublicPostRequest(PublicPostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/posts" % node.host
+        self.url = "%s/api/posts" % node.host
 
     def get(self, requester_uuid="YourAuthSucks"):
         self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)

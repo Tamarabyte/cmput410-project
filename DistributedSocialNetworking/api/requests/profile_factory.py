@@ -43,7 +43,7 @@ class Team8ProfileRequest(ProfileRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/friends" % node.host
+        self.url = "%s/api/friends" % node.host
 
     def get(self, author_uuid, requester_uuid="YourAuthSucks"):
         self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)

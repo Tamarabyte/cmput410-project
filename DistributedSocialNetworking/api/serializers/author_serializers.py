@@ -12,7 +12,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     def validate_host(self, value):
             node = Node.objects.filter(host=value).first()
             if value == 'team8':
-                node = Node.objects.filter(team_number=8).first().host
+                node = Node.objects.filter(team_number=8).first()
             if node is None:
                 print("Unknown host '%s' during serialization, throwing exception" % value)
                 logger.log("Unknown host '%s' during serialization, throwing exception" % value)
@@ -44,6 +44,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         # their shit. 
         # FIX ME
         node = ret.pop('host')
+        print(node)
         if node == 'team8':
             ret['host'] = Node.objects.filter(team_number=8).first().host
         else:
@@ -54,7 +55,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def validate_host(self, value):
         node = Node.objects.filter(host=value).first()
         if value == 'team8':
-            node = Node.objects.filter(team_number=8).first().host
+            node = Node.objects.filter(team_number=8).first()
         if node is None:
             print("Unknown host '%s' during serialization, throwing exception" % value)
             logger.log("Unknown host '%s' during serialization, throwing exception" % value)

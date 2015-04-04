@@ -4,7 +4,7 @@ import datetime
 import dateutil.parser
 from Hindlebook.models import Node, Author, Post, Comment
 from api.serializers import PostSerializer
-from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory
+from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory, CommentRequestFactory
 
 
 # Key for the Request Factories
@@ -32,15 +32,8 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 # Module to hold outgoing API calls to get various info from other services.
 
 def json_to_posts(json, node):
-    if (node.team_number == 8):
-        # Team 8 doesn't follow spec so json['posts'] will error out.
-        # hooray!
-        posts = json
-    else:
-        posts = json["posts"]
-
+    posts = json["posts"]
     out = []
-
     for p in posts:
         guid = p.get('guid', None)
         if guid is None:
@@ -48,18 +41,25 @@ def json_to_posts(json, node):
             continue
 
         post = Post.objects.filter(guid=guid).first()
-        if post is None:
-            # create post
-            serializer = PostSerializer(data=p)
-            serializer.is_valid(raise_exception=True)
-            post = serializer.save(node=node)
-        else:
-            # update post
-            serializer = PostSerializer(post, data=p)
-            serializer.is_valid(raise_exception=True)
-            post = serializer.save(node=node)
-            out.append(post)
-
+        # Try except here because if they pass us a post
+        # from a host we don't know then we error out and 
+        # do nothing, realistically we should just pass over
+        # that post... I know Mark doesn't like this but meh
+        # trying to get thigns to work...
+        try:
+            if post is None:
+                # create post
+                serializer = PostSerializer(data=p)
+                serializer.is_valid(raise_exception=True)
+                post = serializer.save(node=node)
+            else:
+                # update post
+                serializer = PostSerializer(post, data=p)
+                serializer.is_valid(raise_exception=True)
+                post = serializer.save(node=node)
+                out.append(post)
+        except Exception as e:
+            continue
     return out
 
 
@@ -105,9 +105,11 @@ def getForeignStreamPosts(author, min_time):
         # Get the JSON returned
         postsJSON = response.json()
 
-
-        # Turn the JSON into Post objects in the DB!
-        json_to_posts(postsJSON, node)
+        try:
+            # Turn the JSON into Post objects in the DB!
+            json_to_posts(postsJSON, node)
+        except Exception as e:
+            print(str(e))
 
     return []
 
@@ -143,3 +145,12 @@ def getForeignAuthor(uuid):
             author.save()
             break
     return author
+
+def sendForeignComment(comment,node):
+    request = CommentRequestFactory.create(node)
+    response = request.post(comment)
+    if(response.status_code != 200):
+        # Node not reachable
+        print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
+    
+    return response

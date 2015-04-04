@@ -45,7 +45,7 @@ class Team8PostsRequest(AuthoredPostsRequestFactory):
     """
     def __init__(self, node):
         self.node = node
-        self.url = "%s/author" % node.host
+        self.url = "%s/api/author" % node.host
 
     def get(self, author_uuid, requester_uuid="YourAuthSucks"):
         self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
