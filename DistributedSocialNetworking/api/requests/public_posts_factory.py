@@ -45,7 +45,7 @@ class Team8PublicPostRequest(PublicPostsRequestFactory):
         self.url = "%s/posts" % node.host
 
     def get(self, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         return requests.get(url=self.url, auth=self.auth)
 
 

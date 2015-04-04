@@ -39,7 +39,7 @@ class HindlebookAuthoredPostsRequest(AuthoredPostsRequestFactory):
         return requests.get(url=self.url, headers=self.headers, auth=self.auth)
 
 
-class Team8PostRequest(AuthoredPostsRequestFactory):
+class Team8PostsRequest(AuthoredPostsRequestFactory):
     """
     Team 8 specific Authored Post Request
     """
@@ -48,7 +48,7 @@ class Team8PostRequest(AuthoredPostsRequestFactory):
         self.url = "%s/author" % node.host
 
     def get(self, author_uuid, requester_uuid="YourAuthSucks"):
-        self.auth = HTTPBasicAuth("%s:%s" % (requester_uuid, self.node.our_username) , self.node.our_password)
+        self.auth = (requester_uuid+":"+self.node.our_username,self.node.our_password)
         self.url = self.url + "/%s/posts" % author_uuid
         # self.headers = {'uuid': requester_uuid}
         return requests.get(url=self.url, auth=self.auth)

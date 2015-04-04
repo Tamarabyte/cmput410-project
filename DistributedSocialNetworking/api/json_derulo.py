@@ -32,7 +32,12 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 # Module to hold outgoing API calls to get various info from other services.
 
 def json_to_posts(json, node):
-    posts = json["posts"]
+    if (node.team_number == 8):
+        # Team 8 doesn't follow spec so json['posts'] will error out.
+        # hooray!
+        posts = json
+    else:
+        posts = json["posts"]
 
     out = []
 
@@ -58,12 +63,13 @@ def json_to_posts(json, node):
     return out
 
 
+
 def getForeignAuthorPosts(requesterUuid, targetUuid, node):
     ''' Gets all posts created by targetUuid a user on host node that
         are visible by logged in user requestUuid and returns them '''
 
     request = AuthoredPostsRequestFactory.create(node)
-    response = request.get(requesterUuid, targetUuid)
+    response = request.get(targetUuid, requesterUuid)
 
     if(response.status_code != 200):
         # Node not reachable
@@ -72,11 +78,10 @@ def getForeignAuthorPosts(requesterUuid, targetUuid, node):
 
     # Get the JSON returned
     postsJSON = response.json()
-
     # Turn the JSON into Post objects!
-    json_to_posts(postsJSON, node)
+    posts = json_to_posts(postsJSON, node)
 
-    return []
+    return posts
 
 
 def getForeignStreamPosts(author, min_time):
@@ -88,6 +93,7 @@ def getForeignStreamPosts(author, min_time):
     for node in Node.objects.getActiveNodes():
 
         # Make a request for this nodes visible posts
+
         request = VisiblePostsRequestFactory.create(node)
         response = request.get(author.uuid)
 
@@ -98,6 +104,7 @@ def getForeignStreamPosts(author, min_time):
 
         # Get the JSON returned
         postsJSON = response.json()
+
 
         # Turn the JSON into Post objects in the DB!
         json_to_posts(postsJSON, node)
