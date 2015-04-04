@@ -6,7 +6,6 @@ from Hindlebook.models import Node, Author, Post, Comment
 from api.serializers import PostSerializer
 from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory, CommentRequestFactory
 
-
 # Key for the Request Factories
 #
 # Appending .json() to the end of these gets the json
@@ -154,3 +153,4 @@ def sendForeignComment(comment,node):
         print("Node %s returned us status code %s!!!" % (node.host_name, response.status_code))
     
     return response
+

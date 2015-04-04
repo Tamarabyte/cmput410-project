@@ -60,6 +60,7 @@ class ProfileView(TemplateView):
                 
         else:
             targetAuthor = getForeignAuthor(authorUUID)
+            print(targetAuthor.node.host)
             if targetAuthor:
                 context['author'] = targetAuthor
                 #TODO query host server to check if they are friends for isfriends

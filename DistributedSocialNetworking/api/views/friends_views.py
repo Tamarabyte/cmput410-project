@@ -66,7 +66,7 @@ class FriendRequest(APIView):
     """
     POST a friend request
     """
-    def echo_request(author, friend):
+    def echo_request(self,author, friend):
         """
         Echo friend request to foreign author's node
         If it fails, we don't really care so we bite it.
@@ -86,13 +86,16 @@ class FriendRequest(APIView):
 
         author = serializer.validated_data['author']
         friend = serializer.validated_data['friend']
-
+        
         if author.isForeign() and friend.isForeign():
             return Response({"error": "We aren't a matchmaking service for foreign authors. Try OKcupid?"},
                             status=status.HTTP_400_BAD_REQUEST)
-        if friend.isForeign():
-            # Echo request to foreign Author's Node
-            self.echo_request(author, friend)
+        try:
+            if friend.isForeign():
+                # Echo request to foreign Author's Node
+                self.echo_request(author, friend)
+        except Exception as e:
+            print(str(e))
 
         if friend not in author.friends.all():
             author.friends.add(friend)
