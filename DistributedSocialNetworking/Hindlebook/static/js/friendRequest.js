@@ -24,14 +24,7 @@ function follow(uuid) {
         };
 
 
-    // THIS NEEDS TO BE RESOLVED, just a quick hack
-    // to at least get it working... basically
-    // JSON when stringifying everything is adding
-    // backslashes so I'm fucking removing them fuck that
-    // it was making the IDs not match up
     var myJSONString = JSON.stringify(jsonData);
-    var regex = new RegExp("/", 'g');
-    var myEscapedJSONString = myJSONString.replace(regex,"");
     $.ajax({
         success: requestSuccess,
         clearForm : false,
@@ -39,7 +32,7 @@ function follow(uuid) {
         //error: ajaxError,
         type : "POST",
         url : base_url,
-        data : myEscapedJSONString,
+        data : myJSONString,
         beforeSubmit : beforeSubmit
     })
 
@@ -100,18 +93,11 @@ function friend(uuid, is_pending) {
             "author": author,
             "friend": friend
         };
-
+    console.log("friendID: " + $("#friend-uuid-" + uuid).val())
+    console.log("Friendhost: " + $("#friend-host-" + uuid).val())
     console.log("trying to friend request lol")
-    // THIS NEEDS TO BE RESOLVED, just a quick hack
-    // to at least get it working... basically
-    // JSON when stringifying everything is adding
-    // backslashes so I'm fucking removing them fuck that
-    // it was making the IDs not match up
 
     var myJSONString = JSON.stringify(jsonData);
-    console.log("1");
-    var regex = new RegExp("/", 'g');
-    var myEscapedJSONString = myJSONString.replace(regex,"");
     console.log("2");
     $.ajax({
         success: requestSuccess,
@@ -120,7 +106,7 @@ function friend(uuid, is_pending) {
         //error: ajaxError,
         type : "POST",
         url : base_url,
-        data : myEscapedJSONString,
+        data : myJSONString,
         beforeSubmit : beforeSubmit
     });
 
