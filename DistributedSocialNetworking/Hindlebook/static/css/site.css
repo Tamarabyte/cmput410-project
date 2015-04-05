@@ -375,7 +375,7 @@ float: right!important;
 
 .navbar-fixed-top .navbar-right.active {
   padding-left: 15px;
-  background-color: #97310e;
+  background-color: #ae3910;
 }
 
 .navbar-brand {
@@ -521,6 +521,18 @@ float: right!important;
   margin-right: 8px;
 }
 
+.delete-btn {
+  background: none;
+  color: #777;
+  position: relative;
+  top: -12px;
+  right: -10px;
+}
+
+.delete-btn:hover, .delete-btn:focus {
+  color: #D55846;
+}
+
 
  /* Comments  ------------------------------------------ */
 
@@ -534,6 +546,8 @@ float: right!important;
 }
 
 .comment-block {
+    margin-left: -15px;
+    margin-right: -15px;
     border-radius: 20px;
     border: 2px solid #bbb;
     padding: 15px;

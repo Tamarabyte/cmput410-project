@@ -185,4 +185,5 @@ a[class^="icon-"], a[class*="icon-"], span[class^="icon-"], span[class*="icon-"]
 .icon-coins-01:before { content:""; } 
 .icon-oxp-home:before { content:""; } 
 .icon-oxp-check:before { content:""; } 
-.icon-oxp-remove:before { content:""; }
+.icon-oxp-remove:before { content:""; } 
+.icon-globe:before { content:""; }

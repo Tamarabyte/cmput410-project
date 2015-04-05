@@ -9,7 +9,7 @@
                 <div class="pull-left"><img class="post-img" src="{{ MEDIA_URL }}{{ post.author.avatar }}"   height="80"></img></div>
                 {% if post.author.uuid == user_id %}
                 <div class="pull-right">
-                    <button onclick="deletePost('{{ post.guid }}');" class="btn btn-md btn-success img-btn"><i class="icon-kub-trash"></i></button>
+                    <button onclick="deletePost('{{ post.guid }}');" class="btn btn-sm delete-btn"><i class="icon-kub-remove"></i></button>
                 </div>
                 {% endif %}
                 <div class="post-title">{{ post.title }}</div>

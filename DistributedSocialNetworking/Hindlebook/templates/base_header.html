@@ -16,7 +16,7 @@
         </div> <!-- /navbar-header -->
   
         <ul class="nav navbar-nav">
-          <li><a href="#"><i class="icon-screenshot navbar-img"></i></a></li>
+          <li><a href="#"><i class="icon-globe navbar-img"></i></a></li>
           <li><a href="{% url "profile" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-01 navbar-img"></i></a></li>
           <li><a href="{% url "friends_view" authorUUID=user.author.uuid %}"><i class="icon-kub-avatar-02 navbar-img"></i></a></li>
           <li><a href="{% url "requests" %}"><span class="badge" id="notifications-badge">{{ user.author.getFriendRequestCount }}</span></a></li>
@@ -42,11 +42,14 @@
 
 {% block nav_scripts %}
     <script type="text/javascript">
+        var pathname = window.location.pathname; 
         $('#search-bar').hide();
         $("#search-toggle").click(function () {
           $('#search-bar').toggle();
           $('#search-nav').toggleClass("active");
           });
+      $('a[href="' + pathname +'"]').parent('li').addClass("active");
+
     //jQuery('#jquery-live-search input[name="q"]').liveSearch({url: '/search/'});
     </script>
 {% endblock %}
