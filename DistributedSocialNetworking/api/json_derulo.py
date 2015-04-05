@@ -33,6 +33,7 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 def json_to_posts(json, node):
     posts = json["posts"]
     out = []
+    print(json)
     for p in posts:
         guid = p.get('guid', None)
         if guid is None:
@@ -104,11 +105,8 @@ def getForeignStreamPosts(author, min_time):
         # Get the JSON returned
         postsJSON = response.json()
 
-        try:
-            # Turn the JSON into Post objects in the DB!
-            json_to_posts(postsJSON, node)
-        except Exception as e:
-            print(str(e))
+        # Turn the JSON into Post objects in the DB!
+        json_to_posts(postsJSON, node)
 
     return []
 
