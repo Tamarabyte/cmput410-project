@@ -5,6 +5,9 @@ import dateutil.parser
 from Hindlebook.models import Node, Author, Post, Comment
 from api.serializers import PostSerializer
 from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory, ProfileRequestFactory, PostRequestFactory, CommentRequestFactory,FriendQueryRequestFactory
+from Hindlebook.utilites import Logger
+
+logger = Logger()
 
 # Key for the Request Factories
 #
@@ -33,7 +36,6 @@ from api.requests import AuthoredPostsRequestFactory, VisiblePostsRequestFactory
 def json_to_posts(json, node):
     posts = json["posts"]
     out = []
-    print(json)
     for p in posts:
         guid = p.get('guid', None)
         if guid is None:
@@ -59,6 +61,7 @@ def json_to_posts(json, node):
                 post = serializer.save(node=node)
                 out.append(post)
         except Exception as e:
+            logger.log("Error serializing post: "+ str(e) + "\r\n Post JSON:" + str(p))
             continue
     return out
 

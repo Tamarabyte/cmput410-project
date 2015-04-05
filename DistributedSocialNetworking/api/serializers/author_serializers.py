@@ -1,7 +1,9 @@
 from django.forms import widgets
 from rest_framework import serializers
 from Hindlebook.models import Author, Node
+from Hindlebook.utilites import Logger
 
+logger = Logger()
 
 class AuthorSerializer(serializers.ModelSerializer):
     """ Used for sending author JSON data to other nodes """
